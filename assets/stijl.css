@@ -82,10 +82,24 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
   background: color-mix(in srgb, var(--papier) 92%, transparent);
   backdrop-filter: blur(6px);
   border: 1px solid var(--lijn); border-radius: 10px;
-  padding: .7rem .9rem; margin: 0 0 2rem;
-  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  padding: .55rem .9rem; margin: 0 0 2rem;
   font-family: var(--sans); font-size: .88rem;
 }
+.wb-boven { display: flex; align-items: center; gap: 1rem; justify-content: space-between; }
+.wb-boven .wb-zoek { flex: 1 1 auto; max-width: 30rem; }
+.wb-uitklap {
+  flex: none; display: inline-flex; align-items: center; gap: .35rem;
+  background: none; border: 1px solid var(--lijn-sterk); color: var(--inkt-zacht);
+  border-radius: 999px; padding: .3rem .8rem; cursor: pointer; font-family: var(--sans); font-size: .85rem;
+}
+.wb-uitklap:hover { border-color: var(--accent); color: var(--accent); }
+.wb-caret { transition: transform .15s; font-size: .7em; }
+.wb-uitklap.open .wb-caret { transform: rotate(180deg); }
+.wb-instellingen {
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  margin-top: .7rem; padding-top: .7rem; border-top: 1px solid var(--lijn);
+}
+.wb-instellingen[hidden] { display: none; }
 .wb-groep { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
 .wb-kop { color: var(--inkt-zacht); font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; }
 .wb-opt, .wb-app { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; user-select: none; }
@@ -131,20 +145,29 @@ mark.zoektreffer { background: color-mix(in srgb, #f6c944 60%, transparent); col
 mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 
 /* ---- Kantlijnnoten (sidenotes) ----------------------------------------- */
+.wrap-ruim { max-width: 74rem; }
 .kant-links, .kant-rechts { display: none; }
+.kantnoten-aan { position: relative; }         /* positioneringscontext voor de margekolommen */
 .kantnoten-aan .apparaten { display: none; }
-.kantnoten-aan .pagina { position: relative; }
 .kantnoten-aan .tekst { max-width: 34rem; }
-.kantnoten-aan .kant-links,
-.kantnoten-aan .kant-rechts { display: block; position: absolute; top: 0; width: 12.5rem; }
+.kantnoten-aan .tekst .pb { display: none; }   /* paginamarkering staat nu in de marge */
+.kantnoten-aan > .kant-links,
+.kantnoten-aan > .kant-rechts { display: block; position: absolute; top: 0; width: 12rem; }
 .kantnoten-aan .kant-links { left: 0; }
 .kantnoten-aan .kant-rechts { right: 0; }
 .kantnoot {
-  position: absolute; width: 12.5rem; font-family: var(--sans); font-size: .76rem; line-height: 1.4;
+  position: absolute; width: 12rem; font-family: var(--sans); font-size: .76rem; line-height: 1.4;
   color: var(--inkt-zacht); border-top: 2px solid var(--kleur); padding: .25rem 0 0;
 }
 .kant-links .kantnoot { left: 0; }
 .kant-rechts .kantnoot { right: 0; }
+.pagina-nr {
+  position: absolute; top: 0; right: 0; width: 12rem; text-align: right;
+  font-family: var(--sans); font-size: .72rem; letter-spacing: .03em; color: var(--accent);
+}
+.pagina-nr.klikbaar { cursor: pointer; }
+.pagina-nr.klikbaar:hover { text-decoration: underline; }
+.geen-editiemark .pagina-nr { display: none; }
 .kantnoot .kn-lemma { font-weight: 600; color: var(--inkt); }
 .kantnoot .kn-lemma::after { content: " ]"; color: var(--inkt-zacht); font-weight: 400; }
 .kantnoot .lemma { border-bottom: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */

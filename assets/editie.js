@@ -239,12 +239,17 @@
     noten.forEach(function (n) { aanwezig[n.code] = true; });
     var heeftNummers = parseInt(config.meta.regelnummering, 10) > 0;
     var uit = ['<div class="werkbalk" role="group" aria-label="Weergaveopties">'];
-    uit.push('<div class="wb-groep wb-zoek"><span class="wb-kop">Zoeken</span>');
+    uit.push('<div class="wb-boven">');
+    uit.push('<div class="wb-groep wb-zoek">');
     uit.push('<input type="search" class="zoekveld" placeholder="Zoek in de tekst…" aria-label="Zoeken in de editie">');
     uit.push('<span class="zoek-status" aria-live="polite"></span>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled>‹</button>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled>›</button>');
     uit.push('</div>');
+    uit.push('<button type="button" class="wb-uitklap" aria-expanded="false" aria-controls="wb-instellingen">' +
+             'Weergave <span class="wb-caret">▾</span></button>');
+    uit.push('</div>'); // wb-boven
+    uit.push('<div class="wb-instellingen" id="wb-instellingen" hidden>');
     if (meerdere) {
       uit.push('<div class="wb-groep"><span class="wb-kop">Weergave</span>');
       uit.push('<label class="wb-opt"><input type="radio" name="modus" value="doorlopend" checked> Doorlopend</label>');
@@ -264,7 +269,9 @@
                '<input type="checkbox" data-app="' + app.code + '" checked> ' +
                '<span class="wb-stip"></span>' + escapeHtml(app.label) + '</label>');
     });
-    uit.push('</div></div>');
+    uit.push('</div>');   // Apparaten-groep
+    uit.push('</div>');   // wb-instellingen
+    uit.push('</div>');   // werkbalk
     return uit.join('');
   }
   function toggle(id, label, aan) {
@@ -288,50 +295,75 @@
     noten.forEach(function (n) { nootIndex[n.id] = n; });
 
     // ---- Kantlijnnoten (sidenotes) ---------------------------------------
-    function maakKant(pag, zijde) {
+    // De margekolommen zijn GLOBAAL (kinderen van de editie-root), zodat noten
+    // over paginagrenzen heen netjes onder elkaar blijven staan.
+    function maakKant(zijde) {
       var d = document.createElement('div');
       d.className = 'kant-' + zijde;
-      pag.appendChild(d);
+      root.appendChild(d);
       return d;
     }
     function herbereken() {
       var actief = window.matchMedia('(min-width: 1100px)').matches;
       root.classList.toggle('kantnoten-aan', actief);
+      var links = root.querySelector(':scope > .kant-links') || maakKant('links');
+      var rechts = root.querySelector(':scope > .kant-rechts') || maakKant('rechts');
+      links.innerHTML = ''; rechts.innerHTML = '';
+      if (!actief) return;
+      var rootTop = root.getBoundingClientRect().top;
+      var bezetRechts = [];  // door paginanummers bezette stukken (top,bodem)
+
+      // Paginanummers in de rechtermarge, op de hoogte van elke paginastart
       root.querySelectorAll('.pagina').forEach(function (pag) {
-        var links = pag.querySelector('.kant-links') || maakKant(pag, 'links');
-        var rechts = pag.querySelector('.kant-rechts') || maakKant(pag, 'rechts');
-        links.innerHTML = ''; rechts.innerHTML = '';
-        if (!actief) return;
-        var perZijde = { links: [], rechts: [] };
-        noten.forEach(function (n) {
-          if (root.classList.contains('verberg-app-' + n.code)) return;
-          var anchor = pag.querySelector('.tekst .lemma[data-noot="' + n.id + '"]');
-          if (!anchor) return;
-          var app = apparaatVan(config, n.code);
-          var zijde = app.zijde === 'rechts' ? 'rechts' : 'links';
-          perZijde[zijde].push({ n: n, anchor: anchor, app: app });
+        if (pag.offsetParent === null) return; // verborgen (bladermodus)
+        var pbInline = pag.querySelector('.tekst .pb');
+        if (!pbInline) return;
+        var nr = document.createElement('div');
+        nr.className = 'pagina-nr';
+        nr.textContent = pbInline.textContent.replace('∣', '');
+        var doel = pbInline.getAttribute('data-doel');
+        if (doel) { nr.setAttribute('data-doel', doel); nr.classList.add('klikbaar'); }
+        rechts.appendChild(nr);
+        var top = pag.getBoundingClientRect().top - rootTop;
+        nr.style.top = top + 'px';
+        bezetRechts.push([top, top + nr.offsetHeight]);
+      });
+
+      var perZijde = { links: [], rechts: [] };
+      noten.forEach(function (n) {
+        if (root.classList.contains('verberg-app-' + n.code)) return;
+        var anchor = root.querySelector('.tekst .lemma[data-noot="' + n.id + '"]');
+        if (!anchor || anchor.offsetParent === null) return; // verborgen pagina
+        var app = apparaatVan(config, n.code);
+        var zijde = app.zijde === 'rechts' ? 'rechts' : 'links';
+        perZijde[zijde].push({ n: n, anchor: anchor, app: app });
+      });
+
+      ['links', 'rechts'].forEach(function (z) {
+        var cont = z === 'links' ? links : rechts;
+        var lijst = perZijde[z];
+        lijst.sort(function (a, b) {
+          return a.anchor.getBoundingClientRect().top - b.anchor.getBoundingClientRect().top;
         });
-        var pagTop = pag.getBoundingClientRect().top;
-        ['links', 'rechts'].forEach(function (z) {
-          var cont = z === 'links' ? links : rechts;
-          var lijst = perZijde[z];
-          lijst.sort(function (a, b) {
-            return a.anchor.getBoundingClientRect().top - b.anchor.getBoundingClientRect().top;
-          });
-          var laatsteBodem = 0;
-          lijst.forEach(function (item) {
-            var el = document.createElement('div');
-            el.className = 'kantnoot app-' + item.n.code;
-            el.setAttribute('data-noot', item.n.id);
-            el.style.setProperty('--kleur', item.app.kleur);
-            el.innerHTML = '<span class="kn-lemma">' + item.n.lemmaHtml + '</span> ' +
-              '<span class="kn-inhoud">' + item.n.inhoudHtml + '</span>';
-            cont.appendChild(el);
-            var top = item.anchor.getBoundingClientRect().top - pagTop;
-            if (top < laatsteBodem + 10) top = laatsteBodem + 10;
-            el.style.top = top + 'px';
-            laatsteBodem = top + el.offsetHeight;
-          });
+        var laatsteBodem = 0;
+        lijst.forEach(function (item) {
+          var el = document.createElement('div');
+          el.className = 'kantnoot app-' + item.n.code;
+          el.setAttribute('data-noot', item.n.id);
+          el.style.setProperty('--kleur', item.app.kleur);
+          el.innerHTML = '<span class="kn-lemma">' + item.n.lemmaHtml + '</span> ' +
+            '<span class="kn-inhoud">' + item.n.inhoudHtml + '</span>';
+          cont.appendChild(el);
+          var top = item.anchor.getBoundingClientRect().top - rootTop;
+          if (top < laatsteBodem + 10) top = laatsteBodem + 10;
+          // wijk uit voor paginanummers aan de rechterkant
+          if (z === 'rechts') {
+            bezetRechts.forEach(function (b) {
+              if (top < b[1] && top + 20 > b[0]) top = b[1] + 6;
+            });
+          }
+          el.style.top = top + 'px';
+          laatsteBodem = top + el.offsetHeight;
         });
       });
     }
@@ -509,6 +541,17 @@
     // Klik op gemarkeerde tekst -> spring naar de noot in het apparaat en laat
     // die oplichten.
     root.addEventListener('click', function (e) {
+      var up = e.target.closest('.wb-uitklap');
+      if (up) {
+        var panel = root.querySelector('.wb-instellingen');
+        var open = panel.hidden;
+        panel.hidden = !open;
+        up.setAttribute('aria-expanded', String(open));
+        up.classList.toggle('open', open);
+        return;
+      }
+      var pnr = e.target.closest('.pagina-nr[data-doel]');
+      if (pnr) { openOrigineel(config, pnr.getAttribute('data-doel')); return; }
       var zb = e.target.closest('[data-zoek]');
       if (zb) { gaNaarTreffer(zoekIdx + (zb.getAttribute('data-zoek') === 'volgende' ? 1 : -1)); return; }
       var pg = e.target.closest('[data-pager]');
