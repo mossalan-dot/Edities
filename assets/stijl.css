@@ -150,6 +150,12 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .unc-teken { font-family: var(--sans); font-size: .7em; color: var(--inkt-zacht); vertical-align: super; }
 .ed-ex { font-style: italic; }
 .geen-afkorting .ed-ex { font-style: normal; }
+/* Opgeloste letters binnen een woord: standaard cursief tussen ronde haken */
+.ed-ab { font-style: italic; }
+.ed-ab::before { content: "("; font-style: normal; }
+.ed-ab::after  { content: ")"; font-style: normal; }
+.geen-afkorting .ed-ab { font-style: normal; }
+.geen-afkorting .ed-ab::before, .geen-afkorting .ed-ab::after { content: ""; }
 .ed-gap { font-family: var(--sans); font-size: .8em; color: var(--inkt-zacht); }
 .ed-del { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--inkt) 55%, transparent); color: var(--inkt-zacht); }
 

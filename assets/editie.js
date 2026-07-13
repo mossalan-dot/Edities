@@ -31,7 +31,8 @@
         case 'del': return '<span class="ed-del">' + body + '</span>';    // doorhaling
         case 'add': return '<span class="ed-add">⟨' + body + '⟩</span>'; // editeurstoevoeging
         case 'unc': return '<span class="ed-unc">' + body + '<span class="unc-teken">[?]</span></span>';
-        case 'ex':  return '<span class="ed-ex">' + body + '</span>';     // opgeloste afkorting
+        case 'ex':  return '<span class="ed-ex">' + body + '</span>';     // opgeloste afkorting (heel woord)
+        case 'ab':  return '<span class="ed-ab">' + body + '</span>';     // opgeloste letters binnen woord: (…)
         case 'gap': return '<span class="ed-gap">[' + (body || 'lacune') + ']</span>';
         default:    return body;
       }
@@ -245,7 +246,7 @@
     if (heeftNummers) uit.push(toggle('opt-regelnr', 'Regelnummers', true));
     uit.push(toggle('opt-markering', 'Markeer geannoteerde woorden', true));
     uit.push(toggle('opt-editie', 'Paginamarkeringen', true));
-    uit.push(toggle('opt-afkorting', 'Opgeloste afkortingen cursief', true));
+    uit.push(toggle('opt-afkorting', 'Opgeloste afkortingen markeren', true));
     uit.push('</div>');
     uit.push('<div class="wb-groep"><span class="wb-kop">Apparaten</span>');
     config.apparaten.forEach(function (app) {

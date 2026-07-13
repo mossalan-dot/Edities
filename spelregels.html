@@ -109,9 +109,14 @@ apparaat: auteur | Noten van de auteur        | origineel
       <tr><th>Wat</th><th>Schrijf</th><th>Resultaat</th></tr>
       <tr><td>Toevoeging door editeur</td><td><code>{add:tekst}</code></td><td><span class="ed-add">⟨tekst⟩</span></td></tr>
       <tr><td>Onzekere lezing</td><td><code>{unc:tekst}</code></td><td><span class="ed-unc">tekst<span class="unc-teken">[?]</span></span></td></tr>
-      <tr><td>Opgeloste afkorting</td><td><code>{ex:tekst}</code></td><td><span class="ed-ex">tekst</span> (cursief; schakelbaar)</td></tr>
+      <tr><td>Opgeloste afkorting (heel woord)</td><td><code>{ex:tekst}</code></td><td><span class="ed-ex">tekst</span> (cursief; schakelbaar)</td></tr>
+      <tr><td>Opgeloste letters in een woord</td><td><code>Ho{ab:og}Mo{ab:genden}</code></td><td>Ho<span class="ed-ab">og</span>Mo<span class="ed-ab">genden</span></td></tr>
       <tr><td>Lacune / onleesbaar</td><td><code>{gap:reden}</code></td><td><span class="ed-gap">[reden]</span></td></tr>
     </table>
+    <p>Bij <code>{ab:…}</code> markeert u alleen de door de editeur aangevulde letters. Standaard
+    verschijnen die tussen ronde haken en cursief (diplomatische conventie: Ho<span class="ed-ab">og</span>Mo<span class="ed-ab">genden</span>).
+    Met de werkbalkoptie <em>“Opgeloste afkortingen markeren”</em> uit worden de haken en cursivering
+    verborgen en leest het als gewone tekst: <span style="font-style:normal">HoogMogenden</span>.</p>
 
     <h2>6. Pagina- en foliomarkeringen → het origineel</h2>
     <p>Zet op een eigen regel een <code>~</code>, gevolgd door het label en het doel:</p>
