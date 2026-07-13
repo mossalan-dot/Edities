@@ -188,7 +188,7 @@
   }
 
   // ---- Apparaten onderaan -------------------------------------------------
-  function renderApparaten(config, noten) {
+  function renderApparaten(config, noten, heeftNummers) {
     var perCode = {};
     noten.forEach(function (n) { (perCode[n.code] = perCode[n.code] || []).push(n); });
     var uit = ['<div class="apparaten">'];
@@ -203,7 +203,8 @@
       uit.push('<ul class="nootlijst">');
       lijst.forEach(function (n) {
         var regelLink = n.regel
-          ? '<a class="nr-terug" href="#r' + n.regel + '" title="Naar regel ' + n.regel + '">' + n.regel + '</a> '
+          ? '<a class="nr-terug" href="#r' + n.regel + '" title="Terug naar de tekst">' +
+            (heeftNummers ? n.regel : '↩') + '</a> '
           : '';
         uit.push('<li id="n-' + n.id + '" data-noot="' + n.id + '">' + regelLink +
                  '<span class="noot-lemma">' + n.lemmaHtml + '</span>] ' +
@@ -251,7 +252,6 @@
     pop.className = 'noot-popover';
     pop.hidden = true;
     document.body.appendChild(pop);
-    var vastgezet = null;
 
     function toonPopover(el) {
       var id = el.getAttribute('data-noot');
@@ -272,36 +272,39 @@
       pop.style.top = top + 'px';
       pop.style.left = Math.max(8, left) + 'px';
     }
-    function verbergPopover() { if (!vastgezet) pop.hidden = true; }
+    function verbergPopover() { pop.hidden = true; }
 
     root.addEventListener('mouseover', function (e) {
       var el = e.target.closest('.lemma');
-      if (el && !vastgezet) toonPopover(el);
+      if (el) toonPopover(el);
     });
     root.addEventListener('mouseout', function (e) {
-      if (e.target.closest('.lemma') && !vastgezet) verbergPopover();
+      if (e.target.closest('.lemma')) verbergPopover();
     });
     root.addEventListener('focusin', function (e) {
       var el = e.target.closest('.lemma');
       if (el) toonPopover(el);
     });
-    root.addEventListener('focusout', function () { if (!vastgezet) pop.hidden = true; });
+    root.addEventListener('focusout', verbergPopover);
 
+    // Klik op gemarkeerde tekst -> spring naar de noot in het apparaat en laat
+    // die oplichten.
     root.addEventListener('click', function (e) {
       var lemma = e.target.closest('.lemma');
       if (lemma) {
-        vastgezet = null;
-        toonPopover(lemma);   // klik = vastzetten tot een klik elders
-        vastgezet = lemma;
+        var id = lemma.getAttribute('data-noot');
+        var n = nootIndex[id];
+        if (n && root.classList.contains('verberg-app-' + n.code)) return;
+        var doel = document.getElementById('n-' + id);
+        if (doel) {
+          doel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          doel.classList.add('markeer');
+          setTimeout(function () { doel.classList.remove('markeer'); }, 1800);
+        }
         return;
       }
       var pb = e.target.closest('.pb');
       if (pb) { openOrigineel(config, pb.getAttribute('data-doel')); return; }
-    });
-    document.addEventListener('click', function (e) {
-      if (vastgezet && !e.target.closest('.lemma') && !pop.contains(e.target)) {
-        vastgezet = null; pop.hidden = true;
-      }
     });
 
     root.addEventListener('change', function (e) {
@@ -370,11 +373,12 @@
              '.verberg-app-' + c + ' .apparaat[data-code="' + c + '"]{display:none}';
     }).join('\n');
 
+    var heeftNummers = parseInt(meta.regelnummering, 10) > 0;
     root.innerHTML =
       kop +
       renderWerkbalk(config, body.noten) +
       '<div class="tekst">' + body.html + '</div>' +
-      renderApparaten(config, body.noten);
+      renderApparaten(config, body.noten, heeftNummers);
 
     var styleEl = document.createElement('style');
     styleEl.textContent = verbergCss;

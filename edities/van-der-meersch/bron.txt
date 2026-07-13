@@ -5,7 +5,6 @@ jaar: 1672–1674
 bron: Handschrift, Bijzondere Collecties Universiteit van Amsterdam, Ex. W 75 (38 pagina’s)
 type: handschrift
 transcriptie: kritisch
-regelnummering: 5
 origineel_type: afbeelding
 origineel_afbeeldingen: origineel/pagina-{n}.jpg
 apparaat: w    | Woordverklaringen          | editeur
