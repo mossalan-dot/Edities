@@ -114,6 +114,22 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .pager select { font-family: var(--sans); padding: .2rem .3rem; background: var(--papier); color: var(--inkt); border: 1px solid var(--lijn-sterk); border-radius: 5px; }
 .wb-opt input[type="radio"] { accent-color: var(--accent); }
 
+/* ---- Zoeken ------------------------------------------------------------- */
+.wb-zoek { flex: 1 1 16rem; }
+.zoekveld {
+  font-family: var(--sans); font-size: .9rem; padding: .3rem .55rem; min-width: 10rem; flex: 1 1 auto;
+  border: 1px solid var(--lijn-sterk); border-radius: 6px; background: var(--papier); color: var(--inkt);
+}
+.zoek-status { color: var(--inkt-zacht); font-size: .82rem; min-width: 4.5rem; }
+.zoek-knop {
+  border: 1px solid var(--lijn-sterk); background: var(--papier); color: var(--inkt);
+  border-radius: 6px; padding: .2rem .6rem; cursor: pointer; font-family: var(--sans); line-height: 1;
+}
+.zoek-knop:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.zoek-knop:disabled { opacity: .4; cursor: default; }
+mark.zoektreffer { background: color-mix(in srgb, #f6c944 60%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
+mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
+
 /* ---- Tekst met regelnummering ------------------------------------------ */
 .tekst { max-width: var(--leesbreedte); margin: 0 auto; }
 .alinea { margin: 0 0 1.15rem; }

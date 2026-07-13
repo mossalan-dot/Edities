@@ -236,6 +236,12 @@
     noten.forEach(function (n) { aanwezig[n.code] = true; });
     var heeftNummers = parseInt(config.meta.regelnummering, 10) > 0;
     var uit = ['<div class="werkbalk" role="group" aria-label="Weergaveopties">'];
+    uit.push('<div class="wb-groep wb-zoek"><span class="wb-kop">Zoeken</span>');
+    uit.push('<input type="search" class="zoekveld" placeholder="Zoek in de tekst…" aria-label="Zoeken in de editie">');
+    uit.push('<span class="zoek-status" aria-live="polite"></span>');
+    uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled>‹</button>');
+    uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled>›</button>');
+    uit.push('</div>');
     if (meerdere) {
       uit.push('<div class="wb-groep"><span class="wb-kop">Weergave</span>');
       uit.push('<label class="wb-opt"><input type="radio" name="modus" value="doorlopend" checked> Doorlopend</label>');
@@ -307,6 +313,89 @@
       }
     }
 
+    // ---- Zoeken (over alle pagina's) --------------------------------------
+    var veld = root.querySelector('.zoekveld');
+    var zoekMarks = [];
+    var zoekIdx = -1;
+    var zoekTimer;
+
+    function veldWaarde() { return veld ? veld.value.trim() : ''; }
+
+    function updateZoekStatus() {
+      var st = root.querySelector('.zoek-status');
+      var vb = root.querySelector('[data-zoek="vorige"]');
+      var vn = root.querySelector('[data-zoek="volgende"]');
+      var heeft = zoekMarks.length > 0;
+      if (st) st.textContent = veldWaarde()
+        ? (heeft ? (zoekIdx + 1) + ' / ' + zoekMarks.length : 'geen treffers') : '';
+      if (vb) vb.disabled = !heeft;
+      if (vn) vn.disabled = !heeft;
+    }
+
+    function wisZoek() {
+      root.querySelectorAll('.zoektreffer').forEach(function (m) {
+        m.parentNode.replaceChild(document.createTextNode(m.textContent), m);
+      });
+      root.querySelectorAll('.pagina .tekst').forEach(function (c) { c.normalize(); });
+      zoekMarks = []; zoekIdx = -1;
+    }
+
+    function wrapMatches(container, q) {
+      var ql = q.toLowerCase();
+      var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(function (node) {
+        var text = node.nodeValue, lower = text.toLowerCase(), idx = lower.indexOf(ql);
+        if (idx === -1) return;
+        var frag = document.createDocumentFragment(), last = 0;
+        while (idx !== -1) {
+          if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+          var mark = document.createElement('mark');
+          mark.className = 'zoektreffer';
+          mark.textContent = text.slice(idx, idx + q.length);
+          frag.appendChild(mark);
+          last = idx + q.length;
+          idx = lower.indexOf(ql, last);
+        }
+        if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      });
+    }
+
+    function gaNaarTreffer(i) {
+      if (!zoekMarks.length) return;
+      i = (i % zoekMarks.length + zoekMarks.length) % zoekMarks.length;
+      zoekMarks.forEach(function (m) { m.classList.remove('actief'); });
+      var mark = zoekMarks[i];
+      mark.classList.add('actief');
+      zoekIdx = i;
+      var sec = mark.closest('.pagina');
+      if (sec && root.classList.contains('modus-bladeren')) activeer(+sec.getAttribute('data-i'));
+      mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      updateZoekStatus();
+    }
+
+    function zoek(q) {
+      wisZoek();
+      q = q.trim();
+      if (q.length < 2) { updateZoekStatus(); return; }
+      root.querySelectorAll('.pagina .tekst').forEach(function (c) { wrapMatches(c, q); });
+      zoekMarks = [].slice.call(root.querySelectorAll('.zoektreffer'));
+      updateZoekStatus();
+      if (zoekMarks.length) gaNaarTreffer(0);
+    }
+
+    if (veld) {
+      veld.addEventListener('input', function () {
+        clearTimeout(zoekTimer);
+        zoekTimer = setTimeout(function () { zoek(veld.value); }, 180);
+      });
+      veld.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); gaNaarTreffer(zoekIdx + (e.shiftKey ? -1 : 1)); }
+      });
+    }
+
     var pop = document.createElement('div');
     pop.className = 'noot-popover';
     pop.hidden = true;
@@ -349,6 +438,8 @@
     // Klik op gemarkeerde tekst -> spring naar de noot in het apparaat en laat
     // die oplichten.
     root.addEventListener('click', function (e) {
+      var zb = e.target.closest('[data-zoek]');
+      if (zb) { gaNaarTreffer(zoekIdx + (zb.getAttribute('data-zoek') === 'volgende' ? 1 : -1)); return; }
       var pg = e.target.closest('[data-pager]');
       if (pg) { activeer(huidig + (pg.getAttribute('data-pager') === 'volgende' ? 1 : -1)); return; }
       var lemma = e.target.closest('.lemma');
