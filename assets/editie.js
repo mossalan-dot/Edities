@@ -121,7 +121,7 @@
     var inhoud = velden.slice(2).join('|').trim();
     var app = apparaatVan(ctx.config, code);
     if (!app) return opmaak(lemma); // onbekend apparaat: lemma ongemarkeerd tonen
-    var id = code + '-' + (ctx.noten.length + 1);
+    var id = code + '-' + (++ctx.global.n);
     var noot = { id: id, code: code, regel: ctx.regel, lemmaHtml: opmaak(lemma), inhoudHtml: '' };
     ctx.noten.push(noot);
     noot.inhoudHtml = parseSegment(inhoud, ctx); // recursief: geneste noten
@@ -135,56 +135,69 @@
   }
 
   // ---- Body ---------------------------------------------------------------
+  // Splitst de tekst in "pagina's" op de ~-paginamarkeringen, zodat de lezer
+  // kan wisselen tussen doorlopend lezen en per pagina doorbladeren.
   function renderBody(body, config) {
     var regels = body.replace(/\r\n/g, '\n').split('\n');
     var stap = parseInt(config.meta.regelnummering, 10) || 0; // 0 = geen nummering
-    var noten = [];
-    var uit = [];
+    var global = { n: 0 };   // globale nootteller (uniek over alle pagina's)
     var regelnr = 0;
-    var inAlinea = false;
+    var paginas = [];
+    var cur = { label: null, doel: null, uit: [], noten: [], inAlinea: false };
 
-    function sluitAlinea() { if (inAlinea) { uit.push('</div>'); inAlinea = false; } }
-    function openAlinea() { if (!inAlinea) { uit.push('<div class="alinea">'); inAlinea = true; } }
+    function sluit() { if (cur.inAlinea) { cur.uit.push('</div>'); cur.inAlinea = false; } }
+    function open() { if (!cur.inAlinea) { cur.uit.push('<div class="alinea">'); cur.inAlinea = true; } }
 
     for (var i = 0; i < regels.length; i++) {
       var r = regels[i];
       var t = r.trim();
-      if (t === '') { sluitAlinea(); continue; }
+      if (t === '') { sluit(); continue; }
 
       // koppen: #, ##, ###
       var kop = t.match(/^(#{1,3})\s+(.*)$/);
       if (kop) {
-        sluitAlinea();
+        sluit();
         var niveau = kop[1].length;         // 1, 2 of 3
         var hTag = 'h' + (niveau + 1);       // h2 / h3 / h4
-        uit.push('<' + hTag + ' class="tekstkop kop-' + niveau + '">' +
-                 opmaak(escapeHtml(kop[2])) + '</' + hTag + '>');
+        cur.uit.push('<' + hTag + ' class="tekstkop kop-' + niveau + '">' +
+                     opmaak(escapeHtml(kop[2])) + '</' + hTag + '>');
         continue;
       }
 
-      // pagina-/foliomarkering: ~ LABEL | DOEL
+      // pagina-/foliomarkering: ~ LABEL | DOEL  → paginagrens
       if (t.charAt(0) === '~') {
         var pm = t.slice(1).split('|').map(function (x) { return x.trim(); });
-        openAlinea();
-        uit.push('<span class="pb" data-doel="' + escapeHtml(pm[1] || '') +
-                 '" title="Toon origineel">∣' + escapeHtml(pm[0] || '?') + '</span>');
+        var label = pm[0] || '?', doel = pm[1] || '';
+        var pb = '<span class="pb" data-doel="' + escapeHtml(doel) +
+                 '" title="Toon origineel">∣' + escapeHtml(label) + '</span>';
+        sluit();
+        if (cur.label === null) {
+          // eerste markering: label de huidige (eventueel voorafgaande) inhoud
+          cur.label = label; cur.doel = doel; cur.uit.push(pb);
+        } else {
+          paginas.push(cur);
+          cur = { label: label, doel: doel, uit: [pb], noten: [], inAlinea: false };
+        }
         continue;
       }
 
       // gewone tekstregel
-      openAlinea();
+      open();
       regelnr++;
       var toonNr = stap > 0 && (regelnr % stap === 0);
-      var inhoud = renderInline(r, { config: config, noten: noten, regel: regelnr });
-      uit.push(
+      var inhoud = renderInline(r, { config: config, noten: cur.noten, regel: regelnr, global: global });
+      cur.uit.push(
         '<span class="tregel" id="r' + regelnr + '" data-n="' + regelnr + '">' +
           '<span class="rnr">' + (toonNr ? regelnr : '') + '</span>' +
           '<span class="rtekst">' + inhoud + '</span>' +
         '</span>'
       );
     }
-    sluitAlinea();
-    return { html: uit.join('\n'), noten: noten, regels: regelnr };
+    sluit();
+    paginas.push(cur);
+    var alle = [];
+    paginas.forEach(function (p) { alle = alle.concat(p.noten); });
+    return { paginas: paginas, noten: alle, regels: regelnr };
   }
 
   // ---- Apparaten onderaan -------------------------------------------------
@@ -217,11 +230,17 @@
   }
 
   // ---- Werkbalk -----------------------------------------------------------
-  function renderWerkbalk(config, noten) {
+  function renderWerkbalk(config, noten, meerdere) {
     var aanwezig = {};
     noten.forEach(function (n) { aanwezig[n.code] = true; });
     var heeftNummers = parseInt(config.meta.regelnummering, 10) > 0;
     var uit = ['<div class="werkbalk" role="group" aria-label="Weergaveopties">'];
+    if (meerdere) {
+      uit.push('<div class="wb-groep"><span class="wb-kop">Weergave</span>');
+      uit.push('<label class="wb-opt"><input type="radio" name="modus" value="doorlopend" checked> Doorlopend</label>');
+      uit.push('<label class="wb-opt"><input type="radio" name="modus" value="bladeren"> Per pagina</label>');
+      uit.push('</div>');
+    }
     uit.push('<div class="wb-groep"><span class="wb-kop">Tonen</span>');
     if (heeftNummers) uit.push(toggle('opt-regelnr', 'Regelnummers', true));
     uit.push(toggle('opt-markering', 'Markeer geannoteerde woorden', true));
@@ -243,10 +262,49 @@
            (aan ? ' checked' : '') + '> ' + label + '</label>';
   }
 
+  function bouwPager(paginas) {
+    var opts = paginas.map(function (p, i) {
+      return '<option value="' + (i + 1) + '">' + escapeHtml(p.label || ('[' + (i + 1) + ']')) + '</option>';
+    }).join('');
+    return '<div class="pager" hidden>' +
+      '<button type="button" data-pager="vorige">‹ Vorige</button>' +
+      '<span class="pager-midden">pagina <select class="pager-select">' + opts + '</select> van ' + paginas.length + '</span>' +
+      '<button type="button" data-pager="volgende">Volgende ›</button></div>';
+  }
+
   // ---- Interacties --------------------------------------------------------
   function koppelInteracties(root, config, noten) {
     var nootIndex = {};
     noten.forEach(function (n) { nootIndex[n.id] = n; });
+
+    // Weergavemodus (doorlopend / per pagina) + pager
+    var pager = root.querySelector('.pager');
+    var secties = root.querySelectorAll('.pagina');
+    var select = root.querySelector('.pager-select');
+    var huidig = 1;
+    function activeer(i) {
+      i = Math.max(1, Math.min(secties.length, i));
+      secties.forEach(function (s) { s.classList.toggle('actief', +s.getAttribute('data-i') === i); });
+      if (select) select.value = i;
+      var vb = root.querySelector('[data-pager="vorige"]');
+      var vn = root.querySelector('[data-pager="volgende"]');
+      if (vb) vb.disabled = i <= 1;
+      if (vn) vn.disabled = i >= secties.length;
+      huidig = i;
+      history.replaceState(null, '', '#pagina-' + i);
+    }
+    function zetModus(m) {
+      if (m === 'bladeren') {
+        root.classList.add('modus-bladeren');
+        root.classList.remove('modus-doorlopend');
+        if (pager) pager.hidden = false;
+        activeer(huidig);
+      } else {
+        root.classList.add('modus-doorlopend');
+        root.classList.remove('modus-bladeren');
+        if (pager) pager.hidden = true;
+      }
+    }
 
     var pop = document.createElement('div');
     pop.className = 'noot-popover';
@@ -290,6 +348,8 @@
     // Klik op gemarkeerde tekst -> spring naar de noot in het apparaat en laat
     // die oplichten.
     root.addEventListener('click', function (e) {
+      var pg = e.target.closest('[data-pager]');
+      if (pg) { activeer(huidig + (pg.getAttribute('data-pager') === 'volgende' ? 1 : -1)); return; }
       var lemma = e.target.closest('.lemma');
       if (lemma) {
         var id = lemma.getAttribute('data-noot');
@@ -309,6 +369,8 @@
 
     root.addEventListener('change', function (e) {
       var t = e.target;
+      if (t.name === 'modus') { zetModus(t.value); return; }
+      if (t.classList.contains('pager-select')) { activeer(+t.value); return; }
       if (t.matches('input[data-app]')) {
         root.classList.toggle('verberg-app-' + t.getAttribute('data-app'), !t.checked);
       } else if (t.id === 'opt-regelnr') {
@@ -321,6 +383,15 @@
         root.classList.toggle('geen-markering', !t.checked);
       }
     });
+
+    // Dieplink: #pagina-N opent direct in bladermodus op die pagina
+    var mh = location.hash.match(/^#pagina-(\d+)/);
+    if (mh && secties.length > 1) {
+      var radio = root.querySelector('input[name="modus"][value="bladeren"]');
+      if (radio) radio.checked = true;
+      zetModus('bladeren');
+      activeer(+mh[1]);
+    }
   }
 
   // ---- Origineel (scan of pdf) --------------------------------------------
@@ -374,18 +445,28 @@
     }).join('\n');
 
     var heeftNummers = parseInt(meta.regelnummering, 10) > 0;
+    var meerdere = body.paginas.length > 1;
+    var paginasHtml = body.paginas.map(function (p, idx) {
+      return '<section class="pagina" data-i="' + (idx + 1) + '" data-label="' +
+        escapeHtml(p.label || ('[' + (idx + 1) + ']')) + '">' +
+        '<div class="tekst">' + p.uit.join('\n') + '</div>' +
+        renderApparaten(config, p.noten, heeftNummers) +
+        '</section>';
+    }).join('');
+
     root.innerHTML =
       kop +
-      renderWerkbalk(config, body.noten) +
-      '<div class="tekst">' + body.html + '</div>' +
-      renderApparaten(config, body.noten, heeftNummers);
+      renderWerkbalk(config, body.noten, meerdere) +
+      (meerdere ? bouwPager(body.paginas) : '') +
+      paginasHtml;
+    root.classList.add('modus-doorlopend');
 
     var styleEl = document.createElement('style');
     styleEl.textContent = verbergCss;
     root.appendChild(styleEl);
 
     koppelInteracties(root, config, body.noten);
-    return { config: config, regels: body.regels, noten: body.noten.length };
+    return { config: config, regels: body.regels, noten: body.noten.length, paginas: body.paginas.length };
   }
 
   function laad(root) {

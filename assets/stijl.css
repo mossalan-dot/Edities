@@ -92,6 +92,28 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .wb-app .wb-stip { width: .7rem; height: .7rem; border-radius: 50%; background: var(--kleur); display: inline-block; }
 .werkbalk input[type=checkbox] { accent-color: var(--accent); }
 
+/* ---- Pagina's en weergavemodus ----------------------------------------- */
+.modus-bladeren .pagina { display: none; }
+.modus-bladeren .pagina.actief { display: block; }
+.modus-doorlopend .pagina + .pagina { border-top: 1px dashed var(--lijn); margin-top: 2rem; padding-top: 1.5rem; }
+
+.pager {
+  position: sticky; top: 3.6rem; z-index: 15;
+  display: flex; align-items: center; justify-content: center; gap: 1rem;
+  margin: 0 0 1.5rem; padding: .5rem; font-family: var(--sans); font-size: .9rem;
+  background: color-mix(in srgb, var(--papier) 92%, transparent); backdrop-filter: blur(6px);
+  border: 1px solid var(--lijn); border-radius: 10px;
+}
+.pager[hidden] { display: none; }
+.pager button {
+  border: 1px solid var(--lijn-sterk); background: var(--papier); color: var(--inkt);
+  border-radius: 6px; padding: .3rem .8rem; cursor: pointer; font-family: var(--sans); font-size: .9rem;
+}
+.pager button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pager button:disabled { opacity: .4; cursor: default; }
+.pager select { font-family: var(--sans); padding: .2rem .3rem; background: var(--papier); color: var(--inkt); border: 1px solid var(--lijn-sterk); border-radius: 5px; }
+.wb-opt input[type="radio"] { accent-color: var(--accent); }
+
 /* ---- Tekst met regelnummering ------------------------------------------ */
 .tekst { max-width: var(--leesbreedte); margin: 0 auto; }
 .alinea { margin: 0 0 1.15rem; }
@@ -227,7 +249,8 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .prozasectie p { margin: 0 0 1rem; }
 
 @media print {
-  .werkbalk, .sitehoofd, .tabs, .thema-knop { display: none !important; }
+  .werkbalk, .sitehoofd, .tabs, .thema-knop, .pager { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .paneel { display: block !important; }
+  .modus-bladeren .pagina { display: block !important; } /* print altijd alles */
 }

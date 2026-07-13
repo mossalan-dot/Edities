@@ -121,10 +121,16 @@ apparaat: auteur | Noten van de auteur        | origineel
     (opent op die pagina); bij <code>origineel_type: afbeelding</code> vervangt het de
     <code>{n}</code> in het bestandspad (opent de scan in een lightbox).</p>
 
+    <p>De <code>~</code>-markeringen bepalen tevens de <strong>paginagrenzen</strong>: heeft een
+    editie meer dan één markering, dan kan de lezer in de werkbalk kiezen tussen <em>doorlopend</em>
+    lezen (alles onder elkaar) en <em>per pagina</em> doorbladeren (met vorige/volgende en een
+    paginakeuze). Bij het doorbladeren tonen de apparaten alleen de noten van de zichtbare pagina.
+    Elke pagina is aan te linken met <code>#pagina-2</code> in de URL.</p>
+
     <h2>7. Werkbalk (voor de lezer)</h2>
     <p>Boven de tekst kan de lezer aan/uit zetten: elk apparaat afzonderlijk, de regelnummers,
     de paginamarkeringen, de onderstreping van geannoteerde woorden, en of opgeloste afkortingen
-    cursief worden getoond.</p>
+    cursief worden getoond — plus, bij meerdere pagina's, de keuze tussen doorlopend en per pagina.</p>
 
     <h2>8. Lokaal bekijken</h2>
     <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
