@@ -146,18 +146,44 @@ def anker_noten(blokken, noten):
 
 
 def pas_toe(para, inserts):
-    """Wikkel de gevonden spans in [[lemma|code|inhoud]], van rechts naar links."""
+    """Wikkel de gevonden spans in [[lemma|code|inhoud]]. Bevatte (geneste) noten
+    worden correct in elkaar genest; alleen echt kruisende (overlappende) noten
+    kunnen inline niet en worden gemeld."""
     for i, blok in enumerate(para):
-        stukken = sorted(inserts[i], key=lambda x: x[0], reverse=True)
-        tekst = blok['tekst']
-        vorig_start = len(tekst) + 1
-        for (s, e, lemma, code, inhoud) in stukken:
-            if e > vorig_start:  # overlap: inline niet mogelijk
-                sys.stderr.write(f'  ! overlappende noot overgeslagen: {lemma!r}\n')
+        items = [dict(s=s, e=e, code=code, inhoud=inhoud)
+                 for (s, e, _lem, code, inhoud) in inserts[i]]
+        blok['tekst'] = bouw_genest(blok['tekst'], items)
+
+
+def bouw_genest(tekst, items):
+    # Sorteer: buitenste eerst (kleinste start, grootste eind).
+    items = sorted(items, key=lambda x: (x['s'], -x['e']))
+    roots, stack = [], []
+    for it in items:
+        while stack and it['s'] >= stack[-1]['e']:
+            stack.pop()
+        if stack:
+            ouder = stack[-1]
+            if it['e'] > ouder['e']:  # kruist de ouder: niet nestbaar
+                sys.stderr.write(f"  ! kruisende (overlappende) noot overgeslagen: "
+                                 f"{tekst[it['s']:it['e']]!r}\n")
                 continue
-            tekst = tekst[:s] + f'[[{lemma}|{code}|{inhoud}]]' + tekst[e:]
-            vorig_start = s
-        blok['tekst'] = tekst
+            ouder.setdefault('kids', []).append(it)
+        else:
+            roots.append(it)
+        stack.append(it)
+
+    def render(s, e, kids):
+        uit, pos = [], s
+        for k in sorted(kids, key=lambda x: x['s']):
+            uit.append(tekst[pos:k['s']])
+            binnen = render(k['s'], k['e'], k.get('kids', []))
+            uit.append(f"[[{binnen}|{k['code']}|{k['inhoud']}]]")
+            pos = k['e']
+        uit.append(tekst[pos:e])
+        return ''.join(uit)
+
+    return render(0, len(tekst), roots)
 
 
 def bouw_bron(frontmatter, blokken):

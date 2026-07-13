@@ -60,9 +60,10 @@ overlappende/geneste annotaties geen probleem. De importer vindt elk lemma terug
 python3 importeer.py edities/<slug>/editie.md
 ```
 
-*Beperking:* twee losse noten waarvan de ene woordreeks binnen de andere valt (nesting) of
-elkaar kruisen (overlap) in de hoofdtekst kan het inline-runtimeformaat nog niet weergeven;
-de importer meldt zulke gevallen.
+*Nesting werkt:* een commentaarnoot over een hele passage met daarbinnen losse
+woordverklaringen wordt correct in elkaar genest. Alleen echt **kruisende** annotaties
+(twee spans die elkaar overlappen zonder dat de ene de andere bevat) kan het inline-formaat
+niet weergeven; de importer meldt zo'n zeldzaam geval.
 
 ## Een nieuwe editie toevoegen (rechtstreeks in bron.txt)
 

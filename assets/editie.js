@@ -123,9 +123,10 @@
     var app = apparaatVan(ctx.config, code);
     if (!app) return opmaak(lemma); // onbekend apparaat: lemma ongemarkeerd tonen
     var id = code + '-' + (++ctx.global.n);
-    var noot = { id: id, code: code, regel: ctx.regel, lemmaHtml: opmaak(lemma), inhoudHtml: '' };
+    var noot = { id: id, code: code, regel: ctx.regel, lemmaHtml: '', inhoudHtml: '' };
     ctx.noten.push(noot);
-    noot.inhoudHtml = parseSegment(inhoud, ctx); // recursief: geneste noten
+    noot.inhoudHtml = parseSegment(inhoud, ctx); // geneste noot in de inhoud
+    noot.lemmaHtml = parseSegment(lemma, ctx);   // geneste noot in het lemma (hoofdtekst)
     return '<span class="lemma app-' + code + '" data-noot="' + id + '" tabindex="0" ' +
            'role="button" aria-label="Toon noot" style="--kleur:' + app.kleur + '">' +
            noot.lemmaHtml + '</span>';
