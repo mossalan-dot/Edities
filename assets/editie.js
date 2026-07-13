@@ -55,7 +55,9 @@
         var val = regel.slice(idx + 1).trim();
         if (key === 'apparaat') {
           var d = val.split('|').map(function (x) { return x.trim(); });
-          config.apparaten.push({ code: d[0], label: d[1] || d[0], soort: d[2] || 'editeur' });
+          var soort = d[2] || 'editeur';
+          var zijde = d[3] || (soort === 'origineel' ? 'rechts' : 'links');
+          config.apparaten.push({ code: d[0], label: d[1] || d[0], soort: soort, zijde: zijde });
         } else if (key) {
           config.meta[key] = val;
         }
@@ -285,6 +287,63 @@
     var nootIndex = {};
     noten.forEach(function (n) { nootIndex[n.id] = n; });
 
+    // ---- Kantlijnnoten (sidenotes) ---------------------------------------
+    function maakKant(pag, zijde) {
+      var d = document.createElement('div');
+      d.className = 'kant-' + zijde;
+      pag.appendChild(d);
+      return d;
+    }
+    function herbereken() {
+      var actief = window.matchMedia('(min-width: 1100px)').matches;
+      root.classList.toggle('kantnoten-aan', actief);
+      root.querySelectorAll('.pagina').forEach(function (pag) {
+        var links = pag.querySelector('.kant-links') || maakKant(pag, 'links');
+        var rechts = pag.querySelector('.kant-rechts') || maakKant(pag, 'rechts');
+        links.innerHTML = ''; rechts.innerHTML = '';
+        if (!actief) return;
+        var perZijde = { links: [], rechts: [] };
+        noten.forEach(function (n) {
+          if (root.classList.contains('verberg-app-' + n.code)) return;
+          var anchor = pag.querySelector('.tekst .lemma[data-noot="' + n.id + '"]');
+          if (!anchor) return;
+          var app = apparaatVan(config, n.code);
+          var zijde = app.zijde === 'rechts' ? 'rechts' : 'links';
+          perZijde[zijde].push({ n: n, anchor: anchor, app: app });
+        });
+        var pagTop = pag.getBoundingClientRect().top;
+        ['links', 'rechts'].forEach(function (z) {
+          var cont = z === 'links' ? links : rechts;
+          var lijst = perZijde[z];
+          lijst.sort(function (a, b) {
+            return a.anchor.getBoundingClientRect().top - b.anchor.getBoundingClientRect().top;
+          });
+          var laatsteBodem = 0;
+          lijst.forEach(function (item) {
+            var el = document.createElement('div');
+            el.className = 'kantnoot app-' + item.n.code;
+            el.setAttribute('data-noot', item.n.id);
+            el.style.setProperty('--kleur', item.app.kleur);
+            el.innerHTML = '<span class="kn-lemma">' + item.n.lemmaHtml + '</span> ' +
+              '<span class="kn-inhoud">' + item.n.inhoudHtml + '</span>';
+            cont.appendChild(el);
+            var top = item.anchor.getBoundingClientRect().top - pagTop;
+            if (top < laatsteBodem + 10) top = laatsteBodem + 10;
+            el.style.top = top + 'px';
+            laatsteBodem = top + el.offsetHeight;
+          });
+        });
+      });
+    }
+    var herTimer;
+    function herberekenLater() { clearTimeout(herTimer); herTimer = setTimeout(herbereken, 120); }
+    window.addEventListener('resize', herberekenLater);
+
+    function markeerKant(id, aan) {
+      var kn = root.querySelector('.kantnoot[data-noot="' + id + '"]');
+      if (kn) kn.classList.toggle('actief', aan);
+    }
+
     // Weergavemodus (doorlopend / per pagina) + pager
     var pager = root.querySelector('.pager');
     var secties = root.querySelectorAll('.pagina');
@@ -423,16 +482,27 @@
     }
     function verbergPopover() { pop.hidden = true; }
 
+    // Alleen de eerste (hoofdtekst-)lemma van een noot reageert; geneste
+    // lemma's in een kantnoot niet.
+    function hoofdLemma(e) {
+      var el = e.target.closest('.tekst .lemma');
+      return el || null;
+    }
     root.addEventListener('mouseover', function (e) {
-      var el = e.target.closest('.lemma');
-      if (el) toonPopover(el);
+      var el = hoofdLemma(e);
+      if (!el) return;
+      if (root.classList.contains('kantnoten-aan')) markeerKant(el.getAttribute('data-noot'), true);
+      else toonPopover(el);
     });
     root.addEventListener('mouseout', function (e) {
-      if (e.target.closest('.lemma')) verbergPopover();
+      var el = hoofdLemma(e);
+      if (!el) return;
+      if (root.classList.contains('kantnoten-aan')) markeerKant(el.getAttribute('data-noot'), false);
+      else verbergPopover();
     });
     root.addEventListener('focusin', function (e) {
-      var el = e.target.closest('.lemma');
-      if (el) toonPopover(el);
+      var el = hoofdLemma(e);
+      if (el && !root.classList.contains('kantnoten-aan')) toonPopover(el);
     });
     root.addEventListener('focusout', verbergPopover);
 
@@ -443,12 +513,14 @@
       if (zb) { gaNaarTreffer(zoekIdx + (zb.getAttribute('data-zoek') === 'volgende' ? 1 : -1)); return; }
       var pg = e.target.closest('[data-pager]');
       if (pg) { activeer(huidig + (pg.getAttribute('data-pager') === 'volgende' ? 1 : -1)); return; }
-      var lemma = e.target.closest('.lemma');
+      var lemma = e.target.closest('.tekst .lemma');
       if (lemma) {
         var id = lemma.getAttribute('data-noot');
         var n = nootIndex[id];
         if (n && root.classList.contains('verberg-app-' + n.code)) return;
-        var doel = document.getElementById('n-' + id);
+        var doel = root.classList.contains('kantnoten-aan')
+          ? root.querySelector('.kantnoot[data-noot="' + id + '"]')
+          : document.getElementById('n-' + id);
         if (doel) {
           doel.scrollIntoView({ behavior: 'smooth', block: 'center' });
           doel.classList.add('markeer');
@@ -462,16 +534,18 @@
 
     root.addEventListener('change', function (e) {
       var t = e.target;
-      if (t.name === 'modus') { zetModus(t.value); return; }
+      if (t.name === 'modus') { zetModus(t.value); herberekenLater(); return; }
       if (t.classList.contains('pager-select')) { activeer(+t.value); return; }
       if (t.matches('input[data-app]')) {
         root.classList.toggle('verberg-app-' + t.getAttribute('data-app'), !t.checked);
+        herberekenLater();
       } else if (t.id === 'opt-regelnr') {
         root.classList.toggle('geen-regelnr', !t.checked);
       } else if (t.id === 'opt-editie') {
         root.classList.toggle('geen-editiemark', !t.checked);
       } else if (t.id === 'opt-afkorting') {
         root.classList.toggle('geen-afkorting', !t.checked);
+        herberekenLater();
       } else if (t.id === 'opt-markering') {
         root.classList.toggle('geen-markering', !t.checked);
       }
@@ -485,6 +559,8 @@
       zetModus('bladeren');
       activeer(+mh[1]);
     }
+
+    herbereken(); // kantlijnnoten plaatsen (indien breed genoeg)
   }
 
   // ---- Origineel (scan of pdf) --------------------------------------------

@@ -53,11 +53,17 @@ apparaat: comm   | Toelichting en commentaar  | editeur
 apparaat: krit   | Tekstkritisch apparaat     | editeur
 apparaat: auteur | Noten van de auteur        | origineel
 ---</code></pre>
-    <p>Elke <code>apparaat:</code>-regel heeft drie velden, gescheiden door <code>|</code>:
+    <p>Elke <code>apparaat:</code>-regel heeft velden, gescheiden door <code>|</code>:
     de <strong>code</strong> (kort, gebruik je in de noten), het <strong>label</strong>
-    (wat de lezer ziet) en de <strong>soort</strong> (<code>editeur</code> of <code>origineel</code>).
-    Een editie hoeft niet alle apparaten te bevatten — laat weg wat niet van toepassing is
-    (bv. het tekstkritisch apparaat bij een handschrift zonder varianten).</p>
+    (wat de lezer ziet), de <strong>soort</strong> (<code>editeur</code> of <code>origineel</code>)
+    en optioneel de <strong>zijde</strong> (<code>links</code> of <code>rechts</code>) waar de noot
+    als kantlijnnoot verschijnt. Zonder zijde staan editeursnoten links en oorspronkelijke noten
+    rechts. Zo kun je bijvoorbeeld woordverklaringen en toelichting links plaatsen, en het
+    tekstkritische apparaat en de auteursnoten rechts. Een editie hoeft niet alle apparaten te
+    bevatten — laat weg wat niet van toepassing is.</p>
+    <p>Op een breed scherm verschijnen de noten in de kantlijn, naast de regel waar ze bij horen
+    (en scrollen mee); op een smal scherm vallen ze terug op hover/klik en het verzamelde apparaat
+    onder elke pagina.</p>
 
     <h2>2. De tekst</h2>
     <table class="regel-tabel">
