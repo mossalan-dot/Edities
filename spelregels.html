@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spelregels van de markup — Edities</title>
+  <link rel="stylesheet" href="assets/stijl.css">
+  <style>
+    .regel-tabel { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; font-size: .95rem; }
+    .regel-tabel th, .regel-tabel td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--lijn); vertical-align: top; }
+    .regel-tabel th { font-family: var(--sans); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--inkt-zacht); }
+    code, .code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .9em; background: color-mix(in srgb, var(--inkt) 8%, transparent); padding: .1rem .35rem; border-radius: 4px; white-space: nowrap; }
+    pre { background: color-mix(in srgb, var(--inkt) 8%, transparent); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: .88rem; line-height: 1.5; }
+    pre code { background: none; padding: 0; white-space: pre; }
+  </style>
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="index.html">Edities</a></span>
+      <nav>
+        <a href="index.html">Overzicht</a>
+        <a href="spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap prozasectie">
+    <h1>Spelregels van de markup</h1>
+    <p>Een editie is één tekstbestand (<code>bron.txt</code>) met bovenaan een <em>kop</em> met
+    gegevens over de editie, en daaronder de tekst zelf in een lichte opmaak. Hieronder staan
+    alle regels. Deze afspraken staan open ter bespreking en kunnen worden uitgebreid.</p>
+
+    <h2>1. De kop (metagegevens)</h2>
+    <p>De kop staat tussen twee regels met <code>---</code>. Elke regel is <code>sleutel: waarde</code>.
+    De apparaten worden elk op een eigen <code>apparaat:</code>-regel gedefinieerd, in de volgorde
+    waarin ze onderaan moeten verschijnen.</p>
+    <pre><code>---
+titel: Journael van een reis door Italië
+auteur: ...
+jaar: 1685
+bron: Handschrift, signatuur ...
+type: handschrift            # of: druk
+transcriptie: kritisch
+regelnummering: 5            # nummer verspringt om de 5 regels
+facsimile_type: afbeelding   # of: pdf
+facsimile_afbeeldingen: facsimile/pagina-{n}.svg
+# of, bij een pdf:
+# facsimile_pdf: facsimile/journaal.pdf
+apparaat: w    | Woordverklaringen         | editeur
+apparaat: comm | Toelichting en commentaar | editeur
+apparaat: bron | Bronverwijzingen          | editeur
+apparaat: krit | Tekstkritisch apparaat    | editeur
+apparaat: av   | Voetnoten van de auteur   | origineel
+apparaat: ae   | Eindnoten van de auteur   | origineel
+---</code></pre>
+    <p>Elke <code>apparaat:</code>-regel heeft drie velden, gescheiden door <code>|</code>:
+    de <strong>code</strong> (kort, gebruik je in de noten), het <strong>label</strong>
+    (wat de lezer ziet) en de <strong>soort</strong> (<code>editeur</code> of <code>origineel</code>).
+    Een editie hoeft niet alle apparaten te bevatten — laat weg wat niet van toepassing is
+    (bv. het tekstkritisch apparaat bij een handschrift zonder varianten).</p>
+
+    <h2>2. De tekst</h2>
+    <table class="regel-tabel">
+      <tr><th>Wat</th><th>Schrijf</th><th>Effect</th></tr>
+      <tr><td>Tekstregel</td><td>elke regel in het bestand</td><td>wordt één genummerde bronregel</td></tr>
+      <tr><td>Alineascheiding</td><td>een lege regel</td><td>witregel; nummering loopt door</td></tr>
+      <tr><td>Kop / tussenkop</td><td><code>## Tekst</code> of <code>### Tekst</code></td><td>niet-genummerde (tussen)kop</td></tr>
+    </table>
+    <p>De regelnummering volgt dus de <em>regelindeling van de bron</em>: knip de tekst af op
+    dezelfde plaatsen als in het origineel. Om de vijf regels verschijnt het nummer in de marge.</p>
+
+    <h2>3. Noten (de vier apparaten en de auteursnoten)</h2>
+    <p>Een noot koppelt u aan een <em>lemma</em> (het woord of de woordgroep waar de noot bij hoort):</p>
+    <pre><code>[[lemma|code|inhoud van de noot]]</code></pre>
+    <ul>
+      <li><code>lemma</code> — verschijnt in de tekst, krijgt een gekleurde stippellijn en een klein cijfer.</li>
+      <li><code>code</code> — de apparaatcode uit de kop (<code>w</code>, <code>comm</code>, <code>bron</code>, <code>krit</code>, <code>av</code>, <code>ae</code>, …).</li>
+      <li><code>inhoud</code> — de noottekst (mag zelf cursief e.d. bevatten).</li>
+    </ul>
+    <p>Voorbeeld: <code>uit [[Bologne|w|Bologna, stad in Emilia-Romagna]] vertrokken</code>.
+    De noten van elk apparaat worden onderaan verzameld, genummerd en gekoppeld aan het regelnummer.
+    Elk apparaat is met de werkbalk afzonderlijk aan/uit te zetten. <strong>Oorspronkelijke</strong>
+    voet- en eindnoten van de auteur zelf gebruikt u met een apparaat van soort <code>origineel</code>
+    (hierboven <code>av</code> en <code>ae</code>), zodat ze duidelijk gescheiden blijven van de
+    editeursnoten.</p>
+
+    <h2>4. Typografie</h2>
+    <table class="regel-tabel">
+      <tr><th>Wat</th><th>Schrijf</th><th>Resultaat</th></tr>
+      <tr><td>Cursief</td><td><code>*tekst*</code></td><td><em>tekst</em></td></tr>
+      <tr><td>Kleinkapitaal</td><td><code>{sc:tekst}</code></td><td><span class="sc">tekst</span></td></tr>
+      <tr><td>Superscript</td><td><code>{sup:tekst}</code></td><td>x<sup>tekst</sup></td></tr>
+      <tr><td>Subscript</td><td><code>{sub:tekst}</code></td><td>x<sub>tekst</sub></td></tr>
+    </table>
+
+    <h2>5. Editeursingrepen (kritische editie)</h2>
+    <table class="regel-tabel">
+      <tr><th>Wat</th><th>Schrijf</th><th>Resultaat</th></tr>
+      <tr><td>Toevoeging door editeur</td><td><code>{add:tekst}</code></td><td><span class="ed-add">⟨tekst⟩</span></td></tr>
+      <tr><td>Onzekere lezing</td><td><code>{unc:tekst}</code></td><td><span class="ed-unc">tekst<span class="unc-teken">[?]</span></span></td></tr>
+      <tr><td>Opgeloste afkorting</td><td><code>{ex:tekst}</code></td><td><span class="ed-ex">tekst</span> (cursief; schakelbaar)</td></tr>
+      <tr><td>Lacune / onleesbaar</td><td><code>{gap:reden}</code></td><td><span class="ed-gap">[reden]</span></td></tr>
+    </table>
+
+    <h2>6. Pagina- en foliomarkeringen → facsimile</h2>
+    <p>Zet op een eigen regel een <code>~</code>, gevolgd door het label en het facsimiledoel:</p>
+    <pre><code>~ 12r | 1</code></pre>
+    <p>Dit plaatst een klikbare markering <span class="pb">∣12r</span> in de tekst. Het tweede veld
+    is het doel: bij <code>facsimile_type: pdf</code> is dat het paginanummer in de pdf
+    (opent op die pagina); bij <code>facsimile_type: afbeelding</code> vervangt het de
+    <code>{n}</code> in het bestandspad (opent de scan in een lightbox).</p>
+
+    <h2>7. Werkbalk (voor de lezer)</h2>
+    <p>Boven de tekst kan de lezer aan/uit zetten: elk apparaat afzonderlijk, de regelnummers,
+    de facsimilemarkeringen, en of opgeloste afkortingen cursief worden getoond.</p>
+
+    <h2>8. Lokaal bekijken</h2>
+    <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
+    webserver openen, niet rechtstreeks als bestand. Bijvoorbeeld:</p>
+    <pre><code>python3 -m http.server
+# open daarna http://localhost:8000/</code></pre>
+  </main>
+
+  <script src="assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+/* ===========================================================================
+   Edities — stijl voor wetenschappelijke edities van vroegmoderne teksten
+   =========================================================================== */
+
+:root {
+  --papier: #fbfaf7;
+  --inkt: #1f1b16;
+  --inkt-zacht: #5b5348;
+  --lijn: #e3ddd0;
+  --lijn-sterk: #cfc7b6;
+  --accent: #7a5a2f;
+  --accent-zacht: #f0e7d8;
+  --gutter: 3.2rem;
+  --leesbreedte: 42rem;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papier: #17150f;
+    --inkt: #ece5d6;
+    --inkt-zacht: #a89e8a;
+    --lijn: #322d22;
+    --lijn-sterk: #4a4334;
+    --accent: #d0a866;
+    --accent-zacht: #2a2416;
+  }
+}
+:root[data-thema="dark"] {
+  --papier: #17150f; --inkt: #ece5d6; --inkt-zacht: #a89e8a;
+  --lijn: #322d22; --lijn-sterk: #4a4334; --accent: #d0a866; --accent-zacht: #2a2416;
+}
+:root[data-thema="light"] {
+  --papier: #fbfaf7; --inkt: #1f1b16; --inkt-zacht: #5b5348;
+  --lijn: #e3ddd0; --lijn-sterk: #cfc7b6; --accent: #7a5a2f; --accent-zacht: #f0e7d8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--papier);
+  color: var(--inkt);
+  font-family: var(--serif);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+.wrap { max-width: 60rem; margin: 0 auto; padding: 2rem 1.25rem 6rem; }
+
+/* ---- Sitehoofd ---------------------------------------------------------- */
+.sitehoofd {
+  border-bottom: 1px solid var(--lijn);
+  background: color-mix(in srgb, var(--papier) 88%, var(--accent));
+}
+.sitehoofd .binnen {
+  max-width: 60rem; margin: 0 auto; padding: 1rem 1.25rem;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.sitehoofd .merk { font-weight: 600; font-size: 1.15rem; letter-spacing: .01em; }
+.sitehoofd .merk a { color: inherit; text-decoration: none; }
+.sitehoofd nav a { color: var(--inkt-zacht); text-decoration: none; margin-left: 1.1rem; font-family: var(--sans); font-size: .95rem; }
+.sitehoofd nav a:hover { color: var(--accent); }
+.thema-knop {
+  font-family: var(--sans); font-size: .85rem; background: none; cursor: pointer;
+  border: 1px solid var(--lijn-sterk); color: var(--inkt-zacht); border-radius: 999px; padding: .2rem .7rem; margin-left: 1.1rem;
+}
+
+/* ---- Editiehoofd -------------------------------------------------------- */
+.editie-kop h1 { font-size: 1.9rem; line-height: 1.15; margin: 0 0 .3rem; }
+.editie-sub { color: var(--inkt-zacht); font-family: var(--sans); font-size: .95rem; margin: 0 0 1.5rem; }
+.editie-sub span { margin-right: 1rem; }
+.editie-sub .editie-bron { display: block; margin-top: .3rem; font-style: italic; }
+
+/* ---- Werkbalk ----------------------------------------------------------- */
+.werkbalk {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--papier) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--lijn); border-radius: 10px;
+  padding: .7rem .9rem; margin: 0 0 2rem;
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  font-family: var(--sans); font-size: .88rem;
+}
+.wb-groep { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+.wb-kop { color: var(--inkt-zacht); font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; }
+.wb-opt, .wb-app { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; user-select: none; }
+.wb-app .wb-stip { width: .7rem; height: .7rem; border-radius: 50%; background: var(--kleur); display: inline-block; }
+.werkbalk input[type=checkbox] { accent-color: var(--accent); }
+
+/* ---- Tekst met regelnummering ------------------------------------------ */
+.tekst { max-width: var(--leesbreedte); margin: 0 auto; }
+.alinea { margin: 0 0 1.15rem; }
+.tekstkop { font-size: 1.15rem; font-variant: small-caps; letter-spacing: .03em; color: var(--inkt-zacht); margin: 2rem 0 .8rem; }
+
+.tregel { display: grid; grid-template-columns: var(--gutter) 1fr; column-gap: .4rem; align-items: baseline; }
+.tregel .rnr {
+  font-family: var(--sans); font-size: .72rem; color: var(--inkt-zacht);
+  text-align: right; padding-right: .5rem; user-select: none;
+  border-right: 1px solid var(--lijn); -webkit-user-select: none;
+}
+.tregel .rtekst { padding-left: .1rem; }
+.geen-regelnr .tregel { grid-template-columns: 1fr; }
+.geen-regelnr .rnr { display: none; }
+
+/* ---- Lemma's en noottekens ---------------------------------------------- */
+.lemma {
+  border-bottom: 1.5px dotted var(--kleur);
+  cursor: help; outline: none;
+}
+.lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 12%, transparent); border-radius: 2px; }
+.nootteken {
+  font-family: var(--sans); font-size: .62em; font-weight: 600;
+  color: var(--kleur); padding-left: 1px; cursor: pointer; vertical-align: super;
+}
+/* Verberg een apparaat: markeringen én lijst */
+.tekst .lemma[data-noot^="w-"] { }
+/* generieke verberg-regels worden per code via JS-klasse gezet: */
+
+/* ---- Editeursingrepen & typografie -------------------------------------- */
+.sc { font-variant: small-caps; letter-spacing: .02em; }
+.ed-add { color: var(--inkt-zacht); }
+.ed-unc { }
+.unc-teken { font-family: var(--sans); font-size: .7em; color: var(--inkt-zacht); vertical-align: super; }
+.ed-ex { font-style: italic; }
+.geen-afkorting .ed-ex { font-style: normal; }
+.ed-gap { font-family: var(--sans); font-size: .8em; color: var(--inkt-zacht); }
+
+/* ---- Pagina-/foliomarkering --------------------------------------------- */
+.pb {
+  font-family: var(--sans); font-size: .72rem; color: var(--accent);
+  cursor: pointer; padding: 0 .3rem; white-space: nowrap; user-select: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 4px;
+  background: var(--accent-zacht); vertical-align: baseline; line-height: 1;
+}
+.pb:hover { background: color-mix(in srgb, var(--accent) 25%, var(--papier)); }
+.geen-facsimile .pb { display: none; }
+
+/* ---- Apparaten onderaan ------------------------------------------------- */
+.apparaten { max-width: var(--leesbreedte); margin: 3rem auto 0; }
+.apparaat { border-top: 2px solid var(--kleur); padding-top: .6rem; margin-top: 2rem; }
+.apparaat-kop {
+  font-family: var(--sans); font-size: .95rem; font-weight: 600; color: var(--kleur);
+  margin: 0 0 .6rem; display: flex; align-items: baseline; gap: .6rem;
+}
+.apparaat-soort {
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--inkt-zacht); border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .05rem .5rem;
+}
+.nootlijst { list-style: none; margin: 0; padding: 0; font-size: 1rem; }
+.nootlijst li { margin: 0 0 .55rem; line-height: 1.5; }
+.nootlijst .nr-terug {
+  font-family: var(--sans); font-size: .72rem; color: var(--inkt-zacht);
+  text-decoration: none; border: 1px solid var(--lijn); border-radius: 4px;
+  padding: 0 .3rem; margin-right: .3rem;
+}
+.nootlijst .nr-terug:hover { border-color: var(--kleur); color: var(--kleur); }
+.noot-lemma { font-weight: 600; }
+.nootlijst li.markeer { background: color-mix(in srgb, var(--kleur) 16%, transparent); border-radius: 4px; }
+
+/* Per-apparaat verbergen (JS zet klasse verberg-app-<code> op de root) */
+[class*="verberg-app-"] .verberg-marker { }
+
+/* ---- Popover ------------------------------------------------------------ */
+.noot-popover {
+  position: absolute; z-index: 50; max-width: 22rem;
+  background: var(--papier); color: var(--inkt);
+  border: 1px solid var(--lijn-sterk); border-left: 3px solid var(--kleur);
+  border-radius: 8px; padding: .6rem .75rem; box-shadow: 0 8px 28px rgba(0,0,0,.18);
+  font-size: .95rem; line-height: 1.45;
+}
+.pop-label { display: block; font-family: var(--sans); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+.pop-lemma { font-weight: 600; }
+.pop-lemma::after { content: " ]"; color: var(--inkt-zacht); }
+.pop-inhoud { display: block; margin-top: .15rem; }
+
+/* ---- Lightbox ----------------------------------------------------------- */
+.lightbox {
+  position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.8);
+  display: flex; align-items: center; justify-content: center; padding: 2rem;
+}
+.lb-binnen { position: relative; max-width: 92vw; max-height: 90vh; }
+.lb-binnen img { max-width: 92vw; max-height: 82vh; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #fff; }
+.lb-sluit {
+  position: absolute; top: -1rem; right: -1rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  border: none; background: #fff; color: #000; font-size: 1.4rem; cursor: pointer; line-height: 1;
+}
+.lb-bijschrift { color: #fff; text-align: center; font-family: var(--sans); font-size: .85rem; margin-top: .6rem; }
+
+/* ---- Foutmelding -------------------------------------------------------- */
+.fout { font-family: var(--sans); font-size: .95rem; background: var(--accent-zacht); border: 1px solid var(--lijn-sterk); border-radius: 8px; padding: 1rem; }
+.fout code { background: color-mix(in srgb, var(--inkt) 8%, transparent); padding: .1rem .35rem; border-radius: 4px; }
+
+/* ---- Landingspagina ----------------------------------------------------- */
+.hero { padding: 2.5rem 0 1.5rem; border-bottom: 1px solid var(--lijn); margin-bottom: 2rem; }
+.hero h1 { font-size: 2.3rem; margin: 0 0 .5rem; line-height: 1.1; }
+.hero p { color: var(--inkt-zacht); max-width: 40rem; margin: 0; }
+.kaarten { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
+.kaart {
+  border: 1px solid var(--lijn); border-radius: 12px; padding: 1.2rem 1.3rem;
+  text-decoration: none; color: inherit; background: color-mix(in srgb, var(--papier) 94%, var(--accent));
+  transition: border-color .15s, transform .15s;
+}
+.kaart:hover { border-color: var(--accent); transform: translateY(-2px); }
+.kaart h2 { font-size: 1.25rem; margin: 0 0 .3rem; }
+.kaart .k-meta { font-family: var(--sans); font-size: .82rem; color: var(--inkt-zacht); margin: 0 0 .6rem; }
+.kaart .k-tag { display: inline-block; font-family: var(--sans); font-size: .72rem; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .05rem .55rem; color: var(--inkt-zacht); }
+.kaart p { margin: .5rem 0 0; font-size: .98rem; }
+
+/* ---- Editie-secties (inleiding / verantwoording / tabs) ----------------- */
+.tabs { display: flex; gap: .3rem; border-bottom: 1px solid var(--lijn); margin: 1.5rem 0 2rem; font-family: var(--sans); flex-wrap: wrap; }
+.tabs button {
+  background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
+  font-size: .95rem; color: var(--inkt-zacht); padding: .5rem .8rem; margin-bottom: -1px;
+}
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.paneel { display: none; }
+.paneel.actief { display: block; }
+.prozasectie { max-width: var(--leesbreedte); }
+.prozasectie h2 { font-size: 1.5rem; margin: 1.8rem 0 .6rem; }
+.prozasectie h3 { font-size: 1.15rem; margin: 1.4rem 0 .4rem; }
+.prozasectie p { margin: 0 0 1rem; }
+
+@media print {
+  .werkbalk, .sitehoofd, .tabs, .thema-knop { display: none !important; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .paneel { display: block !important; }
+}

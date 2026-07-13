@@ -1,0 +1,43 @@
+---
+titel: Journael van een reis door Italië
+auteur: [demonstratietekst — vervang door uw eigen transcriptie]
+jaar: 1685
+bron: Fictief voorbeeldhandschrift, opgesteld ter demonstratie van het editieplatform
+type: handschrift
+transcriptie: kritisch
+regelnummering: 5
+facsimile_type: afbeelding
+facsimile_afbeeldingen: facsimile/pagina-{n}.svg
+apparaat: w    | Woordverklaringen           | editeur
+apparaat: comm | Toelichting en commentaar   | editeur
+apparaat: bron | Bronverwijzingen            | editeur
+apparaat: krit | Tekstkritisch apparaat      | editeur
+apparaat: av   | Voetnoten van de auteur     | origineel
+apparaat: ae   | Eindnoten van de auteur     | origineel
+---
+## Van Bologna naar Florence, in de {sc:october} des jaars 1685
+
+~ 12r | 1
+Op den derden dezer maand zijn wij, na den [[middagmaal|krit|hs.: {sc:middach-mael}; hier genormaliseerd]] genoten
+te hebben, uit [[Bologne|w|Bologna, stad in Emilia-Romagna]] vertrokken, in gezelschap
+van twee [[Engelsche edellieden|comm|Vermoedelijk John Cecil en zijn goeverneur, die de auteur elders «mijne Britsche metgezellen» noemt.]] die denzelfden weg reisden.
+Het weder was schoon, doch de wegen door de bergen zeer {ex:beswaerlijk}.
+Wij passeerden een {sup:tal} dorpen van geen aanzien,
+en {add:kwamen} tegen den avond aan een {unc:herberg}
+alwaar wij den nacht hebben doorgebracht, niet zonder [[ongemak|av|De weerd was een schelm, die ons dubbel liet betalen voor slecht bier.]].
+
+~ 12v | 2
+Des anderen daags, met het krieken van den dag opgestaan,
+hebben wij de {sc:Apennijnen} overgetrokken, een gebergte
+dat [[Plinius|bron|Vgl. Plinius, *Naturalis Historia* III, 48, over de Apennijnse waterscheiding.]] reeds vermaard heeft gemaakt. De hoogten waren nog met [[sneeuw|comm|Ongewoon voor october; de auteur reist in een koud najaar, wat ook uit latere passages blijkt.]] bedekt,
+schoon het in het dal nog zomers warm was.
+Tegen den middag daalden wij af naar [[Fiorenzuola|w|Firenzuola, in het dal van de Santerno]],
+alwaar men ons met [[maccaroni|w|deegwaar; hier een vroege Nederlandse vermelding van het woord]] onthaalde, een spijze die mij vreemd doch niet onaangenaam voorkwam.
+
+~ 13r | 3
+Den vijfden bereikten wij eindelijk [[Florence|comm|Florence, hoofdstad van het groothertogdom Toscane onder Cosimo {sc:iii} de' Medici.]], de schoonste stad
+die ik op deze gansche reize aanschouwd heb. De {ex:cathedrale}
+met haren wonderbaarlijken [[koepel|bron|De koepel van Brunelleschi; vgl. Vasari, *Le Vite*, over Filippo Brunelleschi.]] verhief zich boven de daken
+gelijk een berg van marmer. Wij namen onzen intrek
+bij een [[weerd|w|waard, herbergier]] nabij de {sc:Ponte Vecchio},
+en besloten alhier eenige dagen te [[verwijlen|ae|Wij bleven ten slotte drie weken; zie mijn aantekeningen over de galerij der Medici, verderop.]].

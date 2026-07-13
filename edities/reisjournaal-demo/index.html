@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Journael van een reis door Italië — Edities</title>
+  <link rel="stylesheet" href="../../assets/stijl.css">
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="../../index.html">Edities</a></span>
+      <nav>
+        <a href="../../index.html">Overzicht</a>
+        <a href="../../spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-paneel="inleiding" aria-selected="false">Inleiding</button>
+      <button role="tab" data-paneel="tekst" aria-selected="true">Tekst &amp; apparaat</button>
+      <button role="tab" data-paneel="verantwoording" aria-selected="false">Verantwoording</button>
+      <button role="tab" data-paneel="facsimile" aria-selected="false">Facsimile</button>
+    </div>
+
+    <!-- INLEIDING -->
+    <section class="paneel prozasectie" data-paneel="inleiding">
+      <h1>Inleiding</h1>
+      <p><em>Dit is een demonstratie-editie.</em> De tekst hieronder is geen echte historische
+      bron, maar een voorbeeld in periodestijl waarmee de mogelijkheden van dit editieplatform
+      worden getoond. Vervang de inhoud door uw eigen wetenschappelijke transcriptie
+      (bijvoorbeeld een reisverslag van <a href="https://alanmoss.nl">alanmoss.nl</a>).</p>
+      <p>Een volwaardige inleiding beschrijft doorgaans: de auteur en diens leven, de aanleiding
+      en context van de reis, de overlevering van de tekst (handschrift of druk, signatuur,
+      datering), eerdere edities, en de literaire of historische betekenis van het werk.</p>
+      <h3>Over deze reis</h3>
+      <p>De fictieve reiziger trekt in het najaar van 1685 van Bologna over de Apennijnen naar
+      Florence. De passage illustreert hoe woordverklaringen, historische toelichting,
+      bronverwijzingen, tekstkritische aantekeningen en de oorspronkelijke noten van de auteur
+      naast elkaar kunnen bestaan, elk in een eigen, af te schakelen apparaat.</p>
+    </section>
+
+    <!-- TEKST & APPARAAT -->
+    <section class="paneel actief" data-paneel="tekst">
+      <div id="editie" data-bron="bron.txt">
+        <p class="fout">Bezig met laden…</p>
+      </div>
+    </section>
+
+    <!-- VERANTWOORDING -->
+    <section class="paneel prozasectie" data-paneel="verantwoording">
+      <h1>Verantwoording van de editie</h1>
+      <p>Deze editie biedt een <strong>kritische, genormaliseerde</strong> tekst. Onderstaande
+      principes leggen vast welke keuzes bij het transcriberen en normaliseren zijn gemaakt.
+      (Dit is een vast onderdeel van elke editie op dit platform; pas de tekst aan uw eigen
+      editieprincipes aan.)</p>
+
+      <h2>Spelling en interpunctie</h2>
+      <p>De spelling is gemoderniseerd waar dat het begrip ten goede komt, met behoud van
+      kenmerkende vroegmoderne vormen. De interpunctie is stilzwijgend aangepast aan het
+      hedendaagse gebruik. Waar een oorspronkelijke lezing van belang is, wordt zij in het
+      <em>tekstkritisch apparaat</em> vermeld (bijvoorbeeld bij regel 1: <em>middach-mael</em>).</p>
+
+      <h2>Afkortingen</h2>
+      <p>Afkortingen zijn opgelost; de aangevulde letters worden desgewenst <em>cursief</em>
+      weergegeven (schakelbaar via de werkbalk). Voorbeeld: <em>beswaerlijk</em>, <em>cathedrale</em>.</p>
+
+      <h2>Editeursingrepen</h2>
+      <p>Toevoegingen van de editeur staan tussen puntige haken ⟨&nbsp;⟩. Onzekere lezingen zijn
+      gemerkt met <span class="unc-teken">[?]</span>. Onleesbare of ontbrekende passages worden
+      als lacune aangeduid.</p>
+
+      <h2>Regelnummering</h2>
+      <p>De regelnummering volgt de regels van de bron en verspringt om de vijf regels. Noten
+      verwijzen naar deze regelnummers.</p>
+
+      <h2>De notenapparaten</h2>
+      <ul>
+        <li><strong>Woordverklaringen</strong> — korte glossen bij een lemma.</li>
+        <li><strong>Toelichting en commentaar</strong> — historische en literaire context.</li>
+        <li><strong>Bronverwijzingen</strong> — citaten en intertekstuele verwijzingen.</li>
+        <li><strong>Tekstkritisch apparaat</strong> — varianten en emendaties (niet altijd van
+        toepassing; bij handschriften soms afwezig).</li>
+        <li><strong>Voet- en eindnoten van de auteur</strong> — de <em>oorspronkelijke</em> noten
+        uit de bron zelf, onderscheiden van de editeursnoten.</li>
+      </ul>
+    </section>
+
+    <!-- FACSIMILE -->
+    <section class="paneel prozasectie" data-paneel="facsimile">
+      <h1>Facsimile</h1>
+      <p>De pagina-/foliomarkeringen in de tekst (bijvoorbeeld <span class="pb">∣12r</span>)
+      openen de bijbehorende scan. In deze demonstratie zijn de scans schematische
+      voorbeeldafbeeldingen; in een echte editie koppelt u hier uw eigen scans of een pdf.</p>
+      <div class="kaarten">
+        <a class="kaart" href="facsimile/pagina-1.svg" target="_blank"><h2>fol. 12r</h2><p class="k-meta">Voorbeeldscan 1</p></a>
+        <a class="kaart" href="facsimile/pagina-2.svg" target="_blank"><h2>fol. 12v</h2><p class="k-meta">Voorbeeldscan 2</p></a>
+        <a class="kaart" href="facsimile/pagina-3.svg" target="_blank"><h2>fol. 13r</h2><p class="k-meta">Voorbeeldscan 3</p></a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/editie.js"></script>
+  <script src="../../assets/site.js"></script>
+  <script>Editie.laad(document.getElementById('editie'));</script>
+</body>
+</html>
