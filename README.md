@@ -40,7 +40,31 @@ edities/
     facsimile/                 voorbeeld-SVG's
 ```
 
-## Een nieuwe editie toevoegen
+## Schrijven in Obsidian (aanbevolen werkwijze)
+
+Je hoeft niet rechtstreeks in het runtime-formaat (`bron.txt`) te schrijven. Prettiger is
+een schoon **`editie.md`** dat je in Obsidian kunt bewerken:
+
+- de **hoofdtekst** blijft schoon (geen nootmarkeringen), met alinea's, koppen (`#`/`##`/`###`),
+  paginamarkeringen (`~ label | doel`) en typografie (`{sc:}`, `{ab:}`, …);
+- daaronder, na een regel `=== NOTEN ===`, een **notenblok** met per regel
+  `lemma | code | inhoud`. Het lemma is het woord of de woordgroep waar de noot bij hoort;
+  voor een lange passage: `eerste woord … laatste woord`. Komt een lemma meer dan eens voor,
+  kies dan het n-de met `lemma (2)`.
+
+Omdat de hoofdtekst schoon blijft, botst niets met Obsidians eigen `[[ ]]`-links, en zijn
+overlappende/geneste annotaties geen probleem. De importer vindt elk lemma terug en genereert
+`bron.txt`:
+
+```
+python3 importeer.py edities/<slug>/editie.md
+```
+
+*Beperking:* twee losse noten waarvan de ene woordreeks binnen de andere valt (nesting) of
+elkaar kruisen (overlap) in de hoofdtekst kan het inline-runtimeformaat nog niet weergeven;
+de importer meldt zulke gevallen.
+
+## Een nieuwe editie toevoegen (rechtstreeks in bron.txt)
 
 1. Maak een map onder `edities/`.
 2. Schrijf `bron.txt` volgens de [spelregels](spelregels.html).
