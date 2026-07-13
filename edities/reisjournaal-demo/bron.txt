@@ -9,8 +9,8 @@ regelnummering: 5
 origineel_type: afbeelding
 origineel_afbeeldingen: facsimile/pagina-{n}.svg
 apparaat: w      | Woordverklaringen          | editeur   | links
-apparaat: comm   | Toelichting en commentaar  | editeur   | links
-apparaat: krit   | Tekstkritisch apparaat     | editeur   | rechts
+apparaat: comm   | Toelichting en commentaar  | editeur   | rechts
+apparaat: krit   | Tekstkritisch apparaat     | editeur   | links
 apparaat: auteur | Noten van de auteur        | origineel | rechts
 ---
 # Van Bologna naar Florence

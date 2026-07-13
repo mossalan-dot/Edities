@@ -7,9 +7,9 @@ type: handschrift
 transcriptie: kritisch
 origineel_type: afbeelding
 origineel_afbeeldingen: origineel/pagina-{n}.jpg
-apparaat: w      | Woordverklaringen          | editeur
-apparaat: comm   | Toelichting en commentaar  | editeur
-apparaat: auteur | Noten van de auteur        | origineel
+apparaat: w      | Woordverklaringen          | editeur   | links
+apparaat: comm   | Toelichting en commentaar  | editeur   | rechts
+apparaat: auteur | Noten van de auteur        | origineel | rechts
 ---
 
 # Reisverhaal van Abraham van der Meersch
