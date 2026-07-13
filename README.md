@@ -7,13 +7,16 @@ alleen HTML, CSS en een beetje JavaScript. Klaar om te hosten op bijvoorbeeld Gi
 ## Wat het kan
 
 - **Automatische regelnummering** gekoppeld aan de bronregels (verspringt om de N regels).
-- **Meerdere notenapparaten**, elk afzonderlijk aan/uit te zetten:
-  woordverklaringen, toelichting/commentaar, bronverwijzingen, tekstkritisch apparaat,
-  en de **oorspronkelijke voet- en eindnoten van de auteur** (apart gehouden van editeursnoten).
+- **Meerdere notenapparaten**, elk afzonderlijk aan/uit te zetten (woordverklaringen,
+  toelichting/commentaar, tekstkritisch apparaat, en de **oorspronkelijke noten van de auteur**,
+  apart gehouden van editeursnoten). Welke apparaten een editie heeft, bepaalt u zelf in de kop.
+- **Geen nootcijfers in de tekst**: geannoteerde woorden zijn subtiel onderstreept; hover of klik
+  toont de noot. Onderaan staan alle noten per apparaat verzameld.
+- **Geneste noten**: een editeur kan een noot maken óp een noot van de auteur.
 - **Kritische/genormaliseerde tekst** met editeursingrepen (toevoeging ⟨⟩, onzekere lezing [?],
   opgeloste afkortingen, lacunes) en een vast onderdeel *Verantwoording*.
-- **Typografie**: cursief, kleinkapitaal, super-/subscript.
-- **Facsimilekoppeling**: pagina-/foliomarkeringen die een pdf-pagina of een scan openen.
+- **Typografie**: cursief, kleinkapitaal, doorhaling, super-/subscript, drie kopniveaus.
+- **Koppeling naar het origineel**: pagina-/foliomarkeringen die een pdf-pagina of een scan openen.
 - **Inleiding / Tekst / Verantwoording / Facsimile** als tabbladen per editie.
 - Licht/donker thema, afdrukvriendelijk.
 
@@ -27,10 +30,14 @@ assets/
   site.js                      thema-schakelaar en tabbladen
   stijl.css                    vormgeving
 edities/
-  reisjournaal-demo/
-    index.html                 editiepagina (inleiding/tekst/verantwoording/facsimile)
-    bron.txt                   de tekst in editie-markup
-    facsimile/                 scans (hier voorbeeld-SVG's)
+  van-der-meersch/             echte editie: Reisverhaal van Abraham van der Meersch
+    index.html                 inleiding / tekst / verantwoording / origineel
+    bron.txt                   transcriptie in editie-markup
+    origineel/                 handschriftscan(s)
+  reisjournaal-demo/           demonstratie van alle functies
+    index.html
+    bron.txt
+    facsimile/                 voorbeeld-SVG's
 ```
 
 ## Een nieuwe editie toevoegen
@@ -52,7 +59,9 @@ python3 -m http.server
 
 ## Status
 
-Prototype. De demonstratie-editie (`reisjournaal-demo`) bevat **geen echte bron** maar
-een voorbeeldtekst in periodestijl, bedoeld om alle functies te tonen. Geplande echte
-edities: de gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz, en handschriftelijke
-reisverslagen (o.a. van [alanmoss.nl](https://alanmoss.nl)).
+Prototype. `van-der-meersch` is een echte editie (openingsfragment van het reisverhaal, met de
+oorspronkelijke editeursnoten en de handschriftscan van pagina 1). `reisjournaal-demo` bevat
+**geen echte bron** maar een voorbeeldtekst in periodestijl, bedoeld om álle functies te tonen
+(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities: de
+gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz, en meer reisverslagen
+(o.a. van [alanmoss.nl](https://alanmoss.nl)).

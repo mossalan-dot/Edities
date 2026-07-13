@@ -95,7 +95,10 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 /* ---- Tekst met regelnummering ------------------------------------------ */
 .tekst { max-width: var(--leesbreedte); margin: 0 auto; }
 .alinea { margin: 0 0 1.15rem; }
-.tekstkop { font-size: 1.15rem; font-variant: small-caps; letter-spacing: .03em; color: var(--inkt-zacht); margin: 2rem 0 .8rem; }
+.tekstkop { color: var(--inkt); margin: 2rem 0 .8rem; line-height: 1.2; }
+.tekstkop.kop-1 { font-size: 1.7rem; }
+.tekstkop.kop-2 { font-size: 1.3rem; }
+.tekstkop.kop-3 { font-size: 1.05rem; font-variant: small-caps; letter-spacing: .04em; color: var(--inkt-zacht); }
 
 .tregel { display: grid; grid-template-columns: var(--gutter) 1fr; column-gap: .4rem; align-items: baseline; }
 .tregel .rnr {
@@ -107,19 +110,16 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .geen-regelnr .tregel { grid-template-columns: 1fr; }
 .geen-regelnr .rnr { display: none; }
 
-/* ---- Lemma's en noottekens ---------------------------------------------- */
+/* ---- Lemma's (geen markeringstekens; subtiele onderstreping + hover) ----- */
 .lemma {
-  border-bottom: 1.5px dotted var(--kleur);
-  cursor: help; outline: none;
+  border-bottom: 1px dotted color-mix(in srgb, var(--kleur) 70%, transparent);
+  cursor: pointer; outline: none;
 }
-.lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 12%, transparent); border-radius: 2px; }
-.nootteken {
-  font-family: var(--sans); font-size: .62em; font-weight: 600;
-  color: var(--kleur); padding-left: 1px; cursor: pointer; vertical-align: super;
-}
-/* Verberg een apparaat: markeringen én lijst */
-.tekst .lemma[data-noot^="w-"] { }
-/* generieke verberg-regels worden per code via JS-klasse gezet: */
+.lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 2px; }
+/* "Markeer geannoteerde woorden" uit: onderstreping weg, hover blijft werken */
+.geen-markering .lemma { border-bottom: none; }
+.geen-markering .lemma:hover, .geen-markering .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); }
+/* Per-apparaat verbergen wordt per code via een JS-stijlblok gezet */
 
 /* ---- Editeursingrepen & typografie -------------------------------------- */
 .sc { font-variant: small-caps; letter-spacing: .02em; }
@@ -129,6 +129,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .ed-ex { font-style: italic; }
 .geen-afkorting .ed-ex { font-style: normal; }
 .ed-gap { font-family: var(--sans); font-size: .8em; color: var(--inkt-zacht); }
+.ed-del { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--inkt) 55%, transparent); color: var(--inkt-zacht); }
 
 /* ---- Pagina-/foliomarkering --------------------------------------------- */
 .pb {
@@ -138,7 +139,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
   background: var(--accent-zacht); vertical-align: baseline; line-height: 1;
 }
 .pb:hover { background: color-mix(in srgb, var(--accent) 25%, var(--papier)); }
-.geen-facsimile .pb { display: none; }
+.geen-editiemark .pb { display: none; }
 
 /* ---- Apparaten onderaan ------------------------------------------------- */
 .apparaten { max-width: var(--leesbreedte); margin: 3rem auto 0; }

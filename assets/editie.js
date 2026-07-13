@@ -2,54 +2,45 @@
  * editie.js — motor voor wetenschappelijke edities van vroegmoderne teksten
  * ----------------------------------------------------------------------------
  * Dependency-vrij. Leest een bronbestand in de eenvoudige editie-markup
- * (zie SPELREGELS.md), en rendert:
- *   - de tekst met automatische regelnummering (elke N regels)
+ * (zie spelregels.html) en rendert:
+ *   - de tekst met (optionele) regelnummering
  *   - meerdere togglebare notenapparaten (editeur- en auteursnoten)
- *   - typografische bijzonderheden (kleinkapitaal, cursief, superscript, ...)
- *   - editeursingrepen (toevoeging, onzekere lezing, opgeloste afkorting)
- *   - pagina-/foliomarkeringen gekoppeld aan facsimile (pdf-pagina of afbeelding)
- *
- * Gebruik in HTML:
- *   <div id="editie" data-bron="bron.txt"></div>
- *   <script src="../../assets/editie.js"></script>
- *   <script>Editie.laad(document.getElementById('editie'));</script>
+ *   - GENESTE noten: een editeur kan een noot maken op een auteursnoot
+ *   - geen markeringstekens in de tekst; geannoteerde woorden zijn subtiel
+ *     onderstreept en tonen hun noot bij hover of klik
+ *   - typografie (kleinkapitaal, cursief, doorhaling, super-/subscript, koppen)
+ *   - editeursingrepen (toevoeging, onzekere lezing, opgeloste afkorting, lacune)
+ *   - pagina-/foliomarkeringen gekoppeld aan het origineel (pdf-pagina of scan)
  */
 (function (global) {
   'use strict';
 
-  // Toegankelijk kleurenpalet; per apparaat één kleur, cyclisch toegewezen.
   var PALET = ['#0f766e', '#7c3aed', '#b45309', '#be123c', '#1d4ed8', '#4d7c0f'];
-
-  // ---- Hulpfuncties -------------------------------------------------------
 
   function escapeHtml(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  // Inline typografie en editeursingrepen (GEEN noten; die zijn al vervangen
-  // door plaatshouders voordat dit draait).
+  // Inline typografie en editeursingrepen (noten zijn hier al afgehandeld).
   function opmaak(s) {
-    // {code:inhoud} — typografische commando's en editeursingrepen
     s = s.replace(/\{(\w+):([\s\S]*?)\}/g, function (m, code, body) {
       switch (code) {
         case 'sc':  return '<span class="sc">' + body + '</span>';        // kleinkapitaal
         case 'sup': return '<sup>' + body + '</sup>';                     // superscript
         case 'sub': return '<sub>' + body + '</sub>';                     // subscript
-        case 'add': return '<span class="ed-add">⟨' + body + '⟩</span>'; // editeurstoevoeging ⟨⟩
-        case 'unc': return '<span class="ed-unc">' + body + '<span class="unc-teken">[?]</span></span>'; // onzekere lezing
+        case 'del': return '<span class="ed-del">' + body + '</span>';    // doorhaling
+        case 'add': return '<span class="ed-add">⟨' + body + '⟩</span>'; // editeurstoevoeging
+        case 'unc': return '<span class="ed-unc">' + body + '<span class="unc-teken">[?]</span></span>';
         case 'ex':  return '<span class="ed-ex">' + body + '</span>';     // opgeloste afkorting
-        case 'gap': return '<span class="ed-gap">[' + (body || 'lacune') + ']</span>'; // lacune
+        case 'gap': return '<span class="ed-gap">[' + (body || 'lacune') + ']</span>';
         default:    return body;
       }
     });
-    // *cursief*
     s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
     return s;
   }
 
-  // ---- Front-matter parser ------------------------------------------------
-  // Platte key: value-regels tussen twee `---`-regels.
-  // Meervoudige `apparaat:`-regels in de vorm  code | label | soort
+  // ---- Front-matter -------------------------------------------------------
   function parseKop(tekst) {
     var config = { apparaten: [], meta: {} };
     var m = tekst.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
@@ -69,12 +60,9 @@
         }
       });
     }
-    // kleur per apparaat
     config.apparaten.forEach(function (a, i) { a.kleur = PALET[i % PALET.length]; });
     return { config: config, body: rest };
   }
-
-  // ---- Body parser + renderer --------------------------------------------
 
   function apparaatVan(config, code) {
     for (var i = 0; i < config.apparaten.length; i++) {
@@ -83,94 +71,111 @@
     return null;
   }
 
-  function renderInline(raw, config, noten, tellers) {
-    // 1. escape
-    var esc = escapeHtml(raw);
-    // 2. noten [[lemma|code|inhoud]] -> plaatshouder
-    var plaats = [];
-    esc = esc.replace(/\[\[([\s\S]*?)\]\]/g, function (m, payload) {
-      var stukken = payload.split('|');
-      var lemma = (stukken.shift() || '').trim();
-      var code = (stukken.shift() || '').trim();
-      var inhoud = stukken.join('|').trim();
-      var app = apparaatVan(config, code);
-      if (!app) {
-        // onbekend apparaat: toon lemma ongemarkeerd
-        return lemma;
-      }
-      tellers[code] = (tellers[code] || 0) + 1;
-      var seq = tellers[code];
-      var id = code + '-' + seq;
-      noten.push({ id: id, code: code, seq: seq, lemma: lemma, inhoud: inhoud, regel: null });
-      var token = '' + (plaats.length) + '';
-      plaats.push({ id: id, code: code, seq: seq, lemma: lemma, kleur: app.kleur });
-      return token;
-    });
-    // 3. typografie op de rest
-    var html = opmaak(esc);
-    // 4. plaatshouders terug -> lemma-span + markeringsteken
-    html = html.replace(/(\d+)/g, function (m, i) {
-      var p = plaats[+i];
-      var lemmaHtml = opmaak(p.lemma);
-      return '<span class="lemma app-' + p.code + '" data-noot="' + p.id + '" tabindex="0" ' +
-             'style="--kleur:' + p.kleur + '">' + lemmaHtml +
-             '<sup class="nootteken app-' + p.code + '" data-noot="' + p.id + '" ' +
-             'style="--kleur:' + p.kleur + '">' + p.seq + '</sup></span>';
-    });
-    return html;
+  // ---- Noten: gebalanceerde [[ ]]-parser (ondersteunt nesting) ------------
+
+  // Zoek de sluitende ]] die hoort bij een [[, met inachtneming van nesting.
+  function matchClose(s, from) {
+    var depth = 1, i = from;
+    while (i < s.length) {
+      if (s.charAt(i) === '[' && s.charAt(i + 1) === '[') { depth++; i += 2; }
+      else if (s.charAt(i) === ']' && s.charAt(i + 1) === ']') {
+        depth--; if (depth === 0) return i; i += 2;
+      } else i++;
+    }
+    return -1;
   }
 
+  // Splits een payload op pipes die NIET binnen geneste [[ ]] staan.
+  function splitTop(payload) {
+    var velden = [], cur = '', depth = 0, i = 0;
+    while (i < payload.length) {
+      if (payload.charAt(i) === '[' && payload.charAt(i + 1) === '[') { depth++; cur += '[['; i += 2; }
+      else if (payload.charAt(i) === ']' && payload.charAt(i + 1) === ']') { depth--; cur += ']]'; i += 2; }
+      else if (payload.charAt(i) === '|' && depth === 0) { velden.push(cur); cur = ''; i++; }
+      else { cur += payload.charAt(i); i++; }
+    }
+    velden.push(cur);
+    return velden;
+  }
+
+  // Verwerk een (reeds ge-escapete) tekst: wissel typografie en noten af.
+  // ctx = { config, noten, regel }.
+  function parseSegment(s, ctx) {
+    var out = '', i = 0;
+    while (i < s.length) {
+      var open = s.indexOf('[[', i);
+      if (open === -1) { out += opmaak(s.slice(i)); break; }
+      out += opmaak(s.slice(i, open));
+      var close = matchClose(s, open + 2);
+      if (close === -1) { out += opmaak(s.slice(open)); break; }
+      out += emitNote(s.slice(open + 2, close), ctx);
+      i = close + 2;
+    }
+    return out;
+  }
+
+  function emitNote(payload, ctx) {
+    var velden = splitTop(payload);
+    var lemma = (velden[0] || '').trim();
+    var code = (velden[1] || '').trim();
+    var inhoud = velden.slice(2).join('|').trim();
+    var app = apparaatVan(ctx.config, code);
+    if (!app) return opmaak(lemma); // onbekend apparaat: lemma ongemarkeerd tonen
+    var id = code + '-' + (ctx.noten.length + 1);
+    var noot = { id: id, code: code, regel: ctx.regel, lemmaHtml: opmaak(lemma), inhoudHtml: '' };
+    ctx.noten.push(noot);
+    noot.inhoudHtml = parseSegment(inhoud, ctx); // recursief: geneste noten
+    return '<span class="lemma app-' + code + '" data-noot="' + id + '" tabindex="0" ' +
+           'role="button" aria-label="Toon noot" style="--kleur:' + app.kleur + '">' +
+           noot.lemmaHtml + '</span>';
+  }
+
+  function renderInline(raw, ctx) {
+    return parseSegment(escapeHtml(raw), ctx);
+  }
+
+  // ---- Body ---------------------------------------------------------------
   function renderBody(body, config) {
     var regels = body.replace(/\r\n/g, '\n').split('\n');
-    var stap = parseInt(config.meta.regelnummering, 10) || 5;
+    var stap = parseInt(config.meta.regelnummering, 10) || 0; // 0 = geen nummering
     var noten = [];
-    var tellers = {};
     var uit = [];
     var regelnr = 0;
     var inAlinea = false;
 
-    function sluitAlinea() {
-      if (inAlinea) { uit.push('</div>'); inAlinea = false; }
-    }
-    function openAlinea() {
-      if (!inAlinea) { uit.push('<div class="alinea">'); inAlinea = true; }
-    }
+    function sluitAlinea() { if (inAlinea) { uit.push('</div>'); inAlinea = false; } }
+    function openAlinea() { if (!inAlinea) { uit.push('<div class="alinea">'); inAlinea = true; } }
 
     for (var i = 0; i < regels.length; i++) {
       var r = regels[i];
       var t = r.trim();
-
       if (t === '') { sluitAlinea(); continue; }
 
-      // kop:  ## Tekst
-      if (/^#{2,3}\s+/.test(t)) {
+      // koppen: #, ##, ###
+      var kop = t.match(/^(#{1,3})\s+(.*)$/);
+      if (kop) {
         sluitAlinea();
-        var niveau = t.indexOf('### ') === 0 ? 3 : 2;
-        var kt = t.replace(/^#{2,3}\s+/, '');
-        uit.push('<h' + niveau + ' class="tekstkop">' + opmaak(escapeHtml(kt)) + '</h' + niveau + '>');
+        var niveau = kop[1].length;         // 1, 2 of 3
+        var hTag = 'h' + (niveau + 1);       // h2 / h3 / h4
+        uit.push('<' + hTag + ' class="tekstkop kop-' + niveau + '">' +
+                 opmaak(escapeHtml(kop[2])) + '</' + hTag + '>');
         continue;
       }
 
-      // pagina-/foliomarkering:  ~ LABEL | DOEL
+      // pagina-/foliomarkering: ~ LABEL | DOEL
       if (t.charAt(0) === '~') {
         var pm = t.slice(1).split('|').map(function (x) { return x.trim(); });
-        var label = pm[0] || '?';
-        var doel = pm[1] || '';
         openAlinea();
-        uit.push('<span class="pb" data-doel="' + escapeHtml(doel) + '" title="Open facsimile">' +
-                 '∣' + escapeHtml(label) + '</span>');
+        uit.push('<span class="pb" data-doel="' + escapeHtml(pm[1] || '') +
+                 '" title="Toon origineel">∣' + escapeHtml(pm[0] || '?') + '</span>');
         continue;
       }
 
       // gewone tekstregel
       openAlinea();
       regelnr++;
-      var toonNr = (regelnr % stap === 0);
-      var startNoten = noten.length;
-      var inhoud = renderInline(r, config, noten, tellers);
-      // koppel regelnummer aan de zojuist toegevoegde noten
-      for (var n = startNoten; n < noten.length; n++) noten[n].regel = regelnr;
-
+      var toonNr = stap > 0 && (regelnr % stap === 0);
+      var inhoud = renderInline(r, { config: config, noten: noten, regel: regelnr });
       uit.push(
         '<span class="tregel" id="r' + regelnr + '" data-n="' + regelnr + '">' +
           '<span class="rnr">' + (toonNr ? regelnr : '') + '</span>' +
@@ -182,8 +187,7 @@
     return { html: uit.join('\n'), noten: noten, regels: regelnr };
   }
 
-  // ---- Apparaat-lijsten onderaan -----------------------------------------
-
+  // ---- Apparaten onderaan -------------------------------------------------
   function renderApparaten(config, noten) {
     var perCode = {};
     noten.forEach(function (n) { (perCode[n.code] = perCode[n.code] || []).push(n); });
@@ -194,31 +198,33 @@
       uit.push('<section class="apparaat app-' + app.code + '" data-code="' + app.code +
                '" style="--kleur:' + app.kleur + '">');
       uit.push('<h3 class="apparaat-kop">' + escapeHtml(app.label) +
-               '<span class="apparaat-soort">' + (app.soort === 'origineel' ? 'oorspronkelijk' : 'editeur') +
-               '</span></h3>');
-      uit.push('<ol class="nootlijst">');
+               '<span class="apparaat-soort">' +
+               (app.soort === 'origineel' ? 'oorspronkelijk' : 'editeur') + '</span></h3>');
+      uit.push('<ul class="nootlijst">');
       lijst.forEach(function (n) {
-        uit.push('<li id="n-' + n.id + '" data-noot="' + n.id + '">' +
-                 '<a class="nr-terug" href="#r' + n.regel + '" title="Naar regel ' + n.regel + '">' +
-                 n.regel + '</a> ' +
-                 '<span class="noot-lemma">' + opmaak(escapeHtml(n.lemma)) + '</span>] ' +
-                 '<span class="noot-inhoud">' + opmaak(escapeHtml(n.inhoud)) + '</span></li>');
+        var regelLink = n.regel
+          ? '<a class="nr-terug" href="#r' + n.regel + '" title="Naar regel ' + n.regel + '">' + n.regel + '</a> '
+          : '';
+        uit.push('<li id="n-' + n.id + '" data-noot="' + n.id + '">' + regelLink +
+                 '<span class="noot-lemma">' + n.lemmaHtml + '</span>] ' +
+                 '<span class="noot-inhoud">' + n.inhoudHtml + '</span></li>');
       });
-      uit.push('</ol></section>');
+      uit.push('</ul></section>');
     });
     uit.push('</div>');
     return uit.join('\n');
   }
 
-  // ---- Werkbalk (toggles) -------------------------------------------------
-
+  // ---- Werkbalk -----------------------------------------------------------
   function renderWerkbalk(config, noten) {
     var aanwezig = {};
     noten.forEach(function (n) { aanwezig[n.code] = true; });
+    var heeftNummers = parseInt(config.meta.regelnummering, 10) > 0;
     var uit = ['<div class="werkbalk" role="group" aria-label="Weergaveopties">'];
     uit.push('<div class="wb-groep"><span class="wb-kop">Tonen</span>');
-    uit.push(toggle('opt-regelnr', 'Regelnummers', true));
-    uit.push(toggle('opt-facsimile', 'Facsimilemarkeringen', true));
+    if (heeftNummers) uit.push(toggle('opt-regelnr', 'Regelnummers', true));
+    uit.push(toggle('opt-markering', 'Markeer geannoteerde woorden', true));
+    uit.push(toggle('opt-editie', 'Paginamarkeringen', true));
     uit.push(toggle('opt-afkorting', 'Opgeloste afkortingen cursief', true));
     uit.push('</div>');
     uit.push('<div class="wb-groep"><span class="wb-kop">Apparaten</span>');
@@ -237,28 +243,26 @@
   }
 
   // ---- Interacties --------------------------------------------------------
-
   function koppelInteracties(root, config, noten) {
     var nootIndex = {};
     noten.forEach(function (n) { nootIndex[n.id] = n; });
 
-    // Popover
     var pop = document.createElement('div');
     pop.className = 'noot-popover';
     pop.hidden = true;
     document.body.appendChild(pop);
+    var vastgezet = null;
 
     function toonPopover(el) {
       var id = el.getAttribute('data-noot');
       var n = nootIndex[id];
       if (!n) return;
-      if (root.classList.contains('verberg-app-' + n.code)) return; // apparaat uit
-
+      if (root.classList.contains('verberg-app-' + n.code)) return;
       var app = apparaatVan(config, n.code);
       pop.innerHTML = '<span class="pop-label" style="color:' + app.kleur + '">' +
-        escapeHtml(app.label) + ' · regel ' + n.regel + '</span>' +
-        '<span class="pop-lemma">' + opmaak(escapeHtml(n.lemma)) + '</span>' +
-        '<span class="pop-inhoud">' + opmaak(escapeHtml(n.inhoud)) + '</span>';
+        escapeHtml(app.label) + (n.regel ? ' · regel ' + n.regel : '') + '</span>' +
+        '<span class="pop-lemma">' + n.lemmaHtml + '</span>' +
+        '<span class="pop-inhoud">' + n.inhoudHtml + '</span>';
       pop.style.setProperty('--kleur', app.kleur);
       pop.hidden = false;
       var rect = el.getBoundingClientRect();
@@ -268,75 +272,69 @@
       pop.style.top = top + 'px';
       pop.style.left = Math.max(8, left) + 'px';
     }
-    function verbergPopover() { pop.hidden = true; }
+    function verbergPopover() { if (!vastgezet) pop.hidden = true; }
 
     root.addEventListener('mouseover', function (e) {
-      var el = e.target.closest('.lemma, .nootteken');
-      if (el) toonPopover(el);
+      var el = e.target.closest('.lemma');
+      if (el && !vastgezet) toonPopover(el);
     });
     root.addEventListener('mouseout', function (e) {
-      var el = e.target.closest('.lemma, .nootteken');
-      if (el && !pop.contains(e.relatedTarget)) verbergPopover();
+      if (e.target.closest('.lemma') && !vastgezet) verbergPopover();
     });
     root.addEventListener('focusin', function (e) {
       var el = e.target.closest('.lemma');
       if (el) toonPopover(el);
     });
-    root.addEventListener('focusout', verbergPopover);
+    root.addEventListener('focusout', function () { if (!vastgezet) pop.hidden = true; });
 
-    // Klik op lemma -> scroll naar apparaatingang
     root.addEventListener('click', function (e) {
-      var lemma = e.target.closest('.lemma, .nootteken');
+      var lemma = e.target.closest('.lemma');
       if (lemma) {
-        var id = lemma.getAttribute('data-noot');
-        var doel = document.getElementById('n-' + id);
-        if (doel) {
-          doel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          doel.classList.add('markeer');
-          setTimeout(function () { doel.classList.remove('markeer'); }, 1600);
-        }
+        vastgezet = null;
+        toonPopover(lemma);   // klik = vastzetten tot een klik elders
+        vastgezet = lemma;
         return;
       }
-      // Klik op pagina-/foliomarkering -> facsimile
       var pb = e.target.closest('.pb');
-      if (pb) openFacsimile(config, pb.getAttribute('data-doel'));
+      if (pb) { openOrigineel(config, pb.getAttribute('data-doel')); return; }
+    });
+    document.addEventListener('click', function (e) {
+      if (vastgezet && !e.target.closest('.lemma') && !pop.contains(e.target)) {
+        vastgezet = null; pop.hidden = true;
+      }
     });
 
-    // Toggles
     root.addEventListener('change', function (e) {
       var t = e.target;
       if (t.matches('input[data-app]')) {
         root.classList.toggle('verberg-app-' + t.getAttribute('data-app'), !t.checked);
       } else if (t.id === 'opt-regelnr') {
         root.classList.toggle('geen-regelnr', !t.checked);
-      } else if (t.id === 'opt-facsimile') {
-        root.classList.toggle('geen-facsimile', !t.checked);
+      } else if (t.id === 'opt-editie') {
+        root.classList.toggle('geen-editiemark', !t.checked);
       } else if (t.id === 'opt-afkorting') {
         root.classList.toggle('geen-afkorting', !t.checked);
+      } else if (t.id === 'opt-markering') {
+        root.classList.toggle('geen-markering', !t.checked);
       }
     });
   }
 
-  // ---- Facsimile ----------------------------------------------------------
-
-  function openFacsimile(config, doel) {
+  // ---- Origineel (scan of pdf) --------------------------------------------
+  function openOrigineel(config, doel) {
     if (!doel) return;
-    var type = config.meta.facsimile_type;
-    if (type === 'pdf' && config.meta.facsimile_pdf) {
-      var url = config.meta.facsimile_pdf + '#page=' + encodeURIComponent(doel);
-      window.open(url, '_blank', 'noopener');
-    } else if (config.meta.facsimile_afbeeldingen) {
-      var src = config.meta.facsimile_afbeeldingen.replace('{n}', doel);
-      toonLightbox(src, doel);
+    if (config.meta.origineel_type === 'pdf' && config.meta.origineel_pdf) {
+      window.open(config.meta.origineel_pdf + '#page=' + encodeURIComponent(doel), '_blank', 'noopener');
+    } else if (config.meta.origineel_afbeeldingen) {
+      toonLightbox(config.meta.origineel_afbeeldingen.replace('{n}', doel), doel);
     }
   }
-
   function toonLightbox(src, label) {
     var box = document.createElement('div');
     box.className = 'lightbox';
     box.innerHTML = '<div class="lb-binnen"><button class="lb-sluit" aria-label="Sluiten">×</button>' +
-      '<img src="' + src + '" alt="Facsimile ' + escapeHtml(label) + '">' +
-      '<div class="lb-bijschrift">Facsimile · ' + escapeHtml(label) + '</div></div>';
+      '<img src="' + src + '" alt="Origineel ' + escapeHtml(label) + '">' +
+      '<div class="lb-bijschrift">Origineel · ' + escapeHtml(label) + '</div></div>';
     function sluit() { box.remove(); document.removeEventListener('keydown', esc); }
     function esc(e) { if (e.key === 'Escape') sluit(); }
     box.addEventListener('click', function (e) {
@@ -346,11 +344,15 @@
     document.body.appendChild(box);
   }
 
-  // ---- Publieke API -------------------------------------------------------
-
+  // ---- Publiek ------------------------------------------------------------
   function render(root, tekst) {
     var parsed = parseKop(tekst);
     var config = parsed.config;
+    // achterwaartse compatibiliteit: facsimile_* -> origineel_*
+    ['type', 'pdf', 'afbeeldingen'].forEach(function (k) {
+      if (config.meta['facsimile_' + k] && !config.meta['origineel_' + k])
+        config.meta['origineel_' + k] = config.meta['facsimile_' + k];
+    });
     var body = renderBody(parsed.body, config);
     var meta = config.meta;
 
@@ -362,13 +364,12 @@
         (meta.bron ? '<span class="editie-bron">' + escapeHtml(meta.bron) + '</span>' : '') +
       '</p></header>';
 
-    // Dynamisch stijlblok: per apparaat een verberg-regel (codes zijn variabel)
     var verbergCss = config.apparaten.map(function (a) {
       var c = a.code;
-      return '.verberg-app-' + c + ' .nootteken.app-' + c + '{display:none}' +
-             '.verberg-app-' + c + ' .lemma.app-' + c + '{border-bottom:none;cursor:text;background:none}' +
+      return '.verberg-app-' + c + ' .lemma.app-' + c + '{border-bottom:none;cursor:text;background:none}' +
              '.verberg-app-' + c + ' .apparaat[data-code="' + c + '"]{display:none}';
     }).join('\n');
+
     root.innerHTML =
       kop +
       renderWerkbalk(config, body.noten) +
@@ -380,7 +381,6 @@
     root.appendChild(styleEl);
 
     koppelInteracties(root, config, body.noten);
-    root._editieConfig = config;
     return { config: config, regels: body.regels, noten: body.noten.length };
   }
 
@@ -388,10 +388,7 @@
     var bron = root.getAttribute('data-bron');
     if (!bron) { console.error('Editie: geen data-bron opgegeven'); return; }
     fetch(bron)
-      .then(function (r) {
-        if (!r.ok) throw new Error('kon bron niet laden: ' + r.status);
-        return r.text();
-      })
+      .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.text(); })
       .then(function (tekst) { render(root, tekst); })
       .catch(function (err) {
         root.innerHTML = '<p class="fout">Kon de editie niet laden (' + escapeHtml(err.message) +

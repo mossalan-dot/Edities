@@ -43,17 +43,15 @@ jaar: 1685
 bron: Handschrift, signatuur ...
 type: handschrift            # of: druk
 transcriptie: kritisch
-regelnummering: 5            # nummer verspringt om de 5 regels
-facsimile_type: afbeelding   # of: pdf
-facsimile_afbeeldingen: facsimile/pagina-{n}.svg
+regelnummering: 5            # nummer verspringt om de 5 regels (0 of weglaten = geen nummering)
+origineel_type: afbeelding   # of: pdf
+origineel_afbeeldingen: origineel/pagina-{n}.jpg
 # of, bij een pdf:
-# facsimile_pdf: facsimile/journaal.pdf
-apparaat: w    | Woordverklaringen         | editeur
-apparaat: comm | Toelichting en commentaar | editeur
-apparaat: bron | Bronverwijzingen          | editeur
-apparaat: krit | Tekstkritisch apparaat    | editeur
-apparaat: av   | Voetnoten van de auteur   | origineel
-apparaat: ae   | Eindnoten van de auteur   | origineel
+# origineel_pdf: origineel/handschrift.pdf
+apparaat: w      | Woordverklaringen          | editeur
+apparaat: comm   | Toelichting en commentaar  | editeur
+apparaat: krit   | Tekstkritisch apparaat     | editeur
+apparaat: auteur | Noten van de auteur        | origineel
 ---</code></pre>
     <p>Elke <code>apparaat:</code>-regel heeft drie velden, gescheiden door <code>|</code>:
     de <strong>code</strong> (kort, gebruik je in de noten), het <strong>label</strong>
@@ -66,25 +64,35 @@ apparaat: ae   | Eindnoten van de auteur   | origineel
       <tr><th>Wat</th><th>Schrijf</th><th>Effect</th></tr>
       <tr><td>Tekstregel</td><td>elke regel in het bestand</td><td>wordt één genummerde bronregel</td></tr>
       <tr><td>Alineascheiding</td><td>een lege regel</td><td>witregel; nummering loopt door</td></tr>
-      <tr><td>Kop / tussenkop</td><td><code>## Tekst</code> of <code>### Tekst</code></td><td>niet-genummerde (tussen)kop</td></tr>
+      <tr><td>Kop (3 niveaus)</td><td><code># Tekst</code>, <code>## Tekst</code>, <code>### Tekst</code></td><td>niet-genummerde koppen, van groot naar klein</td></tr>
     </table>
     <p>De regelnummering volgt dus de <em>regelindeling van de bron</em>: knip de tekst af op
     dezelfde plaatsen als in het origineel. Om de vijf regels verschijnt het nummer in de marge.</p>
 
-    <h2>3. Noten (de vier apparaten en de auteursnoten)</h2>
+    <h2>3. Noten</h2>
     <p>Een noot koppelt u aan een <em>lemma</em> (het woord of de woordgroep waar de noot bij hoort):</p>
     <pre><code>[[lemma|code|inhoud van de noot]]</code></pre>
     <ul>
-      <li><code>lemma</code> — verschijnt in de tekst, krijgt een gekleurde stippellijn en een klein cijfer.</li>
-      <li><code>code</code> — de apparaatcode uit de kop (<code>w</code>, <code>comm</code>, <code>bron</code>, <code>krit</code>, <code>av</code>, <code>ae</code>, …).</li>
-      <li><code>inhoud</code> — de noottekst (mag zelf cursief e.d. bevatten).</li>
+      <li><code>lemma</code> — verschijnt in de tekst en wordt subtiel onderstreept in de kleur van
+      het apparaat. Er staan géén nootcijfers in de lopende tekst.</li>
+      <li><code>code</code> — de apparaatcode uit de kop (<code>w</code>, <code>comm</code>,
+      <code>krit</code>, <code>auteur</code>, …).</li>
+      <li><code>inhoud</code> — de noottekst (mag zelf cursief, kleinkapitaal en zelfs een geneste
+      noot bevatten).</li>
     </ul>
     <p>Voorbeeld: <code>uit [[Bologne|w|Bologna, stad in Emilia-Romagna]] vertrokken</code>.
-    De noten van elk apparaat worden onderaan verzameld, genummerd en gekoppeld aan het regelnummer.
-    Elk apparaat is met de werkbalk afzonderlijk aan/uit te zetten. <strong>Oorspronkelijke</strong>
-    voet- en eindnoten van de auteur zelf gebruikt u met een apparaat van soort <code>origineel</code>
-    (hierboven <code>av</code> en <code>ae</code>), zodat ze duidelijk gescheiden blijven van de
+    Bij <em>hover</em> of <em>klik</em> op het lemma verschijnt de noot; onderaan zijn alle noten
+    per apparaat verzameld en gekoppeld aan het regelnummer. Elk apparaat is met de werkbalk
+    afzonderlijk aan/uit te zetten.</p>
+    <p><strong>Oorspronkelijke noten van de auteur</strong> (voet- én eindnoten uit de bron zelf)
+    geeft u een apparaat van soort <code>origineel</code>, zodat ze gescheiden blijven van de
     editeursnoten.</p>
+    <h3>Geneste noten — een editeursnoot óp een auteursnoot</h3>
+    <p>Omdat de inhoud van een noot zelf weer een lemma mag bevatten, kunt u binnen een
+    auteursnoot commentaar geven. Voorbeeld:</p>
+    <pre><code>[[ongemak|auteur|De weerd was een [[schelm|comm|Sterke term; ...]], die ons bedroog.]]</code></pre>
+    <p>In de auteursnoot is dan het woord <em>schelm</em> onderstreept en toont het bij hover uw
+    editeurscommentaar.</p>
 
     <h2>4. Typografie</h2>
     <table class="regel-tabel">
@@ -93,6 +101,7 @@ apparaat: ae   | Eindnoten van de auteur   | origineel
       <tr><td>Kleinkapitaal</td><td><code>{sc:tekst}</code></td><td><span class="sc">tekst</span></td></tr>
       <tr><td>Superscript</td><td><code>{sup:tekst}</code></td><td>x<sup>tekst</sup></td></tr>
       <tr><td>Subscript</td><td><code>{sub:tekst}</code></td><td>x<sub>tekst</sub></td></tr>
+      <tr><td>Doorhaling</td><td><code>{del:tekst}</code></td><td><span class="ed-del">tekst</span></td></tr>
     </table>
 
     <h2>5. Editeursingrepen (kritische editie)</h2>
@@ -104,17 +113,18 @@ apparaat: ae   | Eindnoten van de auteur   | origineel
       <tr><td>Lacune / onleesbaar</td><td><code>{gap:reden}</code></td><td><span class="ed-gap">[reden]</span></td></tr>
     </table>
 
-    <h2>6. Pagina- en foliomarkeringen → facsimile</h2>
-    <p>Zet op een eigen regel een <code>~</code>, gevolgd door het label en het facsimiledoel:</p>
+    <h2>6. Pagina- en foliomarkeringen → het origineel</h2>
+    <p>Zet op een eigen regel een <code>~</code>, gevolgd door het label en het doel:</p>
     <pre><code>~ 12r | 1</code></pre>
     <p>Dit plaatst een klikbare markering <span class="pb">∣12r</span> in de tekst. Het tweede veld
-    is het doel: bij <code>facsimile_type: pdf</code> is dat het paginanummer in de pdf
-    (opent op die pagina); bij <code>facsimile_type: afbeelding</code> vervangt het de
+    is het doel: bij <code>origineel_type: pdf</code> is dat het paginanummer in de pdf
+    (opent op die pagina); bij <code>origineel_type: afbeelding</code> vervangt het de
     <code>{n}</code> in het bestandspad (opent de scan in een lightbox).</p>
 
     <h2>7. Werkbalk (voor de lezer)</h2>
     <p>Boven de tekst kan de lezer aan/uit zetten: elk apparaat afzonderlijk, de regelnummers,
-    de facsimilemarkeringen, en of opgeloste afkortingen cursief worden getoond.</p>
+    de paginamarkeringen, de onderstreping van geannoteerde woorden, en of opgeloste afkortingen
+    cursief worden getoond.</p>
 
     <h2>8. Lokaal bekijken</h2>
     <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
