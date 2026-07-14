@@ -718,6 +718,7 @@
       (meerdere ? bouwPager(body.paginas) : '') +
       paginasHtml;
     root.classList.add('modus-doorlopend');
+    if (!heeftNummers) root.classList.add('geen-regelnr'); // geen lege nummer-goot
 
     var styleEl = document.createElement('style');
     styleEl.textContent = verbergCss;
