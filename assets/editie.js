@@ -1065,7 +1065,7 @@
       '<p class="editie-sub">' +
         (meta.auteur ? '<span>' + escapeHtml(meta.auteur) + '</span>' : '') +
         (meta.jaar ? '<span>' + escapeHtml(meta.jaar) + '</span>' : '') +
-        (meta.bron ? '<span class="editie-bron">' + escapeHtml(meta.bron) + '</span>' : '') +
+        (meta.type ? '<span class="editie-bron">' + escapeHtml(meta.type.charAt(0).toUpperCase() + meta.type.slice(1)) + '</span>' : '') +
       '</p></header>';
 
     var verbergCss = config.apparaten.map(function (a) {
