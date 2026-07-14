@@ -358,6 +358,37 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .prozasectie h3 { font-size: 1.15rem; margin: 1.4rem 0 .4rem; }
 .prozasectie p { margin: 0 0 1rem; }
 
+/* ---- Register van namen & plaatsen ------------------------------------ */
+/* De ankers in de tekst zijn onzichtbaar tot een register-verwijzing ze oplicht. */
+.register-anker { /* geen visuele markering in de lopende tekst */ }
+.register-anker.reg-actief {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: background .2s ease;
+}
+.reg-uitleg { color: var(--inkt-zacht); max-width: var(--leesbreedte); }
+.reg-groep { margin: 1.6rem 0; }
+.reg-groep h2 { font-size: 1.3rem; margin: 0 0 .6rem; }
+.register-lijst { margin: 0; }
+.register-lijst dt {
+  font-weight: 600;
+  margin: .7rem 0 .1rem;
+}
+.register-lijst dt .reg-var {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--inkt-zacht);
+}
+.register-lijst dd {
+  margin: 0 0 .2rem;
+  padding-left: 1rem;
+  font-size: .95em;
+}
+.register-lijst dd .reg-link { color: var(--accent); text-decoration: none; }
+.register-lijst dd .reg-link:hover { text-decoration: underline; }
+.register-lijst dd .reg-sep { color: var(--lijn); margin: 0 .35rem; }
+
 @media print {
   .werkbalk, .sitehoofd, .tabs, .thema-knop, .pager { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }

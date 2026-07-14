@@ -729,3 +729,40 @@ Gij zijt … hier naa | comm | Dit is een passage uit het gedicht 'Gewillige Pat
 Deeze … weegaa | comm | De volgende pagina hoort niet bij het oorspronkelijke reisverslag. Wanneer de pagina gemaakt is, is echter onduidelijk
 wanneert | w | wanneer het.
 Continueerende tot 17 meert | comm | Onder dit fragment staat nog een passage over een winter in 1728, maar dit is niet meer in zijn volledigheid te lezen.
+
+=== REGISTER ===
+# soort | canonieke naam | variant, variant, …  (de canonieke naam hoeft niet als variant herhaald te worden)
+persoon | Tycho Brahe          | Tycho Brahe, Tycho Brake
+persoon | Christiaan V         | Cristianus
+persoon | George van Denemarken | Jurge
+persoon | Christiaan Huygens   | Huijgens
+persoon | René Descartes       | Descartes
+persoon | Abraham de Graaf     | Abraham de Graaf
+persoon | Paul Rocke           | Paul Rochus
+
+plaats | Amsterdam     | Amsterdam
+plaats | Hamburg       | Hamburg
+plaats | Harburg       | Haarburg
+plaats | Rendsburg     | Rendsburg
+plaats | Itzehoe       | Itzehou
+plaats | Elmshorn      | Elmshoorn
+plaats | Kopenhagen    | Coppenhagen, Kopenhagen
+plaats | Nyborg        | Nieuburg, Nieuwburg, Nyborg
+plaats | Göteborg      | Gottenburg, Gotenburg, Gottenborg
+plaats | Stockholm     | Stokholm
+plaats | Helsingborg   | Elsenburg
+plaats | Helsingør     | Elseneur
+plaats | Ängelholm     | Engelholm
+plaats | Laholm        | Laholm
+plaats | Falkenberg    | Falkenburg, Valkenburg
+plaats | Lund          | Lundun
+plaats | Oslo          | Christiania
+plaats | Kronborg      | Croonenburg
+plaats | Amager        | Amager
+plaats | Sprogø        | Sprogø
+plaats | Sont          | Sont, Sond
+plaats | Grote Belt    | Belt
+plaats | Jutland       | Jutland
+plaats | Denemarken    | Deenemarken, Denemarken
+plaats | Zweden        | Sweeden
+plaats | Nova Zembla   | Nova Zembla

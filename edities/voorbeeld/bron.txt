@@ -9,6 +9,7 @@ apparaat: w      | Woordverklaringen          | editeur   | links
 apparaat: krit   | Tekstkritisch apparaat     | editeur   | links
 apparaat: comm   | Toelichting en commentaar  | editeur   | rechts
 apparaat: auteur | Noten van de auteur        | origineel | rechts
+register: plaats | Constantinopel | Constantinopel, Constantinopolen
 ---
 
 # Proefeditie — overzicht van de opmaak
@@ -40,3 +41,4 @@ Een commentaarnoot kan bovendien [[een lange passage bestrijken waarin zelf een 
 ### {sc:Bijzondere gevallen}
 
 Het woord anker komt in deze alinea twee keer voor. De noot hoort bij het tweede [[anker|comm|Deze noot is met «(2)» aan het tweede voorkomen van 'anker' gekoppeld.]], niet bij het eerste. Zo kies je met een telling het juiste voorkomen.
+De schipper zag zich onderweg genoodzaakt eerst Constantinopolen aan te doen en daarna, met gunstige wind, opnieuw Constantinopel te bezoeken. Zulke wisselende schrijfwijzen brengt het register onder één noemer, met een verwijzing naar elke vindplaats.

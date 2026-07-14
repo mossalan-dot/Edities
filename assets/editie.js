@@ -50,7 +50,7 @@
 
   // ---- Front-matter -------------------------------------------------------
   function parseKop(tekst) {
-    var config = { apparaten: [], meta: {} };
+    var config = { apparaten: [], register: [], meta: {} };
     var m = tekst.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
     var rest = tekst;
     if (m) {
@@ -65,6 +65,16 @@
           var soort = d[2] || 'editeur';
           var zijde = d[3] || (soort === 'origineel' ? 'rechts' : 'links');
           config.apparaten.push({ code: d[0], label: d[1] || d[0], soort: soort, zijde: zijde });
+        } else if (key === 'register') {
+          // register: soort | canonieke naam | variant1, variant2, …
+          var r = val.split('|').map(function (x) { return x.trim(); });
+          var soortR = (r[0] || 'persoon').toLowerCase();
+          var naam = r[1] || '';
+          var varRuw = (r[2] || naam);
+          var varianten = varRuw.split(',').map(function (x) { return x.trim(); })
+            .filter(function (x) { return x.length; });
+          if (varianten.indexOf(naam) === -1 && naam) varianten.push(naam);
+          if (naam) config.register.push({ soort: soortR, naam: naam, varianten: varianten });
         } else if (key) {
           config.meta[key] = val;
         }
@@ -665,6 +675,152 @@
     document.body.appendChild(box);
   }
 
+  // ---- Register van namen & plaatsen --------------------------------------
+  function regEscape(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  // Eén verwijzing per pagina (naar het eerste voorkomen), in paginavolgorde.
+  function dedupLabels(voorkomens) {
+    var gezien = {}, uit = [];
+    voorkomens.forEach(function (v) {
+      var sleutel = v.label || v.id;
+      if (gezien[sleutel]) return;
+      gezien[sleutel] = true;
+      uit.push(v);
+    });
+    return uit;
+  }
+
+  function bouwRegister(root, config) {
+    var doel = document.getElementById('register');
+    if (!doel || !config.register || !config.register.length) return;
+
+    // Alle varianten met verwijzing naar hun ingang, langste eerst zodat
+    // 'Tycho Brahe' vóór 'Tycho' matcht.
+    var alle = [];
+    config.register.forEach(function (ing, i) {
+      ing._voorkomens = [];
+      ing.varianten.forEach(function (v) { alle.push({ v: v, i: i }); });
+    });
+    alle.sort(function (a, b) { return b.v.length - a.v.length; });
+    if (!alle.length) return;
+
+    var perVariant = {};
+    alle.forEach(function (a) { perVariant[a.v.toLowerCase()] = a.i; });
+    var patroon;
+    try {
+      patroon = new RegExp(
+        '(?<![\\p{L}\\p{N}])(' +
+        alle.map(function (a) { return regEscape(a.v); }).join('|') +
+        ')(?![\\p{L}\\p{N}])', 'giu');
+    } catch (e) {
+      // Oudere browser zonder lookbehind/unicode-props: sla het register over.
+      return;
+    }
+
+    var teller = 0;
+    root.querySelectorAll('.pagina .tekst').forEach(function (tekstEl) {
+      var pagina = tekstEl.closest('.pagina');
+      var label = pagina ? pagina.getAttribute('data-label') : '';
+      // Verzamel eerst de tekstknopen; wijzig de DOM daarna.
+      var knopen = [];
+      var loper = document.createTreeWalker(tekstEl, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          // Sla bijschriften van afbeeldingen over.
+          if (n.parentNode.closest('figure')) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      var n;
+      while ((n = loper.nextNode())) knopen.push(n);
+
+      knopen.forEach(function (node) {
+        var tekst = node.nodeValue;
+        patroon.lastIndex = 0;
+        if (!patroon.test(tekst)) return;
+        patroon.lastIndex = 0;
+        var frag = document.createDocumentFragment();
+        var laatst = 0, mm;
+        while ((mm = patroon.exec(tekst))) {
+          var woord = mm[1];
+          var start = mm.index;
+          if (start > laatst) frag.appendChild(document.createTextNode(tekst.slice(laatst, start)));
+          var id = 'reg-' + (++teller);
+          var span = document.createElement('span');
+          span.className = 'register-anker';
+          span.id = id;
+          span.textContent = woord;
+          frag.appendChild(span);
+          laatst = start + woord.length;
+          var ing = config.register[perVariant[woord.toLowerCase()]];
+          if (ing) ing._voorkomens.push({ id: id, label: label });
+        }
+        if (laatst < tekst.length) frag.appendChild(document.createTextNode(tekst.slice(laatst)));
+        node.parentNode.replaceChild(frag, node);
+      });
+    });
+
+    // Groepeer per soort en render alfabetisch.
+    var groepen = {
+      persoon: { titel: 'Personen', items: [] },
+      plaats:  { titel: 'Plaatsen', items: [] }
+    };
+    config.register.forEach(function (ing) {
+      if (!ing._voorkomens.length) return;
+      var g = groepen[ing.soort] || (groepen[ing.soort] = { titel: ing.soort, items: [] });
+      g.items.push(ing);
+    });
+
+    var html = '<h1>Register</h1>' +
+      '<p class="reg-uitleg">Namen van personen en plaatsen, met hun spelvarianten in het ' +
+      'handschrift. Klik op een vindplaats om die in de tekst op te zoeken.</p>';
+    var volgorde = ['persoon', 'plaats'];
+    Object.keys(groepen).forEach(function (k) { if (volgorde.indexOf(k) === -1) volgorde.push(k); });
+    var iets = false;
+    volgorde.forEach(function (k) {
+      var g = groepen[k];
+      if (!g || !g.items.length) return;
+      iets = true;
+      g.items.sort(function (a, b) { return a.naam.localeCompare(b.naam, 'nl'); });
+      html += '<section class="reg-groep"><h2>' + escapeHtml(g.titel) + '</h2><dl class="register-lijst">';
+      g.items.forEach(function (ing) {
+        var varTekst = ing.varianten.filter(function (v) { return v !== ing.naam; });
+        html += '<dt>' + escapeHtml(ing.naam) +
+          (varTekst.length ? ' <span class="reg-var">(' + escapeHtml(varTekst.join(', ')) + ')</span>' : '') +
+          '</dt><dd>' +
+          dedupLabels(ing._voorkomens).map(function (v, j) {
+            return '<a class="reg-link" data-doel="' + v.id + '" href="#">' +
+              escapeHtml(v.label || ('§' + (j + 1))) + '</a>';
+          }).join('<span class="reg-sep">·</span>') +
+          '</dd>';
+      });
+      html += '</dl></section>';
+    });
+    if (!iets) html += '<p>Nog geen vindplaatsen gevonden.</p>';
+    doel.innerHTML = html;
+
+    doel.addEventListener('click', function (e) {
+      var link = e.target.closest('.reg-link');
+      if (!link) return;
+      e.preventDefault();
+      var id = link.getAttribute('data-doel');
+      var tab = document.querySelector('.tabs [data-paneel="tekst"]');
+      if (tab) tab.click();
+      var mikpunt = document.getElementById(id);
+      if (!mikpunt) return;
+      // Zorg dat de pagina zichtbaar is in de per-pagina modus.
+      var pag = mikpunt.closest('.pagina');
+      if (pag && root.classList.contains('modus-pagina')) {
+        var knop = root.querySelector('.pager-knop[data-i="' + pag.getAttribute('data-i') + '"]');
+        if (knop) knop.click();
+      }
+      root.querySelectorAll('.reg-actief').forEach(function (x) { x.classList.remove('reg-actief'); });
+      mikpunt.classList.add('reg-actief');
+      mikpunt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function () { mikpunt.classList.remove('reg-actief'); }, 2600);
+    });
+  }
+
   // ---- Publiek ------------------------------------------------------------
   function render(root, tekst) {
     var parsed = parseKop(tekst);
@@ -714,6 +870,7 @@
     root.appendChild(styleEl);
 
     koppelInteracties(root, config, body.noten);
+    bouwRegister(root, config);
     return { config: config, regels: body.regels, noten: body.noten.length, paginas: body.paginas.length };
   }
 

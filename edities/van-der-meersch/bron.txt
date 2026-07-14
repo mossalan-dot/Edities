@@ -10,6 +10,39 @@ origineel_afbeeldingen: origineel/pagina-{n}.jpg
 apparaat: w      | Woordverklaringen          | editeur   | links
 apparaat: comm   | Toelichting en commentaar  | editeur   | rechts
 apparaat: auteur | Noten van de auteur        | origineel | rechts
+register: persoon | Tycho Brahe          | Tycho Brahe, Tycho Brake
+register: persoon | Christiaan V         | Cristianus
+register: persoon | George van Denemarken | Jurge
+register: persoon | Christiaan Huygens   | Huijgens
+register: persoon | René Descartes       | Descartes
+register: persoon | Abraham de Graaf     | Abraham de Graaf
+register: persoon | Paul Rocke           | Paul Rochus
+register: plaats | Amsterdam     | Amsterdam
+register: plaats | Hamburg       | Hamburg
+register: plaats | Harburg       | Haarburg
+register: plaats | Rendsburg     | Rendsburg
+register: plaats | Itzehoe       | Itzehou
+register: plaats | Elmshorn      | Elmshoorn
+register: plaats | Kopenhagen    | Coppenhagen, Kopenhagen
+register: plaats | Nyborg        | Nieuburg, Nieuwburg, Nyborg
+register: plaats | Göteborg      | Gottenburg, Gotenburg, Gottenborg
+register: plaats | Stockholm     | Stokholm
+register: plaats | Helsingborg   | Elsenburg
+register: plaats | Helsingør     | Elseneur
+register: plaats | Ängelholm     | Engelholm
+register: plaats | Laholm        | Laholm
+register: plaats | Falkenberg    | Falkenburg, Valkenburg
+register: plaats | Lund          | Lundun
+register: plaats | Oslo          | Christiania
+register: plaats | Kronborg      | Croonenburg
+register: plaats | Amager        | Amager
+register: plaats | Sprogø        | Sprogø
+register: plaats | Sont          | Sont, Sond
+register: plaats | Grote Belt    | Belt
+register: plaats | Jutland       | Jutland
+register: plaats | Denemarken    | Deenemarken, Denemarken
+register: plaats | Zweden        | Sweeden
+register: plaats | Nova Zembla   | Nova Zembla
 ---
 
 # Reisverhaal van Abraham van der Meersch

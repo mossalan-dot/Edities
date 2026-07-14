@@ -80,6 +80,19 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   NESTING in de hoofdtekst: overlapt een commentaarnoot een woordverklaring
   (de ene ligt binnen de andere), dan nest de importer ze vanzelf.
 
+--- HET REGISTER (=== REGISTER ===) ------------------------------------------
+  Een optioneel blok, ingeleid door een regel  === REGISTER === , met per regel:
+        soort | canonieke naam | variant, variant, …
+     soort    persoon of plaats (bepaalt de groep in het register).
+     naam     de gestandaardiseerde vorm die als kopje verschijnt.
+     varianten alle schrijfwijzen zoals ze in het handschrift voorkomen,
+              door komma's gescheiden. De canonieke naam hoeft niet herhaald.
+  Het register verschijnt NIET in het notenapparaat. De site zoekt elke variant
+  in de lopende tekst op, groepeert de vindplaatsen onder de canonieke naam en
+  toont ze op een apart tabblad «Register». Klikken op een vindplaats opent de
+  tekst en licht het woord op. Zo vang je afwijkende en inconsequente spelling
+  onder één noemer, zonder de hoofdtekst te vervuilen.
+
 --- WEERGAVE (voor de lezer) -------------------------------------------------
   Werkbalk: zoeken, doorlopend lezen of per pagina bladeren, apparaten aan/uit,
   regelnummers, paginamarkeringen, en de kantlijnnoten (breed scherm) of het
@@ -117,6 +130,8 @@ Een commentaarnoot kan bovendien een lange passage bestrijken waarin zelf een wo
 
 Het woord anker komt in deze alinea twee keer voor. De noot hoort bij het tweede anker, niet bij het eerste. Zo kies je met een telling het juiste voorkomen.
 
+De schipper zag zich onderweg genoodzaakt eerst Constantinopolen aan te doen en daarna, met gunstige wind, opnieuw Constantinopel te bezoeken. Zulke wisselende schrijfwijzen brengt het register onder één noemer, met een verwijzing naar elke vindplaats.
+
 === NOTEN ===
 kompas | w | instrument voor de navigatie.
 Constantinopel | comm | Het huidige Istanbul; in de vroegmoderne tijd de hoofdstad van het Ottomaanse Rijk.
@@ -126,3 +141,7 @@ van het eerste … laatste woord | w | Voorbeeld van een lemma dat meerdere woor
 een lange passage bestrijken … becommentarieerde zin | comm | Voorbeeld van een commentaarnoot die een hele passage omvat; de woordverklaring galjoen staat er genest in.
 galjoen | w | versierde boeg van een schip; ook het schip zelf.
 anker (2) | comm | Deze noot is met «(2)» aan het tweede voorkomen van 'anker' gekoppeld.
+
+=== REGISTER ===
+# soort | canonieke naam | variant, variant, …
+plaats | Constantinopel | Constantinopel, Constantinopolen

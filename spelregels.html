@@ -174,12 +174,37 @@ apparaat: auteur | Noten van de auteur        | origineel
     paginakeuze). Bij het doorbladeren tonen de apparaten alleen de noten van de zichtbare pagina.
     Elke pagina is aan te linken met <code>#pagina-2</code> in de URL.</p>
 
-    <h2>8. Werkbalk (voor de lezer)</h2>
+    <h2>8. Register van namen en plaatsen</h2>
+    <p>Naast de noten kunt u een <strong>register</strong> aanleggen. Dat verschijnt op een apart
+    tabblad en <em>niet</em> in het notenapparaat. Het register is bij uitstek geschikt om de
+    afwijkende en inconsequente spelling van eigennamen onder één noemer te brengen. Voeg onderaan
+    het bronbestand een blok toe, ingeleid door een regel <code>=== REGISTER ===</code>, met per
+    regel:</p>
+    <pre><code>soort | canonieke naam | variant, variant, …</code></pre>
+    <ul>
+      <li><code>soort</code> — <code>persoon</code> of <code>plaats</code>; bepaalt onder welke groep
+      (Personen of Plaatsen) de ingang komt te staan.</li>
+      <li><code>canonieke naam</code> — de gestandaardiseerde vorm die als kopje verschijnt
+      (bijvoorbeeld <em>Göteborg</em>).</li>
+      <li><code>varianten</code> — alle schrijfwijzen zoals ze in het handschrift voorkomen, door
+      komma's gescheiden (<em>Gottenburg, Gotenburg, Gottenborg</em>). De canonieke naam hoeft niet
+      te worden herhaald.</li>
+    </ul>
+    <p>Voorbeeld:</p>
+    <pre><code>=== REGISTER ===
+persoon | Tycho Brahe | Tycho Brahe, Tycho Brake
+plaats  | Kopenhagen  | Coppenhagen, Kopenhagen</code></pre>
+    <p>De site zoekt elke variant in de lopende tekst op, groepeert de vindplaatsen alfabetisch onder
+    de canonieke naam en toont bij elke ingang de pagina's waarop de naam voorkomt. Een klik op een
+    vindplaats opent de tekst en licht het woord even op. De hoofdtekst blijft schoon: er komen geen
+    markeringen in te staan.</p>
+
+    <h2>9. Werkbalk (voor de lezer)</h2>
     <p>Boven de tekst kan de lezer aan/uit zetten: elk apparaat afzonderlijk, de regelnummers,
     de paginamarkeringen, de onderstreping van geannoteerde woorden, en of opgeloste afkortingen
     cursief worden getoond — plus, bij meerdere pagina's, de keuze tussen doorlopend en per pagina.</p>
 
-    <h2>9. Lokaal bekijken</h2>
+    <h2>10. Lokaal bekijken</h2>
     <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
     webserver openen, niet rechtstreeks als bestand. Bijvoorbeeld:</p>
     <pre><code>python3 -m http.server

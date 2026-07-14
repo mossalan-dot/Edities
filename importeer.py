@@ -29,21 +29,32 @@ import sys
 import os
 
 NOTEN_SCHEIDING = re.compile(r'^\s*={3,}\s*NOTEN\s*={3,}\s*$', re.IGNORECASE)
+REGISTER_SCHEIDING = re.compile(r'^\s*={3,}\s*REGISTER\s*={3,}\s*$', re.IGNORECASE)
 
 
 def parse_bestand(tekst):
-    """Splits frontmatter, hoofdtekst en notenblok."""
+    """Splits frontmatter, hoofdtekst, notenblok en registerblok.
+
+    Retour: (frontmatter, hoofdtekst, noten, registerregels). Het registerblok
+    (=== REGISTER ===) bevat regels  soort | canonieke naam | variant, variant …
+    die als  register:-regels aan de frontmatter worden toegevoegd."""
     m = re.match(r'^---\s*\n(.*?)\n---\s*\n?', tekst, re.DOTALL)
     frontmatter = m.group(1) if m else ''
     rest = tekst[m.end():] if m else tekst
 
-    tekstregels, notenregels = [], []
-    in_noten = False
+    tekstregels, notenregels, registerregels = [], [], []
+    sectie = 'tekst'
     for regel in rest.split('\n'):
         if NOTEN_SCHEIDING.match(regel):
-            in_noten = True
-            continue
-        (notenregels if in_noten else tekstregels).append(regel)
+            sectie = 'noten'; continue
+        if REGISTER_SCHEIDING.match(regel):
+            sectie = 'register'; continue
+        if sectie == 'noten':
+            notenregels.append(regel)
+        elif sectie == 'register':
+            registerregels.append(regel)
+        else:
+            tekstregels.append(regel)
 
     noten = []
     for regel in notenregels:
@@ -52,7 +63,13 @@ def parse_bestand(tekst):
         velden = [x.strip() for x in regel.split('|', 2)]
         if len(velden) == 3:
             noten.append(tuple(velden))  # (lemma, code, inhoud)
-    return frontmatter, '\n'.join(tekstregels), noten
+
+    register = []
+    for regel in registerregels:
+        if not regel.strip() or regel.lstrip().startswith('#') or '|' not in regel:
+            continue
+        register.append(regel.strip())
+    return frontmatter, '\n'.join(tekstregels), noten, register
 
 
 def maak_blokken(tekst):
@@ -223,7 +240,10 @@ def main():
     # Obsidian-commentaar %% ... %% wordt genegeerd (bv. voor een legenda).
     tekst = re.sub(r'%%[\s\S]*?%%', '', tekst)
 
-    frontmatter, hoofdtekst, noten = parse_bestand(tekst)
+    frontmatter, hoofdtekst, noten, register = parse_bestand(tekst)
+    if register:
+        extra = '\n'.join('register: ' + r for r in register)
+        frontmatter = frontmatter.rstrip('\n') + '\n' + extra
     blokken = maak_blokken(hoofdtekst)
     para, inserts, rapport = anker_noten(blokken, noten)
     pas_toe(para, inserts)
