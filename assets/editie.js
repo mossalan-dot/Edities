@@ -350,12 +350,13 @@
       var actief = window.matchMedia('(min-width: 1100px)').matches;
       root.classList.toggle('kantnoten-aan', actief);
 
-      // Brede figuren: precies zo breed als de ruimte tussen de kantnoten
-      // (12rem-kolom + wat lucht aan weerskanten), of vol op smal scherm.
+      // Brede figuren: bescheiden gekoppeld aan de hoofdtekstkolom — enkele rem
+      // breder dan de tekst, gecentreerd op die kolom (niet tot de notenmarges).
       var remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      var tekstEl = root.querySelector('.tekst');
+      var tekstW = tekstEl ? tekstEl.clientWidth : Math.min(root.clientWidth, 40 * remPx);
       root.querySelectorAll('.editie-figuur.breed').forEach(function (fig) {
-        fig.style.width = actief ? (root.clientWidth - 27 * remPx) + 'px'
-                                 : Math.min(root.clientWidth, 56 * remPx) + 'px';
+        fig.style.width = (tekstW + 6 * remPx) + 'px';   // ~3rem aan elke kant
       });
 
       var links = root.querySelector(':scope > .kant-links') || maakKant('links');
