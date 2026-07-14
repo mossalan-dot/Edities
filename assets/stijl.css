@@ -129,7 +129,9 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 /* ---- Pagina's en weergavemodus ----------------------------------------- */
 .modus-bladeren .pagina { display: none; }
 .modus-bladeren .pagina.actief { display: block; }
-.modus-doorlopend .pagina + .pagina { border-top: 1px dashed var(--lijn); margin-top: 2rem; padding-top: 1.5rem; }
+/* Paginascheiding: stippellijn alleen onder de tekstkolom, niet door de noten */
+.modus-doorlopend .pagina + .pagina { margin-top: 2rem; }
+.modus-doorlopend .pagina + .pagina .tekst { border-top: 1px dashed var(--lijn); padding-top: 1.5rem; }
 
 .pager {
   position: sticky; top: 3.6rem; z-index: 15;
