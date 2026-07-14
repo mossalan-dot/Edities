@@ -94,9 +94,10 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   onder één noemer, zonder de hoofdtekst te vervuilen.
 
 --- WEERGAVE (voor de lezer) -------------------------------------------------
-  Werkbalk: zoeken, doorlopend lezen of per pagina bladeren, apparaten aan/uit,
-  regelnummers, paginamarkeringen, en de kantlijnnoten (breed scherm) of het
-  apparaat onderaan (smal scherm).
+  Werkbalk: zoeken, een inhoudsopgave (knop Inhoud) met de kopjes, doorlopend
+  lezen of per pagina bladeren, apparaten aan/uit, regelnummers,
+  paginamarkeringen, en de kantlijnnoten (breed scherm) of het apparaat
+  onderaan (smal scherm).
 ================================================================================
 %%
 

@@ -185,6 +185,7 @@
     var regelnr = 0;
     var figuurnr = 0;
     var paginas = [];
+    var koppen = [];
     var cur = { label: null, doel: null, uit: [], noten: [], inAlinea: false };
 
     function sluit() { if (cur.inAlinea) { cur.uit.push('</div>'); cur.inAlinea = false; } }
@@ -201,7 +202,9 @@
         sluit();
         var niveau = kop[1].length;         // 1, 2 of 3
         var hTag = 'h' + (niveau + 1);       // h2 / h3 / h4
-        cur.uit.push('<' + hTag + ' class="tekstkop kop-' + niveau + '">' +
+        var kopId = 'kop-' + (koppen.length + 1);
+        koppen.push({ niveau: niveau, tekst: platteKop(kop[2]), id: kopId, pagina: paginas.length + 1 });
+        cur.uit.push('<' + hTag + ' class="tekstkop kop-' + niveau + '" id="' + kopId + '">' +
                      opmaak(escapeHtml(kop[2])) + '</' + hTag + '>');
         continue;
       }
@@ -254,7 +257,12 @@
     paginas.push(cur);
     var alle = [];
     paginas.forEach(function (p) { alle = alle.concat(p.noten); });
-    return { paginas: paginas, noten: alle, regels: regelnr };
+    return { paginas: paginas, noten: alle, regels: regelnr, koppen: koppen };
+  }
+
+  // Markup uit een kop halen voor een leesbaar inhoudsopgave-label.
+  function platteKop(s) {
+    return s.replace(/\{[a-z]+:([^{}]*)\}/g, '$1').replace(/\*+/g, '').trim();
   }
 
   // ---- Apparaten onderaan -------------------------------------------------
@@ -287,10 +295,11 @@
   }
 
   // ---- Werkbalk -----------------------------------------------------------
-  function renderWerkbalk(config, noten, meerdere) {
+  function renderWerkbalk(config, noten, meerdere, koppen) {
     var aanwezig = {};
     noten.forEach(function (n) { aanwezig[n.code] = true; });
     var heeftNummers = parseInt(config.meta.regelnummering, 10) > 0;
+    var heeftInhoud = koppen && koppen.length > 0;
     var uit = ['<div class="werkbalk" role="group" aria-label="Weergaveopties">'];
     uit.push('<div class="wb-boven">');
     uit.push('<div class="wb-groep wb-zoek">');
@@ -299,9 +308,25 @@
     uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled>‹</button>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled>›</button>');
     uit.push('</div>');
+    uit.push('<div class="wb-knoppen">');
+    if (heeftInhoud) {
+      uit.push('<button type="button" class="wb-uitklap wb-inhoud-knop" aria-expanded="false" aria-controls="wb-inhoud">' +
+               'Inhoud <span class="wb-caret">▾</span></button>');
+    }
     uit.push('<button type="button" class="wb-uitklap" aria-expanded="false" aria-controls="wb-instellingen">' +
              'Weergave <span class="wb-caret">▾</span></button>');
+    uit.push('</div>');
     uit.push('</div>'); // wb-boven
+    if (heeftInhoud) {
+      uit.push('<nav class="wb-inhoud" id="wb-inhoud" hidden aria-label="Inhoudsopgave">');
+      uit.push('<ol class="inhoud-lijst">');
+      koppen.forEach(function (k) {
+        uit.push('<li class="inh-niv-' + k.niveau + '">' +
+          '<a href="#" data-kop="' + k.id + '" data-pagina="' + k.pagina + '">' +
+          escapeHtml(k.tekst) + '</a></li>');
+      });
+      uit.push('</ol></nav>');
+    }
     uit.push('<div class="wb-instellingen" id="wb-instellingen" hidden>');
     if (meerdere) {
       uit.push('<div class="wb-groep"><span class="wb-kop">Weergave</span>');
@@ -447,6 +472,9 @@
         if (pager) pager.hidden = true;
       }
     }
+    // Beschikbaar voor register en inhoudsopgave: toon (in bladermodus) de
+    // pagina waar een element op staat.
+    root._toonPagina = function (i) { if (root.classList.contains('modus-bladeren')) activeer(i); };
 
     // ---- Zoeken (over alle pagina's) --------------------------------------
     var veld = root.querySelector('.zoekveld');
@@ -586,11 +614,36 @@
     root.addEventListener('click', function (e) {
       var up = e.target.closest('.wb-uitklap');
       if (up) {
-        var panel = root.querySelector('.wb-instellingen');
+        var panel = document.getElementById(up.getAttribute('aria-controls'));
+        if (!panel) return;
         var open = panel.hidden;
+        // Sluit eventuele andere open werkbalkpanelen.
+        root.querySelectorAll('.wb-uitklap').forEach(function (b) {
+          if (b === up) return;
+          var p = document.getElementById(b.getAttribute('aria-controls'));
+          if (p && !p.hidden) { p.hidden = true; b.setAttribute('aria-expanded', 'false'); b.classList.remove('open'); }
+        });
         panel.hidden = !open;
         up.setAttribute('aria-expanded', String(open));
         up.classList.toggle('open', open);
+        return;
+      }
+      var kl = e.target.closest('[data-kop]');
+      if (kl) {
+        e.preventDefault();
+        var kopId = kl.getAttribute('data-kop');
+        if (root._toonPagina) root._toonPagina(+kl.getAttribute('data-pagina'));
+        var kdoel = document.getElementById(kopId);
+        if (kdoel) {
+          kdoel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          kdoel.classList.add('kop-actief');
+          setTimeout(function () { kdoel.classList.remove('kop-actief'); }, 2000);
+        }
+        // Sluit het inhoudspaneel na een keuze.
+        var inh = root.querySelector('.wb-inhoud');
+        var iknop = root.querySelector('.wb-inhoud-knop');
+        if (inh) inh.hidden = true;
+        if (iknop) { iknop.setAttribute('aria-expanded', 'false'); iknop.classList.remove('open'); }
         return;
       }
       var pnr = e.target.closest('.pagina-nr[data-doel]');
@@ -810,10 +863,7 @@
       if (!mikpunt) return;
       // Zorg dat de pagina zichtbaar is in de per-pagina modus.
       var pag = mikpunt.closest('.pagina');
-      if (pag && root.classList.contains('modus-pagina')) {
-        var knop = root.querySelector('.pager-knop[data-i="' + pag.getAttribute('data-i') + '"]');
-        if (knop) knop.click();
-      }
+      if (pag && root._toonPagina) root._toonPagina(+pag.getAttribute('data-i'));
       root.querySelectorAll('.reg-actief').forEach(function (x) { x.classList.remove('reg-actief'); });
       mikpunt.classList.add('reg-actief');
       mikpunt.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -859,7 +909,7 @@
 
     root.innerHTML =
       kop +
-      renderWerkbalk(config, body.noten, meerdere) +
+      renderWerkbalk(config, body.noten, meerdere, body.koppen) +
       (meerdere ? bouwPager(body.paginas) : '') +
       paginasHtml;
     root.classList.add('modus-doorlopend');
