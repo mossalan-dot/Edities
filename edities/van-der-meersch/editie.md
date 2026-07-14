@@ -77,6 +77,8 @@ Dit drukte dien victorieuse vorst, dit kost hij niet opkroppen. Hij trekt terug,
 
 ## {sc:Sprogø, Korsør, Næstved, Kopenhagen}
 
+@ 1674-02-23 | 23 februari 1674
+
 Den morgenstont op den 23 februarij vertoonden hem seer helder en klaar met strenge vorst.
 
 
@@ -201,6 +203,8 @@ Gottenborg is een net steedje met dwerse burgwallen, maer meest al houte huijzen
 
 
 ## {sc:De Terugreis}
+
+@ 1674-03-17 | 17 maart 1674
 
 't Was dan den 17 maart, nadat wij overal minsaam afscheijd genomen, hadden, gelijk de heren van Halmael van mij en ik van haer elk ons weegs van Gottenborg vertrokken. Ik weer so eenzaam, heel alleen besprak een slee met 2 paarden met een jong gezel, daar ik mee spreeken kon. Daarmee vertrok ik dan van Gottenborg.
 

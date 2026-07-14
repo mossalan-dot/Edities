@@ -186,6 +186,7 @@
     var figuurnr = 0;
     var paginas = [];
     var koppen = [];
+    var dagen = [];
     var cur = { label: null, doel: null, uit: [], noten: [], inAlinea: false };
 
     function sluit() { if (cur.inAlinea) { cur.uit.push('</div>'); cur.inAlinea = false; } }
@@ -224,6 +225,20 @@
         continue;
       }
 
+      // dagtekening:  @ SLEUTEL [sv|sn] | LABEL  → datummarkering voor navigatie
+      if (t.charAt(0) === '@' && /^@\s/.test(t)) {
+        var dm = parseDag(t.slice(1).trim());
+        if (dm) {
+          sluit();
+          var dagId = 'dag-' + (dagen.length + 1);
+          dagen.push({ id: dagId, sleutel: dm.sleutel, label: dm.label, stijl: dm.stijl, pagina: paginas.length + 1 });
+          cur.uit.push('<span class="db" id="' + dagId + '">' +
+            '<span class="db-diamant" aria-hidden="true">◈</span> ' + escapeHtml(dm.label) +
+            (dm.stijl ? ' <span class="db-stijl">' + dm.stijl + '</span>' : '') + '</span>');
+          continue;
+        }
+      }
+
       // pagina-/foliomarkering: ~ LABEL | DOEL  → paginagrens
       if (t.charAt(0) === '~') {
         var pm = t.slice(1).split('|').map(function (x) { return x.trim(); });
@@ -257,12 +272,45 @@
     paginas.push(cur);
     var alle = [];
     paginas.forEach(function (p) { alle = alle.concat(p.noten); });
-    return { paginas: paginas, noten: alle, regels: regelnr, koppen: koppen };
+    return { paginas: paginas, noten: alle, regels: regelnr, koppen: koppen, dagen: dagen };
   }
 
   // Markup uit een kop halen voor een leesbaar inhoudsopgave-label.
   function platteKop(s) {
     return s.replace(/\{[a-z]+:([^{}]*)\}/g, '$1').replace(/\*+/g, '').trim();
+  }
+
+  // ---- Dagtekeningen ------------------------------------------------------
+  // Sorteersleutel uit een (gedeeltelijke) datum YYYY[-MM[-DD]]. Bij stilo
+  // vetus (Juliaans) wordt een volledige datum naar stilo novo (Gregoriaans)
+  // omgezet, zodat de dagen chronologisch blijven kloppen.
+  function dagSleutel(k, stijl) {
+    var m = k.match(/^(\d{4})(?:-(\d{1,2}))?(?:-(\d{1,2}))?$/);
+    if (!m) return -1;
+    var y = +m[1], mo = m[2] ? +m[2] : 0, d = m[3] ? +m[3] : 0;
+    if (stijl === 'sv' && mo && d) {
+      var off = y < 1700 ? 10 : (y < 1800 ? 11 : 12); // Juliaans → Gregoriaans
+      var dt = new Date(Date.UTC(y, mo - 1, d + off));
+      y = dt.getUTCFullYear(); mo = dt.getUTCMonth() + 1; d = dt.getUTCDate();
+    }
+    return y * 10000 + mo * 100 + d;
+  }
+  // Ontleedt  SLEUTEL[/SLEUTEL2] [sv|sn] | LABEL .
+  function parseDag(s) {
+    var pipe = s.indexOf('|');
+    var links = (pipe === -1 ? s : s.slice(0, pipe)).trim();
+    var label = (pipe === -1 ? '' : s.slice(pipe + 1)).trim();
+    var stijl = '';
+    var ms = links.match(/\s(sv|sn)$/i);
+    if (ms) { stijl = ms[1].toLowerCase(); links = links.slice(0, ms.index).trim(); }
+    var keyRuw = links.split('/')[0].trim(); // begin van een eventueel bereik
+    if (!/^\d{4}(-\d{1,2}){0,2}$/.test(keyRuw)) return null;
+    if (!label) label = keyRuw;
+    return {
+      sleutel: dagSleutel(keyRuw, stijl),
+      label: label,
+      stijl: stijl === 'sv' ? 'o.s.' : (stijl === 'sn' ? 'n.s.' : '')
+    };
   }
 
   // ---- Apparaten onderaan -------------------------------------------------
@@ -295,11 +343,12 @@
   }
 
   // ---- Werkbalk -----------------------------------------------------------
-  function renderWerkbalk(config, noten, meerdere, koppen) {
+  function renderWerkbalk(config, noten, meerdere, koppen, dagen) {
     var aanwezig = {};
     noten.forEach(function (n) { aanwezig[n.code] = true; });
     var heeftNummers = parseInt(config.meta.regelnummering, 10) > 0;
     var heeftInhoud = koppen && koppen.length > 0;
+    var heeftDagen = dagen && dagen.length > 0;
     var uit = ['<div class="werkbalk" role="group" aria-label="Weergaveopties">'];
     uit.push('<div class="wb-boven">');
     uit.push('<div class="wb-groep wb-zoek">');
@@ -313,6 +362,10 @@
       uit.push('<button type="button" class="wb-uitklap wb-inhoud-knop" aria-expanded="false" aria-controls="wb-inhoud">' +
                'Inhoud <span class="wb-caret">▾</span></button>');
     }
+    if (heeftDagen) {
+      uit.push('<button type="button" class="wb-uitklap wb-dagen-knop" aria-expanded="false" aria-controls="wb-dagen">' +
+               'Dagen <span class="wb-caret">▾</span></button>');
+    }
     uit.push('<button type="button" class="wb-uitklap" aria-expanded="false" aria-controls="wb-instellingen">' +
              'Weergave <span class="wb-caret">▾</span></button>');
     uit.push('</div>');
@@ -322,8 +375,19 @@
       uit.push('<ol class="inhoud-lijst">');
       koppen.forEach(function (k) {
         uit.push('<li class="inh-niv-' + k.niveau + '">' +
-          '<a href="#" data-kop="' + k.id + '" data-pagina="' + k.pagina + '">' +
+          '<a href="#" data-spring="' + k.id + '" data-pagina="' + k.pagina + '">' +
           escapeHtml(k.tekst) + '</a></li>');
+      });
+      uit.push('</ol></nav>');
+    }
+    if (heeftDagen) {
+      var chron = dagen.slice().sort(function (a, b) { return a.sleutel - b.sleutel; });
+      uit.push('<nav class="wb-dagen" id="wb-dagen" hidden aria-label="Dagen">');
+      uit.push('<ol class="dagen-lijst">');
+      chron.forEach(function (d) {
+        uit.push('<li><a href="#" data-spring="' + d.id + '" data-pagina="' + d.pagina + '">' +
+          escapeHtml(d.label) +
+          (d.stijl ? ' <span class="db-stijl">' + d.stijl + '</span>' : '') + '</a></li>');
       });
       uit.push('</ol></nav>');
     }
@@ -338,6 +402,7 @@
     if (heeftNummers) uit.push(toggle('opt-regelnr', 'Regelnummers', true));
     uit.push(toggle('opt-markering', 'Markeer geannoteerde woorden', true));
     uit.push(toggle('opt-editie', 'Paginamarkeringen', true));
+    if (heeftDagen) uit.push(toggle('opt-dagen', 'Dagtekeningen', true));
     uit.push(toggle('opt-afkorting', 'Opgeloste afkortingen markeren', true));
     uit.push('</div>');
     uit.push('<div class="wb-groep"><span class="wb-kop">Apparaten</span>');
@@ -628,22 +693,21 @@
         up.classList.toggle('open', open);
         return;
       }
-      var kl = e.target.closest('[data-kop]');
-      if (kl) {
+      var sl = e.target.closest('[data-spring]');
+      if (sl) {
         e.preventDefault();
-        var kopId = kl.getAttribute('data-kop');
-        if (root._toonPagina) root._toonPagina(+kl.getAttribute('data-pagina'));
-        var kdoel = document.getElementById(kopId);
-        if (kdoel) {
-          kdoel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          kdoel.classList.add('kop-actief');
-          setTimeout(function () { kdoel.classList.remove('kop-actief'); }, 2000);
+        if (root._toonPagina) root._toonPagina(+sl.getAttribute('data-pagina'));
+        var sdoel = document.getElementById(sl.getAttribute('data-spring'));
+        if (sdoel) {
+          sdoel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sdoel.classList.add('spring-actief');
+          setTimeout(function () { sdoel.classList.remove('spring-actief'); }, 2000);
         }
-        // Sluit het inhoudspaneel na een keuze.
-        var inh = root.querySelector('.wb-inhoud');
-        var iknop = root.querySelector('.wb-inhoud-knop');
-        if (inh) inh.hidden = true;
-        if (iknop) { iknop.setAttribute('aria-expanded', 'false'); iknop.classList.remove('open'); }
+        // Sluit alle open werkbalkpanelen (Inhoud / Dagen) na een keuze.
+        root.querySelectorAll('.wb-uitklap').forEach(function (b) {
+          var p = document.getElementById(b.getAttribute('aria-controls'));
+          if (p && p.tagName === 'NAV') { p.hidden = true; b.setAttribute('aria-expanded', 'false'); b.classList.remove('open'); }
+        });
         return;
       }
       var pnr = e.target.closest('.pagina-nr[data-doel]');
@@ -684,6 +748,8 @@
         root.classList.toggle('geen-regelnr', !t.checked);
       } else if (t.id === 'opt-editie') {
         root.classList.toggle('geen-editiemark', !t.checked);
+      } else if (t.id === 'opt-dagen') {
+        root.classList.toggle('geen-dagmark', !t.checked);
       } else if (t.id === 'opt-afkorting') {
         root.classList.toggle('geen-afkorting', !t.checked);
         herberekenLater();
@@ -909,7 +975,7 @@
 
     root.innerHTML =
       kop +
-      renderWerkbalk(config, body.noten, meerdere, body.koppen) +
+      renderWerkbalk(config, body.noten, meerdere, body.koppen, body.dagen) +
       (meerdere ? bouwPager(body.paginas) : '') +
       paginasHtml;
     root.classList.add('modus-doorlopend');

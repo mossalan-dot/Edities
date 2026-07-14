@@ -199,15 +199,38 @@ plaats  | Kopenhagen  | Coppenhagen, Kopenhagen</code></pre>
     vindplaats opent de tekst en licht het woord even op. De hoofdtekst blijft schoon: er komen geen
     markeringen in te staan.</p>
 
-    <h2>9. Werkbalk (voor de lezer)</h2>
+    <h2>9. Dagtekeningen (navigatie per dag)</h2>
+    <p>Naast doorlopend lezen en per pagina bladeren kan de lezer ook per dag navigeren. Daarvoor
+    markeert u in de tekst waar een nieuwe dag begint met een regel die begint met <code>@</code>:</p>
+    <pre><code>@ sleutel [sv|sn] | label</code></pre>
+    <ul>
+      <li><code>sleutel</code> — een machinaal leesbare datum <code>JJJJ-MM-DD</code>. Ontbreekt de
+      dag of de maand, laat die dan weg (<code>1674-02</code> of <code>1674</code>). Voor een
+      <em>periode</em> geeft u begin- en einddatum met een schuine streep:
+      <code>1674-01-05/1674-01-08</code> (er wordt op de begindatum gesorteerd).</li>
+      <li><code>sv</code> / <code>sn</code> — optioneel de kalenderstijl: <code>sv</code> voor de oude
+      stijl (stilo vetus, Juliaanse kalender), <code>sn</code> voor de nieuwe stijl (Gregoriaans, de
+      standaard). Een <code>sv</code>-datum krijgt in de weergave een tagje <em>o.s.</em> en wordt
+      voor de juiste chronologische volgorde intern naar de nieuwe stijl omgerekend.</li>
+      <li><code>label</code> — de tekst zoals die in de dagbalk en in de marge verschijnt
+      (bijvoorbeeld <em>23 februari 1674</em>).</li>
+    </ul>
+    <p>Voorbeeld:</p>
+    <pre><code>@ 1674-02-12 sv | 12 februari 1674</code></pre>
+    <p>De dagtekeningen verschijnen als ingetogen datumregels in de tekst (met de werkbalk uit te
+    zetten) en vullen de knop <strong>Dagen</strong>, waarmee de lezer chronologisch naar elke dag
+    kan springen. Zo werkt doorklikken niet alleen doorlopend of per pagina, maar ook per dag.</p>
+
+    <h2>10. Werkbalk (voor de lezer)</h2>
     <p>Boven de tekst kan de lezer aan/uit zetten: elk apparaat afzonderlijk, de regelnummers,
     de paginamarkeringen, de onderstreping van geannoteerde woorden, en of opgeloste afkortingen
     cursief worden getoond — plus, bij meerdere pagina's, de keuze tussen doorlopend en per pagina.</p>
-    <p>Zijn er kopjes in de tekst, dan verschijnt links een knop <strong>Inhoud</strong> met een
-    inhoudsopgave; een klik op een kopje springt naar de bijbehorende plaats (en, in de modus per
-    pagina, naar de juiste pagina). Rechts vindt de lezer de zoekbalk en de knop <strong>Weergave</strong>.</p>
+    <p>Zijn er kopjes in de tekst, dan verschijnt een knop <strong>Inhoud</strong> met een
+    inhoudsopgave; zijn er dagtekeningen, dan een knop <strong>Dagen</strong> (zie §9). Een klik
+    springt telkens naar de bijbehorende plaats (en, in de modus per pagina, naar de juiste pagina).
+    Links vindt de lezer de zoekbalk, rechts de knop <strong>Weergave</strong>.</p>
 
-    <h2>10. Lokaal bekijken</h2>
+    <h2>11. Lokaal bekijken</h2>
     <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
     webserver openen, niet rechtstreeks als bestand. Bijvoorbeeld:</p>
     <pre><code>python3 -m http.server

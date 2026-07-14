@@ -42,6 +42,11 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   (lege regel)          nieuwe alinea
   ~ label | doel        paginagrens; opent facsimile 'doel' (pdf-pagina of {n}).
                         Laat 'doel' leeg als er (nog) geen scan is.
+  @ sleutel [sv|sn] | label
+                        dagtekening; markeert waar een dag begint (knop 'Dagen').
+                        sleutel = JJJJ[-MM[-DD]]; een periode: JJJJ-MM-DD/JJJJ-MM-DD.
+                        sv = oude stijl (Juliaans), sn = nieuwe stijl (standaard);
+                        sv-data worden voor de volgorde naar de nieuwe stijl omgezet.
   ![bijschrift](pad)    afbeelding met bijschrift (genummerd, klik = lightbox).
                         Blijft binnen de tekstkolom; {breed} = volledige kolombreedte:
                         ![bijschrift](afbeeldingen/kaart.jpg){breed}
@@ -132,6 +137,24 @@ Een commentaarnoot kan bovendien een lange passage bestrijken waarin zelf een wo
 Het woord anker komt in deze alinea twee keer voor. De noot hoort bij het tweede anker, niet bij het eerste. Zo kies je met een telling het juiste voorkomen.
 
 De schipper zag zich onderweg genoodzaakt eerst Constantinopolen aan te doen en daarna, met gunstige wind, opnieuw Constantinopel te bezoeken. Zulke wisselende schrijfwijzen brengt het register onder één noemer, met een verwijzing naar elke vindplaats.
+
+### {sc:Dagtekeningen}
+
+@ 1674-01-03 | 3 januari 1674
+
+Een dagtekening markeert waar in de tekst een nieuwe dag begint; de lezer kan er via de knop «Dagen» naartoe springen. Een gewone datum ziet er zo uit.
+
+@ 1674-01-05/1674-01-08 | 5–8 januari 1674
+
+Een periode geeft u met een schuine streep tussen begin- en einddatum; er wordt op de begindatum gesorteerd.
+
+@ 1674-02 | februari 1674
+
+Ontbreekt de dag (of zelfs de maand), dan laat u die eenvoudig weg: hier is alleen de maand bekend.
+
+@ 1674-02-12 sv | 12 februari 1674
+
+Een datum in de oude stijl (stilo vetus, Juliaanse kalender) markeert u met «sv»; hij krijgt een tagje o.s. en wordt voor de juiste volgorde naar de nieuwe stijl omgerekend.
 
 === NOTEN ===
 kompas | w | instrument voor de navigatie.
