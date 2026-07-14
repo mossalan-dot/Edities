@@ -399,9 +399,7 @@
       if (!lijst || !lijst.length) return;
       uit.push('<section class="apparaat app-' + app.code + '" data-code="' + app.code +
                '" style="--kleur:' + app.kleur + '">');
-      uit.push('<h3 class="apparaat-kop">' + escapeHtml(app.label) +
-               '<span class="apparaat-soort">' +
-               (app.soort === 'origineel' ? 'oorspronkelijk' : 'editeur') + '</span></h3>');
+      uit.push('<h3 class="apparaat-kop">' + escapeHtml(app.label) + '</h3>');
       uit.push('<ul class="nootlijst">');
       lijst.forEach(function (n) {
         var regelLink = n.regel
@@ -430,8 +428,8 @@
     uit.push('<div class="wb-groep wb-zoek">');
     uit.push('<input type="search" class="zoekveld" placeholder="Zoek in de tekst…" aria-label="Zoeken in de editie">');
     uit.push('<span class="zoek-status" aria-live="polite"></span>');
-    uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled>‹</button>');
-    uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled>›</button>');
+    uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled hidden>‹</button>');
+    uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled hidden>›</button>');
     uit.push('</div>');
     uit.push('<div class="wb-knoppen">');
     if (heeftInhoud) {
@@ -654,8 +652,9 @@
       var heeft = zoekMarks.length > 0;
       if (st) st.textContent = veldWaarde()
         ? (heeft ? (zoekIdx + 1) + ' / ' + zoekMarks.length : 'geen treffers') : '';
-      if (vb) vb.disabled = !heeft;
-      if (vn) vn.disabled = !heeft;
+      // Pijltjes alleen tonen als er treffers zijn om doorheen te bladeren.
+      if (vb) { vb.disabled = !heeft; vb.hidden = !heeft; }
+      if (vn) { vn.disabled = !heeft; vn.hidden = !heeft; }
     }
 
     function wisZoek() {
