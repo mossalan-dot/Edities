@@ -80,27 +80,29 @@ def maak_blokken(tekst):
 
 
 def zoek_span(tekst, delen, start, occ):
-    """Vind de positie van een lemma in `tekst` vanaf `start`.
+    """Vind de positie van een lemma in `tekst` vanaf `start` (hoofdletter-
+    ongevoelig; de oorspronkelijke schrijfwijze in de tekst blijft behouden).
     `delen` = [heel] of [eerste, laatste] (bij een … in het lemma).
     `occ`   = gewenst voorkomen (1-based) of None."""
+    lo = tekst.lower()
     if len(delen) == 1:
-        deel = delen[0]
+        deel = delen[0].lower()
         if occ:
             pos, idx = 0, -1
             for _ in range(occ):
-                idx = tekst.find(deel, pos)
+                idx = lo.find(deel, pos)
                 if idx == -1:
                     return None
                 pos = idx + len(deel)
             return (idx, idx + len(deel))
-        idx = tekst.find(deel, start)
+        idx = lo.find(deel, start)
         return (idx, idx + len(deel)) if idx != -1 else None
     # eerste … laatste
-    kop, staart = delen[0], delen[-1]
-    hi = tekst.find(kop, start)
+    kop, staart = delen[0].lower(), delen[-1].lower()
+    hi = lo.find(kop, start)
     if hi == -1:
         return None
-    ti = tekst.find(staart, hi + len(kop))
+    ti = lo.find(staart, hi + len(kop))
     if ti == -1:
         return None
     return (hi, ti + len(staart))

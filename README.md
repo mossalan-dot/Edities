@@ -84,8 +84,10 @@ python3 -m http.server
 
 ## Status
 
-Prototype. `van-der-meersch` is een echte editie (openingsfragment van het reisverhaal, met de
-oorspronkelijke editeursnoten en de handschriftscan van pagina 1). `reisjournaal-demo` bevat
+Prototype. `van-der-meersch` is een echte editie: het **volledige reisverhaal** (38
+handschriftpagina’s, ±486 oorspronkelijke editeursnoten), geautomatiseerd uit de bestaande
+PDF-uitgave overgezet met `edities/van-der-meersch/uit-pdf.py` en verankerd door de importer
+(±96% automatisch; de rest is proefleeswerk). `reisjournaal-demo` bevat
 **geen echte bron** maar een voorbeeldtekst in periodestijl, bedoeld om álle functies te tonen
 (geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities: de
 gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz, en meer reisverslagen
