@@ -1,0 +1,23 @@
+# Caddyfile — statische hosting voor de Edities-site op een Hetzner-server.
+# Caddy regelt automatisch HTTPS (Let's Encrypt). Vervang het domein hieronder.
+#
+# Installeren (Debian/Ubuntu):
+#   sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+#   curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+#   curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+#   sudo apt update && sudo apt install caddy
+# Plaats dit bestand als /etc/caddy/Caddyfile en draai:  sudo systemctl reload caddy
+
+edities.example.nl {
+	root * /var/www/edities
+	file_server
+	encode gzip zstd
+
+	# Statische assets langer cachen (styles/scripts/afbeeldingen).
+	@statisch path /assets/* *.jpg *.jpeg *.png *.svg *.webp
+	header @statisch Cache-Control "public, max-age=604800"
+
+	# bron.txt en edities kort cachen zodat updates snel doorkomen.
+	@data path *.txt *.md
+	header @data Cache-Control "public, max-age=300"
+}
