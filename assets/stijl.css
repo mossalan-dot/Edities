@@ -247,6 +247,25 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .kantnoot .lemma { border-bottom: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */
 .kantnoot.actief { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 0 0 4px 4px; }
 
+/* Inklapbare kantnoten: grote noten tonen standaard ~3 regels zodat ze op
+   ooghoogte van hun markering blijven staan. Klik op de noot (of op de
+   verwijzing in de tekst) toont/verbergt de rest. */
+.kantnoot:not(.uitgeklapt) { max-height: calc(1.4em * 3 + .45rem); overflow: hidden; }
+.kantnoot.inklapbaar { cursor: pointer; }
+.kantnoot.inklapbaar:not(.uitgeklapt)::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1.6em;
+  background: linear-gradient(to bottom, transparent, var(--papier));
+  pointer-events: none;
+}
+.kantnoot .kn-meer { display: none; }
+.kantnoot.inklapbaar .kn-meer {
+  display: inline-block; position: absolute; right: 0; bottom: 0;
+  font-family: var(--sans); font-size: .68rem; font-weight: 600; letter-spacing: .02em;
+  color: var(--kleur); background: var(--papier); padding: 0 0 0 .45rem;
+}
+.kantnoot.inklapbaar.uitgeklapt .kn-meer { position: static; display: block; margin-top: .25rem; }
+.kantnoot.markeer { background: color-mix(in srgb, var(--kleur) 16%, transparent); border-radius: 0 0 4px 4px; }
+
 /* ---- Tekst met regelnummering ------------------------------------------ */
 .tekst { max-width: var(--leesbreedte); margin: 0 auto; }
 .alinea { margin: 0 0 1.15rem; }

@@ -513,6 +513,10 @@
     var nootIndex = {};
     noten.forEach(function (n) { nootIndex[n.id] = n; });
 
+    // Welke kantnoten volledig uitgeklapt zijn (id -> true). Blijft bewaard
+    // over herberekeningen heen (resize, toggle).
+    var uitgeklapt = Object.create(null);
+
     // ---- Kantlijnnoten (sidenotes) ---------------------------------------
     // De margekolommen zijn GLOBAAL (kinderen van de editie-root), zodat noten
     // over paginagrenzen heen netjes onder elkaar blijven staan.
@@ -557,8 +561,10 @@
         el.className = 'kantnoot app-' + n.code;
         el.setAttribute('data-noot', n.id);
         el.style.setProperty('--kleur', app.kleur);
+        if (uitgeklapt[n.id]) el.classList.add('uitgeklapt');
         el.innerHTML = '<span class="kn-lemma">' + n.labelHtml + '</span> ' +
-          '<span class="kn-inhoud">' + n.inhoudHtml + '</span>';
+          '<span class="kn-inhoud">' + n.inhoudHtml + '</span>' +
+          '<span class="kn-meer" aria-hidden="true"></span>';
         perZijde[zijde].push({ el: el, top: anchor.getBoundingClientRect().top - rootTop });
       });
 
@@ -570,6 +576,17 @@
         var laatsteBodem = 0;
         lijst.forEach(function (item) {
           cont.appendChild(item.el);
+          if (item.el.classList.contains('kantnoot')) {
+            // Ingekort (past niet in de standaardhoogte) -> klikbaar maken.
+            var lang = item.el.classList.contains('uitgeklapt') ||
+                       item.el.scrollHeight > item.el.clientHeight + 1;
+            item.el.classList.toggle('inklapbaar', lang);
+            if (lang) {
+              var meer = item.el.querySelector('.kn-meer');
+              if (meer) meer.textContent = item.el.classList.contains('uitgeklapt')
+                ? '− minder' : '… meer';
+            }
+          }
           var top = item.top < laatsteBodem + 10 ? laatsteBodem + 10 : item.top;
           item.el.style.top = top + 'px';
           laatsteBodem = top + item.el.offsetHeight;
@@ -753,6 +770,16 @@
     // Klik op gemarkeerde tekst -> spring naar de noot in het apparaat en laat
     // die oplichten.
     root.addEventListener('click', function (e) {
+      // Klik op een (ingekorte) kantnoot: uit- of inklappen en herschikken.
+      var knClick = e.target.closest('.kantnoot');
+      if (knClick && root.classList.contains('kantnoten-aan')) {
+        if (knClick.classList.contains('inklapbaar')) {
+          var knId = knClick.getAttribute('data-noot');
+          if (uitgeklapt[knId]) delete uitgeklapt[knId]; else uitgeklapt[knId] = true;
+          herbereken();
+        }
+        return;
+      }
       var up = e.target.closest('.wb-uitklap');
       if (up) {
         var panel = document.getElementById(up.getAttribute('aria-controls'));
@@ -797,7 +824,11 @@
         var id = lemma.getAttribute('data-noot');
         var n = nootIndex[id];
         if (n && root.classList.contains('verberg-app-' + n.code)) return;
-        var doel = root.classList.contains('kantnoten-aan')
+        var kantAan = root.classList.contains('kantnoten-aan');
+        // In kantnoot-modus: de bijbehorende noot volledig openklappen en
+        // opnieuw plaatsen, zodat je de hele noot ziet op ooghoogte.
+        if (kantAan) { uitgeklapt[id] = true; herbereken(); }
+        var doel = kantAan
           ? root.querySelector('.kantnoot[data-noot="' + id + '"]')
           : document.getElementById('n-' + id);
         if (doel) {
