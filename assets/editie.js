@@ -350,15 +350,6 @@
       var actief = window.matchMedia('(min-width: 1100px)').matches;
       root.classList.toggle('kantnoten-aan', actief);
 
-      // Brede figuren: bescheiden gekoppeld aan de hoofdtekstkolom — enkele rem
-      // breder dan de tekst, gecentreerd op die kolom (niet tot de notenmarges).
-      var remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      var tekstEl = root.querySelector('.tekst');
-      var tekstW = tekstEl ? tekstEl.clientWidth : Math.min(root.clientWidth, 40 * remPx);
-      root.querySelectorAll('.editie-figuur.breed').forEach(function (fig) {
-        fig.style.width = (tekstW + 6 * remPx) + 'px';   // ~3rem aan elke kant
-      });
-
       var links = root.querySelector(':scope > .kant-links') || maakKant('links');
       var rechts = root.querySelector(':scope > .kant-rechts') || maakKant('rechts');
       links.innerHTML = ''; rechts.innerHTML = '';

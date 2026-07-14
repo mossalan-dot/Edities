@@ -42,8 +42,8 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   (lege regel)          nieuwe alinea
   ~ label | doel        paginagrens; opent facsimile 'doel' (pdf-pagina of {n}).
                         Laat 'doel' leeg als er (nog) geen scan is.
-  ![bijschrift](pad)    afbeelding met bijschrift (genummerd, klik om te vergroten).
-                        Voeg {breed} toe voor een brede figuur buiten de tekstkolom:
+  ![bijschrift](pad)    afbeelding met bijschrift (genummerd, klik = lightbox).
+                        Blijft binnen de tekstkolom; {breed} = volledige kolombreedte:
                         ![bijschrift](afbeeldingen/kaart.jpg){breed}
   Typografie:
      *cursief*                 **vet**
