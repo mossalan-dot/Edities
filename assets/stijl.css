@@ -122,7 +122,9 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
   margin-top: .5rem; line-height: 1.4; text-align: left;
 }
 .editie-figuur .fig-nr { font-weight: 600; color: var(--inkt); }
-.editie-figuur.breed { width: 48rem; max-width: 88vw; margin-left: 50%; transform: translateX(-50%); }
+/* Breed: breekt uit tot de uiterste marge (tussen de kantnoten). De exacte
+   breedte wordt responsief door JS gezet; hier alleen de centrering. */
+.editie-figuur.breed { max-width: none; margin-left: 50%; transform: translateX(-50%); }
 
 /* ---- Pagina's en weergavemodus ----------------------------------------- */
 .modus-bladeren .pagina { display: none; }

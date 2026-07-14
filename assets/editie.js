@@ -349,6 +349,15 @@
     function herbereken() {
       var actief = window.matchMedia('(min-width: 1100px)').matches;
       root.classList.toggle('kantnoten-aan', actief);
+
+      // Brede figuren: precies zo breed als de ruimte tussen de kantnoten
+      // (12rem-kolom + wat lucht aan weerskanten), of vol op smal scherm.
+      var remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      root.querySelectorAll('.editie-figuur.breed').forEach(function (fig) {
+        fig.style.width = actief ? (root.clientWidth - 27 * remPx) + 'px'
+                                 : Math.min(root.clientWidth, 56 * remPx) + 'px';
+      });
+
       var links = root.querySelector(':scope > .kant-links') || maakKant('links');
       var rechts = root.querySelector(':scope > .kant-rechts') || maakKant('rechts');
       links.innerHTML = ''; rechts.innerHTML = '';
