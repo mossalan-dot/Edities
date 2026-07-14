@@ -56,3 +56,18 @@ Ontbreekt de dag (of zelfs de maand), dan laat u die eenvoudig weg: hier is alle
 
 @ 1674-02-12 sv | 12 februari 1674
 Een datum in de oude stijl (stilo vetus, Juliaanse kalender) markeert u met «sv»; hij krijgt een tagje o.s. en wordt voor de juiste volgorde naar de nieuwe stijl omgerekend.
+
+### {sc:Lijsten en tabellen}
+
+De lading bestond blijkens de vrachtbrief onder meer uit:
+
+- [[potas|w|Kaliumcarbonaat, gewonnen uit houtas; grondstof voor glas en zeep. Voorbeeld van een noot verankerd in een lijstitem.]] en weedas voor de ververij
+- klaphout en wagenschot van eikenhout
+- vloersteenen uit Kalmar
+
+Ook een eenvoudige tabel is mogelijk; noten werken ook binnen een cel:
+
+| Gewest | Munt | Koers |
+| --- | --- | ---: |
+| Holland | gulden | 20 stuivers |
+| Denemarken | [[rijksdaalder|comm|Grote zilveren munt. Voorbeeld van een noot verankerd in een tabelcel.]] | 6 mark |

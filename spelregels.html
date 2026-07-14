@@ -75,6 +75,25 @@ apparaat: auteur | Noten van de auteur        | origineel
     <p>De regelnummering volgt dus de <em>regelindeling van de bron</em>: knip de tekst af op
     dezelfde plaatsen als in het origineel. Om de vijf regels verschijnt het nummer in de marge.</p>
 
+    <h3>Lijsten en tabellen</h3>
+    <p>Opsommingen en tabellen schrijft u in de gewone Markdown-notatie; ze worden als
+    structuurblokken weergegeven (zonder eigen regelnummer, net als koppen en afbeeldingen).</p>
+    <table class="regel-tabel">
+      <tr><th>Wat</th><th>Schrijf</th><th>Effect</th></tr>
+      <tr><td>Opsomming</td><td><code>- item</code> (of <code>* item</code>) op opeenvolgende regels</td><td>een lijst met opsommingstekens</td></tr>
+      <tr><td>Genummerde lijst</td><td><code>1. item</code> op opeenvolgende regels</td><td>een genummerde lijst</td></tr>
+      <tr><td>Tabel</td><td><code>| cel | cel |</code> op opeenvolgende regels</td><td>een tabel</td></tr>
+      <tr><td>Koprij + uitlijning</td><td>een scheidingsrij <code>| --- | ---: |</code></td><td>de rij erboven wordt koprij; <code>---:</code> lijnt rechts uit, <code>:--:</code> centreert</td></tr>
+    </table>
+    <p>Voorbeeld van een tabel:</p>
+    <pre><code>| Gewest     | Munt         | Koers       |
+| ---        | ---          | ---:        |
+| Holland    | gulden       | 20 stuivers |
+| Denemarken | rijksdaalder | 6 mark      |</code></pre>
+    <p>Noten mogen ook in een lijstitem of een tabelcel vallen: u verankert ze op de gewone manier
+    via het <code>=== NOTEN ===</code>-blok (zie §3). Zowel het register als de zoekfunctie doorzoeken
+    de tekst in lijsten en tabellen mee.</p>
+
     <h2>3. Noten</h2>
     <p>Een noot koppelt u aan een <em>lemma</em> (het woord of de woordgroep waar de noot bij hoort):</p>
     <pre><code>[[lemma|code|inhoud van de noot]]</code></pre>

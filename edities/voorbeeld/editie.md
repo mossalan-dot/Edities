@@ -50,6 +50,12 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   ![bijschrift](pad)    afbeelding met bijschrift (genummerd, klik = lightbox).
                         Blijft binnen de tekstkolom; {breed} = volledige kolombreedte:
                         ![bijschrift](afbeeldingen/kaart.jpg){breed}
+  - item                opsomming (opeenvolgende regels). '* item' kan ook;
+  1. item               '1. item' geeft een genummerde lijst.
+  | cel | cel |         tabel (opeenvolgende regels). Een scheidingsrij met
+  | --- | ---: |        streepjes geeft de koprij; dubbele punten regelen de
+                        uitlijning (---: rechts, :--: gecentreerd). Noten mogen
+                        in lijstitems en cellen staan (verankerd via === NOTEN ===).
   Typografie:
      *cursief*                 **vet**
      {sc:kleinkapitaal}        {sp:gesperd}   (spatiëring, gangbaar in oude drukken)
@@ -156,6 +162,21 @@ Ontbreekt de dag (of zelfs de maand), dan laat u die eenvoudig weg: hier is alle
 
 Een datum in de oude stijl (stilo vetus, Juliaanse kalender) markeert u met «sv»; hij krijgt een tagje o.s. en wordt voor de juiste volgorde naar de nieuwe stijl omgerekend.
 
+### {sc:Lijsten en tabellen}
+
+De lading bestond blijkens de vrachtbrief onder meer uit:
+
+- potas en weedas voor de ververij
+- klaphout en wagenschot van eikenhout
+- vloersteenen uit Kalmar
+
+Ook een eenvoudige tabel is mogelijk; noten werken ook binnen een cel:
+
+| Gewest | Munt | Koers |
+| --- | --- | ---: |
+| Holland | gulden | 20 stuivers |
+| Denemarken | rijksdaalder | 6 mark |
+
 === NOTEN ===
 kompas | w | instrument voor de navigatie.
 Constantinopel | comm | Het huidige Istanbul; in de vroegmoderne tijd de hoofdstad van het Ottomaanse Rijk.
@@ -165,6 +186,8 @@ van het eerste … laatste woord | w | Voorbeeld van een lemma dat meerdere woor
 een lange passage bestrijken … becommentarieerde zin | comm | Voorbeeld van een commentaarnoot die een hele passage omvat; de woordverklaring galjoen staat er genest in.
 galjoen | w | versierde boeg van een schip; ook het schip zelf.
 anker (2) | comm | Deze noot is met «(2)» aan het tweede voorkomen van 'anker' gekoppeld.
+potas | w | Kaliumcarbonaat, gewonnen uit houtas; grondstof voor glas en zeep. Voorbeeld van een noot verankerd in een lijstitem.
+rijksdaalder | comm | Grote zilveren munt. Voorbeeld van een noot verankerd in een tabelcel.
 
 === REGISTER ===
 # soort | canonieke naam | variant, variant, …

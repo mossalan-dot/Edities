@@ -255,6 +255,24 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .tekstkop.kop-2 { font-size: 1.3rem; }
 .tekstkop.kop-3 { font-size: 1.05rem; font-variant: small-caps; letter-spacing: .04em; color: var(--inkt-zacht); }
 
+/* ---- Lijsten en tabellen in de editie ---------------------------------- */
+.ed-lijst { margin: 0 0 1.15rem; padding-left: 1.6rem; }
+.geen-regelnr .ed-lijst { padding-left: calc(var(--gutter) + 1rem); }
+.ed-lijst li { margin: .15rem 0; padding-left: .2rem; }
+.ed-lijst li::marker { color: var(--inkt-zacht); }
+
+.ed-tabel-omhulsel { margin: 0 0 1.15rem; overflow-x: auto; }
+.geen-regelnr .ed-tabel-omhulsel { padding-left: var(--gutter); }
+.ed-tabel {
+  border-collapse: collapse; width: auto; min-width: 60%;
+  font-size: .96em; line-height: 1.4;
+}
+.ed-tabel th, .ed-tabel td {
+  border: 1px solid var(--lijn); padding: .32rem .7rem; text-align: left; vertical-align: top;
+}
+.ed-tabel th { background: color-mix(in srgb, var(--papier) 85%, var(--accent)); font-weight: 600; }
+.ed-tabel tr:nth-child(even) td { background: color-mix(in srgb, var(--papier) 60%, var(--lijn)); }
+
 .tregel { display: grid; grid-template-columns: var(--gutter) 1fr; column-gap: .4rem; align-items: baseline; }
 .tregel .rnr {
   font-family: var(--sans); font-size: .72rem; color: var(--inkt-zacht);

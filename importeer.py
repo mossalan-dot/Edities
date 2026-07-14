@@ -72,15 +72,70 @@ def parse_bestand(tekst):
     return frontmatter, '\n'.join(tekstregels), noten, register
 
 
-def maak_blokken(tekst):
-    """Groepeer de hoofdtekst in blokken: alinea's (samengevoegd), koppen, markeringen."""
-    blokken = []
-    para = []
+LIJST_ITEM = re.compile(r'^([-*]|\d+\.)(\s+)(.*)$')
 
-    def flush():
+
+def split_top_pipe(s):
+    """Split op |-tekens die NIET binnen geneste [[ ]] staan (zie editie.js)."""
+    velden, cur, depth, i = [], '', 0, 0
+    while i < len(s):
+        if s[i:i + 2] == '[[':
+            depth += 1; cur += '[['; i += 2
+        elif s[i:i + 2] == ']]':
+            depth -= 1; cur += ']]'; i += 2
+        elif s[i] == '|' and depth == 0:
+            velden.append(cur); cur = ''; i += 1
+        else:
+            cur += s[i]; i += 1
+    velden.append(cur)
+    return velden
+
+
+def tabel_cellen(rij):
+    s = rij.strip()
+    s = re.sub(r'^\|', '', s)
+    s = re.sub(r'\|\s*$', '', s)
+    return [c.strip() for c in split_top_pipe(s)]
+
+
+def is_scheidingsrij(rij):
+    cellen = tabel_cellen(rij)
+    return bool(cellen) and all(re.match(r'^:?-{3,}:?$', c) for c in cellen)
+
+
+def maak_blokken(tekst):
+    """Groepeer de hoofdtekst in blokken: alinea's (samengevoegd), koppen,
+    markeringen, lijsten en tabellen."""
+    blokken = []
+    para, lijst, tabel = [], [], []
+
+    def flush_para():
         if para:
             blokken.append({'type': 'para', 'tekst': ' '.join(x.strip() for x in para)})
             para.clear()
+
+    def flush_lijst():
+        if lijst:
+            items = []
+            for s in lijst:
+                m = LIJST_ITEM.match(s)
+                items.append({'marker': m.group(1) + m.group(2), 'inhoud': m.group(3)})
+            blokken.append({'type': 'lijst', 'items': items,
+                            'geordend': bool(re.match(r'^\d', lijst[0]))})
+            lijst.clear()
+
+    def flush_tabel():
+        if tabel:
+            rijen = []
+            for s in tabel:
+                sep = is_scheidingsrij(s)
+                rijen.append({'sep': sep, 'raw': s,
+                              'cellen': [] if sep else tabel_cellen(s)})
+            blokken.append({'type': 'tabel', 'rijen': rijen})
+            tabel.clear()
+
+    def flush():
+        flush_para(); flush_lijst(); flush_tabel()
 
     for regel in tekst.split('\n'):
         s = regel.strip()
@@ -94,8 +149,12 @@ def maak_blokken(tekst):
             flush(); blokken.append({'type': 'mark', 'tekst': s})
         elif re.match(r'^@\s', s):
             flush(); blokken.append({'type': 'dag', 'tekst': s})
+        elif LIJST_ITEM.match(s):
+            flush_para(); flush_tabel(); lijst.append(s)
+        elif s.startswith('|'):
+            flush_para(); flush_lijst(); tabel.append(s)
         else:
-            para.append(s)
+            flush_lijst(); flush_tabel(); para.append(s)
     flush()
     return blokken
 
@@ -129,12 +188,50 @@ def zoek_span(tekst, delen, start, occ):
     return (hi, ti + len(staart))
 
 
+class Segment:
+    """Een doorzoekbaar, muteerbaar stuk tekst: een alinea, een lijstitem of
+    een tabelcel. `lees`/`schrijf` koppelen het aan zijn plek in het blok."""
+    def __init__(self, lees, schrijf):
+        self._lees, self._schrijf = lees, schrijf
+        self.inserts = []
+
+    @property
+    def tekst(self):
+        return self._lees()
+
+    def commit(self):
+        if self.inserts:
+            self._schrijf(bouw_genest(self.tekst, self.inserts))
+
+
+def maak_segmenten(blokken):
+    """Vlakke lijst van doorzoekbare segmenten, in leesvolgorde."""
+    segs = []
+    for b in blokken:
+        if b['type'] == 'para':
+            segs.append(Segment(lambda b=b: b['tekst'],
+                                lambda v, b=b: b.__setitem__('tekst', v)))
+        elif b['type'] == 'lijst':
+            for it in b['items']:
+                segs.append(Segment(lambda it=it: it['inhoud'],
+                                    lambda v, it=it: it.__setitem__('inhoud', v)))
+        elif b['type'] == 'tabel':
+            for rij in b['rijen']:
+                if rij['sep']:
+                    continue
+                for ci in range(len(rij['cellen'])):
+                    segs.append(Segment(
+                        (lambda rij=rij, ci=ci: rij['cellen'][ci]),
+                        (lambda v, rij=rij, ci=ci: rij['cellen'].__setitem__(ci, v))))
+    return segs
+
+
 def anker_noten(blokken, noten):
-    """Bepaal voor elke noot de plek in de alineablokken (zonder de tekst nog te wijzigen)."""
-    para = [b for b in blokken if b['type'] == 'para']
-    inserts = {i: [] for i in range(len(para))}
+    """Verankert elke noot in het juiste segment (alinea, lijstitem of tabelcel),
+    in leesvolgorde vanaf de vorige noot, met terugval naar het begin."""
+    segmenten = maak_segmenten(blokken)
     rapport = []
-    cur_blok, cur_pos = 0, 0
+    cur_seg, cur_pos = 0, 0
 
     for lemma, code, inhoud in noten:
         m = re.search(r'\((\d+)\)\s*$', lemma)
@@ -144,38 +241,36 @@ def anker_noten(blokken, noten):
         delen = [d.strip() for d in re.split(r'\s*(?:…|\.\.\.)\s*', lemma)]
 
         gevonden = None
-        bi, pos = cur_blok, cur_pos
-        while bi < len(para):
-            res = zoek_span(para[bi]['tekst'], delen, pos, occ)
+        si, pos = cur_seg, cur_pos
+        while si < len(segmenten):
+            res = zoek_span(segmenten[si].tekst, delen, pos, occ)
             if res:
-                gevonden = (bi, res)
+                gevonden = (si, res)
                 break
-            bi, pos = bi + 1, 0
+            si, pos = si + 1, 0
         if not gevonden:  # terugval: vanaf het begin
-            for bi2 in range(len(para)):
-                res = zoek_span(para[bi2]['tekst'], delen, 0, occ)
+            for si2 in range(len(segmenten)):
+                res = zoek_span(segmenten[si2].tekst, delen, 0, occ)
                 if res:
-                    gevonden = (bi2, res)
+                    gevonden = (si2, res)
                     break
 
         if not gevonden:
             rapport.append(('NIET GEVONDEN', lemma, code))
             continue
-        bi, (s, e) = gevonden
-        inserts[bi].append((s, e, para[bi]['tekst'][s:e], code, inhoud))
-        cur_blok, cur_pos = bi, e
-        rapport.append(('ok', para[bi]['tekst'][s:e], code))
-    return para, inserts, rapport
+        si, (s, e) = gevonden
+        seg = segmenten[si]
+        seg.inserts.append(dict(s=s, e=e, code=code, inhoud=inhoud))
+        cur_seg, cur_pos = si, e
+        rapport.append(('ok', seg.tekst[s:e], code))
+    return segmenten, rapport
 
 
-def pas_toe(para, inserts):
-    """Wikkel de gevonden spans in [[lemma|code|inhoud]]. Bevatte (geneste) noten
-    worden correct in elkaar genest; alleen echt kruisende (overlappende) noten
-    kunnen inline niet en worden gemeld."""
-    for i, blok in enumerate(para):
-        items = [dict(s=s, e=e, code=code, inhoud=inhoud)
-                 for (s, e, _lem, code, inhoud) in inserts[i]]
-        blok['tekst'] = bouw_genest(blok['tekst'], items)
+def pas_toe(segmenten):
+    """Wikkel de gevonden spans in [[lemma|code|inhoud]] (geneste noten worden
+    correct in elkaar genest; echt kruisende noten worden gemeld)."""
+    for seg in segmenten:
+        seg.commit()
 
 
 def bouw_genest(tekst, items):
@@ -230,6 +325,16 @@ def bouw_bron(frontmatter, blokken):
             uit.append('')
             uit.append(b['tekst'])
             uit.append('')
+        elif b['type'] == 'lijst':
+            uit.append('')
+            for it in b['items']:
+                uit.append(it['marker'] + it['inhoud'])
+            uit.append('')
+        elif b['type'] == 'tabel':
+            uit.append('')
+            for rij in b['rijen']:
+                uit.append(rij['raw'] if rij['sep'] else '| ' + ' | '.join(rij['cellen']) + ' |')
+            uit.append('')
         else:  # para
             uit.append(b['tekst'])
         vorig = b['type']
@@ -251,8 +356,8 @@ def main():
         extra = '\n'.join('register: ' + r for r in register)
         frontmatter = frontmatter.rstrip('\n') + '\n' + extra
     blokken = maak_blokken(hoofdtekst)
-    para, inserts, rapport = anker_noten(blokken, noten)
-    pas_toe(para, inserts)
+    segmenten, rapport = anker_noten(blokken, noten)
+    pas_toe(segmenten)
     bron = bouw_bron(frontmatter, blokken)
 
     uitvoer = os.path.join(os.path.dirname(invoer), 'bron.txt')

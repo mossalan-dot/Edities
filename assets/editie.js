@@ -256,6 +256,40 @@
         continue;
       }
 
+      // tabel:  | cel | cel |   (opeenvolgende regels; een --- rij = koprij)
+      if (t.charAt(0) === '|') {
+        sluit();
+        var rijen = [];
+        while (i < regels.length && regels[i].trim().charAt(0) === '|') {
+          rijen.push(regels[i].trim());
+          i++;
+        }
+        i--; // de for-lus verhoogt i zelf
+        cur.uit.push(renderTabel(rijen, { config: config, noten: cur.noten, regel: regelnr, global: global }));
+        continue;
+      }
+
+      // lijst:  - item   of   1. item   (opeenvolgende regels)
+      var li = t.match(/^([-*]|\d+\.)\s+(.*)$/);
+      if (li) {
+        sluit();
+        var geordend = /\d/.test(li[1]);
+        var items = [];
+        while (i < regels.length) {
+          var lt = regels[i].trim();
+          var lm = lt.match(/^([-*]|\d+\.)\s+(.*)$/);
+          if (!lm) break;
+          items.push(renderInline(lm[2], { config: config, noten: cur.noten, regel: regelnr, global: global }));
+          i++;
+        }
+        i--;
+        var tag = geordend ? 'ol' : 'ul';
+        cur.uit.push('<' + tag + ' class="ed-lijst">' +
+          items.map(function (it) { return '<li>' + it + '</li>'; }).join('') +
+          '</' + tag + '>');
+        continue;
+      }
+
       // gewone tekstregel
       open();
       regelnr++;
@@ -278,6 +312,48 @@
   // Markup uit een kop halen voor een leesbaar inhoudsopgave-label.
   function platteKop(s) {
     return s.replace(/\{[a-z]+:([^{}]*)\}/g, '$1').replace(/\*+/g, '').trim();
+  }
+
+  // Cellen uit een tabelrij: split op top-niveau | (respecteert geneste [[ ]]).
+  function tabelCellen(rij) {
+    var s = rij.trim().replace(/^\|/, '').replace(/\|\s*$/, '');
+    return splitTop(s).map(function (c) { return c.trim(); });
+  }
+  function isScheidingsrij(rij) {
+    return tabelCellen(rij).every(function (c) { return /^:?-{3,}:?$/.test(c); });
+  }
+  function uitlijning(spec) {
+    var l = spec.charAt(0) === ':', r = spec.charAt(spec.length - 1) === ':';
+    if (l && r) return 'center';
+    if (r) return 'right';
+    if (l) return 'left';
+    return '';
+  }
+  function renderTabel(rijen, ctx) {
+    // Scheidingsrij (---) bepaalt de koprij en de uitlijning per kolom.
+    var scheidingIdx = -1, uitlijn = [];
+    for (var k = 0; k < rijen.length; k++) {
+      if (isScheidingsrij(rijen[k])) {
+        scheidingIdx = k;
+        uitlijn = tabelCellen(rijen[k]).map(uitlijning);
+        break;
+      }
+    }
+    function cel(inhoud, tag, i) {
+      var st = uitlijn[i] ? ' style="text-align:' + uitlijn[i] + '"' : '';
+      return '<' + tag + st + '>' + renderInline(inhoud, ctx) + '</' + tag + '>';
+    }
+    var uit = ['<div class="ed-tabel-omhulsel"><table class="ed-tabel">'];
+    rijen.forEach(function (rij, k) {
+      if (k === scheidingIdx) return;
+      var kop = scheidingIdx > -1 && k < scheidingIdx;
+      var cellen = tabelCellen(rij);
+      uit.push('<tr>' + cellen.map(function (c, i) {
+        return cel(c, kop ? 'th' : 'td', i);
+      }).join('') + '</tr>');
+    });
+    uit.push('</table></div>');
+    return uit.join('');
   }
 
   // ---- Dagtekeningen ------------------------------------------------------
