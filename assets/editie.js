@@ -243,7 +243,7 @@
             (heeftNummers ? n.regel : '↩') + '</a> '
           : '';
         uit.push('<li id="n-' + n.id + '" data-noot="' + n.id + '">' + regelLink +
-                 '<span class="noot-lemma">' + n.labelHtml + '</span>] ' +
+                 '<span class="noot-lemma">' + n.labelHtml + '</span><span class="l-scheid"> | </span>' +
                  '<span class="noot-inhoud">' + n.inhoudHtml + '</span></li>');
       });
       uit.push('</ul></section>');

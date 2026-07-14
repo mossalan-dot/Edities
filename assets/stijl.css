@@ -169,7 +169,7 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .pagina-nr.klikbaar:hover { text-decoration: underline; }
 .geen-editiemark .pagina-nr { display: none; }
 .kantnoot .kn-lemma { font-weight: 600; color: var(--inkt); }
-.kantnoot .kn-lemma::after { content: " ]"; color: var(--inkt-zacht); font-weight: 400; }
+.kantnoot .kn-lemma::after { content: " |"; color: var(--inkt-zacht); font-weight: 400; }
 .kantnoot .lemma { border-bottom: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */
 .kantnoot.actief { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 0 0 4px 4px; }
 
@@ -248,6 +248,7 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 }
 .nootlijst .nr-terug:hover { border-color: var(--kleur); color: var(--kleur); }
 .noot-lemma { font-weight: 600; }
+.l-scheid { color: var(--inkt-zacht); font-weight: 400; }
 .nootlijst li.markeer { background: color-mix(in srgb, var(--kleur) 16%, transparent); border-radius: 4px; }
 
 /* Per-apparaat verbergen (JS zet klasse verberg-app-<code> op de root) */
@@ -263,7 +264,7 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 }
 .pop-label { display: block; font-family: var(--sans); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
 .pop-lemma { font-weight: 600; }
-.pop-lemma::after { content: " ]"; color: var(--inkt-zacht); }
+.pop-lemma::after { content: " |"; color: var(--inkt-zacht); }
 .pop-inhoud { display: block; margin-top: .15rem; }
 
 /* ---- Lightbox ----------------------------------------------------------- */
