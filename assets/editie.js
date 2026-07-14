@@ -101,6 +101,24 @@
     return velden;
   }
 
+  // Reduceer een lemma tot platte woorden (voor het ingekorte label): strip
+  // geneste noten (hou hun lemma), typografiecommando's en cursiefsterren.
+  function plattekst(s) {
+    s = s.replace(/\[\[([\s\S]*?)\]\]/g, function (m, p) { return splitTop(p)[0]; });
+    s = s.replace(/\{\w+:([\s\S]*?)\}/g, '$1');
+    return s.replace(/\*/g, '');
+  }
+
+  // Label voor apparaat/kantnoot: bij lange lemma's "eerste … laatste woord".
+  var LEMMA_MAX_WOORDEN = 5;
+  function maakLabel(lemma, lemmaHtml) {
+    var woorden = plattekst(lemma).replace(/\s+/g, ' ').trim().split(' ');
+    if (woorden.length > LEMMA_MAX_WOORDEN) {
+      return woorden[0] + ' … ' + woorden[woorden.length - 1];
+    }
+    return lemmaHtml;
+  }
+
   // Verwerk een (reeds ge-escapete) tekst: wissel typografie en noten af.
   // ctx = { config, noten, regel }.
   function parseSegment(s, ctx) {
@@ -129,6 +147,7 @@
     ctx.noten.push(noot);
     noot.inhoudHtml = parseSegment(inhoud, ctx); // geneste noot in de inhoud
     noot.lemmaHtml = parseSegment(lemma, ctx);   // geneste noot in het lemma (hoofdtekst)
+    noot.labelHtml = maakLabel(lemma, noot.lemmaHtml); // ingekort label voor apparaat/kantnoot
     return '<span class="lemma app-' + code + '" data-noot="' + id + '" tabindex="0" ' +
            'role="button" aria-label="Toon noot" style="--kleur:' + app.kleur + '">' +
            noot.lemmaHtml + '</span>';
@@ -224,7 +243,7 @@
             (heeftNummers ? n.regel : '↩') + '</a> '
           : '';
         uit.push('<li id="n-' + n.id + '" data-noot="' + n.id + '">' + regelLink +
-                 '<span class="noot-lemma">' + n.lemmaHtml + '</span>] ' +
+                 '<span class="noot-lemma">' + n.labelHtml + '</span>] ' +
                  '<span class="noot-inhoud">' + n.inhoudHtml + '</span></li>');
       });
       uit.push('</ul></section>');
@@ -351,7 +370,7 @@
           el.className = 'kantnoot app-' + item.n.code;
           el.setAttribute('data-noot', item.n.id);
           el.style.setProperty('--kleur', item.app.kleur);
-          el.innerHTML = '<span class="kn-lemma">' + item.n.lemmaHtml + '</span> ' +
+          el.innerHTML = '<span class="kn-lemma">' + item.n.labelHtml + '</span> ' +
             '<span class="kn-inhoud">' + item.n.inhoudHtml + '</span>';
           cont.appendChild(el);
           var top = item.anchor.getBoundingClientRect().top - rootTop;
@@ -501,7 +520,7 @@
       var app = apparaatVan(config, n.code);
       pop.innerHTML = '<span class="pop-label" style="color:' + app.kleur + '">' +
         escapeHtml(app.label) + (n.regel ? ' · regel ' + n.regel : '') + '</span>' +
-        '<span class="pop-lemma">' + n.lemmaHtml + '</span>' +
+        '<span class="pop-lemma">' + n.labelHtml + '</span>' +
         '<span class="pop-inhoud">' + n.inhoudHtml + '</span>';
       pop.style.setProperty('--kleur', app.kleur);
       pop.hidden = false;
