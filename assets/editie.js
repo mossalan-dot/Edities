@@ -355,9 +355,9 @@
       links.innerHTML = ''; rechts.innerHTML = '';
       if (!actief) return;
       var rootTop = root.getBoundingClientRect().top;
-      var bezetRechts = [];  // door paginanummers bezette stukken (top,bodem)
+      var perZijde = { links: [], rechts: [] };
 
-      // Paginanummers in de rechtermarge, op de hoogte van elke paginastart
+      // Paginanummers: draaien mee in de rechterstapel (zo geen overlap met noten)
       root.querySelectorAll('.pagina').forEach(function (pag) {
         if (pag.offsetParent === null) return; // verborgen (bladermodus)
         var pbInline = pag.querySelector('.tekst .pb');
@@ -367,47 +367,36 @@
         nr.textContent = pbInline.textContent.replace('∣', '');
         var doel = pbInline.getAttribute('data-doel');
         if (doel) { nr.setAttribute('data-doel', doel); nr.classList.add('klikbaar'); }
-        rechts.appendChild(nr);
-        var top = pag.getBoundingClientRect().top - rootTop;
-        nr.style.top = top + 'px';
-        bezetRechts.push([top, top + nr.offsetHeight]);
+        perZijde.rechts.push({ el: nr, top: pag.getBoundingClientRect().top - rootTop });
       });
 
-      var perZijde = { links: [], rechts: [] };
+      // Kantnoten
       noten.forEach(function (n) {
         if (root.classList.contains('verberg-app-' + n.code)) return;
         var anchor = root.querySelector('.tekst .lemma[data-noot="' + n.id + '"]');
         if (!anchor || anchor.offsetParent === null) return; // verborgen pagina
         var app = apparaatVan(config, n.code);
         var zijde = app.zijde === 'rechts' ? 'rechts' : 'links';
-        perZijde[zijde].push({ n: n, anchor: anchor, app: app });
+        var el = document.createElement('div');
+        el.className = 'kantnoot app-' + n.code;
+        el.setAttribute('data-noot', n.id);
+        el.style.setProperty('--kleur', app.kleur);
+        el.innerHTML = '<span class="kn-lemma">' + n.labelHtml + '</span> ' +
+          '<span class="kn-inhoud">' + n.inhoudHtml + '</span>';
+        perZijde[zijde].push({ el: el, top: anchor.getBoundingClientRect().top - rootTop });
       });
 
+      // Plaats per zijde van boven naar beneden, met botsingsafhandeling
       ['links', 'rechts'].forEach(function (z) {
         var cont = z === 'links' ? links : rechts;
         var lijst = perZijde[z];
-        lijst.sort(function (a, b) {
-          return a.anchor.getBoundingClientRect().top - b.anchor.getBoundingClientRect().top;
-        });
+        lijst.sort(function (a, b) { return a.top - b.top; });
         var laatsteBodem = 0;
         lijst.forEach(function (item) {
-          var el = document.createElement('div');
-          el.className = 'kantnoot app-' + item.n.code;
-          el.setAttribute('data-noot', item.n.id);
-          el.style.setProperty('--kleur', item.app.kleur);
-          el.innerHTML = '<span class="kn-lemma">' + item.n.labelHtml + '</span> ' +
-            '<span class="kn-inhoud">' + item.n.inhoudHtml + '</span>';
-          cont.appendChild(el);
-          var top = item.anchor.getBoundingClientRect().top - rootTop;
-          if (top < laatsteBodem + 10) top = laatsteBodem + 10;
-          // wijk uit voor paginanummers aan de rechterkant
-          if (z === 'rechts') {
-            bezetRechts.forEach(function (b) {
-              if (top < b[1] && top + 20 > b[0]) top = b[1] + 6;
-            });
-          }
-          el.style.top = top + 'px';
-          laatsteBodem = top + el.offsetHeight;
+          cont.appendChild(item.el);
+          var top = item.top < laatsteBodem + 10 ? laatsteBodem + 10 : item.top;
+          item.el.style.top = top + 'px';
+          laatsteBodem = top + item.el.offsetHeight;
         });
       });
     }
