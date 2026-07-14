@@ -295,7 +295,7 @@ als alleen Jooden bij vergunning | comm | De toelating van Joden in Duitse stede
 Altena | w | Altona.
 Frederikstad | w | Frederikstad aan de Eider.
 troubeltijt | w | onrustige periode.
-de troubeltijd … a 1618 | comm | Tussen 1617 en 1619 heerste er een religieus conflict in de Republiek tussen remonstranten en contraremonstranten, dat uiteindelijk resulteerde in de terechtstelling en executie van raadspensionaris Johan van Oldenbarnevelt (1548–1619) en de oprichting van de Synode van Dordrecht.
+troubeltijt … a 1618 | comm | Tussen 1617 en 1619 heerste er een religieus conflict in de Republiek tussen remonstranten en contraremonstranten, dat uiteindelijk resulteerde in de terechtstelling en executie van raadspensionaris Johan van Oldenbarnevelt (1548–1619) en de oprichting van de Synode van Dordrecht.
 previlegie | w | privelege, bijzonder recht.
 in de … remonstranten behoort | comm | Na het religieuze conflict in de Republiek nodigde hertog Frederik III van Sleeswijk–Holstein–Gottorp (1597–1659) remonstrantse en doopsgezinde vluchtelingen uit om zich te vestigen aan de Eider. In 1621 begonnen zij aan de bouw van Frederikstad aan de Eider.
 ijderstee | comm | Niet gevonden in het Woordenboek der Nederlandsche Taal. Waarschijnlijk betekent het 'plaats aan de Eider'. Mogelijk gaat het om een woordspeling met de samenstelling 'ieder' en 'stede', met de betekenis 'stad voor ieder' of 'vrijplaats'.
@@ -304,11 +304,11 @@ Dennewerk | w | Dannewerk.
 Gottorff ('tslot … van Holstijn) | comm | Slot Gottorp was het kasteel en de hoofdzetel van het vorstenhuis Holstein–Gottorp en de verblijfplaats van de eerder vermelde vorst Frederik III.
 wel gemoet | w | vriendelijk, gemoedelijk.
 naat | w | naar het.
-een afgesant … Denemarken rijsden | comm | Mogelijk gaat het om Hugues de Terlon (c. 1620–1690), de Franse ambassadeur in Kopenhagen tussen 1670 en 1676, of een persoon verbonden aan Terlon.
+een afgesant | comm | Mogelijk gaat het om Hugues de Terlon (c. 1620–1690), de Franse ambassadeur in Kopenhagen tussen 1670 en 1676, of een persoon verbonden aan Terlon.
 schoon | w | ofschoon, hoewel.
 ruineusen | w | verwoestende.
 en schoon … oorlog was | comm | Tussen 1672 en 1679 vochten Frankrijk en de Republiek in de Hollandse Oorlog.
-schoon overmand | w | aanzienlijk in de minderheid.
+schoon overmant | w | aanzienlijk in de minderheid.
 geweer | w | bewapening.
 tostand | w | toestand.
 minister | w | vertegenwoordiger, afgezant.
@@ -330,7 +330,7 @@ meede | w | mede, honingwijn.
 abondant | w | overvloedig.
 ongemeene | w | ongewone.
 gequeekt | w | gefokt.
-maar weinig … Jutze ossen | comm | Denemarken stond in de zeventiende eeuw bekend om zijn handel in ossen. Ossenvlees werd in de zeevaart vaak als proviand gebruikt.
+maar wijnig … Jutze ossen | comm | Denemarken stond in de zeventiende eeuw bekend om zijn handel in ossen. Ossenvlees werd in de zeevaart vaak als proviand gebruikt.
 Odenzee | w | Odense.
 morsig | w | vies.
 landsdouwen | w | akkerlanden, velden.
@@ -393,7 +393,7 @@ Spro | w | Sprogø.
 niet wel | w | niet meer dan.
 lijfsberging | w | onderdak, verblijf.
 occagien | w | omstandigheden.
-Daarop staat … koning besorgt | comm | In 1571 gaf koning Frederik II opdracht aan Axel Viffert om een noodhuis te bouwen op Sprogø.
+Daarop staat een huijsje | comm | In 1571 gaf koning Frederik II opdracht aan Axel Viffert om een noodhuis te bouwen op Sprogø.
 't Was … te overwinteren | comm | Tijdens hun expeditie naar Indië via de Noordkaap in 1596 strandden de Nederlandse ontdekkingsreizigers Willem Barentsz (c. 1550–1597) en Jacob van Heemskerck (1567– 1607) op de noordelijke archipel Nova Zembla. Zij waren genoodzaakt op het eiland te overwinteren en bouwden als onderdak het beroemde 'behouden huis'.
 gemeenzaam | w | minzaam, vriendelijk.
 die ook … anno 1665 | comm | Von Cicignon was commandant van de vesting Bergenhus in 1665 en vocht mee in de slag in de baai van Bergen.
@@ -428,14 +428,14 @@ Hier was geen bidden voor | comm | Hier was niets tegen in te brengen.
 stuivers | w | Brabantse stuiver.
 Kiög | w | Køge.
 Kiögerbogt | w | Køgebocht.
-veeltijds | w | vaak.
+veeltijts | w | vaak.
 de Amakkermart | comm | De Amagertorv of het Amagerplein in het historische centrum van Kopenhagen.
 Lekkerbeetje | comm | lekkerbek, smulpaap. De 'Store Lekkerbidsken' of 'Stadens Gjæstehuus' was een bekende herberg in Kopenhagen, doorgaans bestemd voor diplomatieke gezanten.
 siviele | w | schappelijke, billijke.
 getracteert | w | onthaald, ontvangen.
-de tans … Christianus Quintus | comm | Christiaan V (1646–1699), zoon van Frederik III, was koning van Denemarken en Noorwegen tussen 1670 en 1699.
+koning Cristianus Quintus | comm | Christiaan V (1646–1699), zoon van Frederik III, was koning van Denemarken en Noorwegen tussen 1670 en 1699.
 prins Jurge | comm | George van Denemarken (1653–1708) was de broer van Christiaan V.
-princes Amma in Engeland | comm | Anna Stuart (1665–1714) trouwde in 1683 met George van Denemarken.
+princes Anna in Engeland | comm | Anna Stuart (1665–1714) trouwde in 1683 met George van Denemarken.
 koning William | comm | Willem III (1650–1702) was de Nederlandse stadhouder en vanaf 1689 koning van Engeland en Ierland. Hij was getrouwd met Maria II (1662–1694).
 die na … Brittanje regeerde | comm | Na het overlijden van haar zwager Willem III in 1702 werd Anna Stuart gekroond als koningin van Engeland, Schotland en Ierland. Deze passage suggereert dat dit reisverslag geschreven of herschreven is na 1702.
 heb ik … reijzen gezien | comm | heb ik destijds op diverse reizen gezien.
@@ -475,7 +475,7 @@ discouraerde | w | discussieerde, sprak.
 Maertii | w | maart.
 Ween | w | Ven.
 Tycho Brahe | comm | Tycho Brahe (1546–1601) was een beroemde Deense astronoom. Als reactie op Copernicus' heliocentrische theorie, die het gangbare geocentrische model van Ptolemaeus verwierp, stelde Brahe een eigen model op waarin hij de verschillende waarnemingen van beide astrologen een plaats trachtte te geven.
-Dit eijlandje … wijde uitgestektheijt | comm | Met toestemming van Rudolf II (1552–1612) werd op het eiland Ven tussen 1576 en 1680 de Uraniborg gebouwd, het astronomisch observatorium van Tycho Brahe.
+Dit eijlandje … wijde uijtgestektheijt | comm | Met toestemming van Rudolf II (1552–1612) werd op het eiland Ven tussen 1576 en 1680 de Uraniborg gebouwd, het astronomisch observatorium van Tycho Brahe.
 het gevoelen | comm | de waarneming, de overtuiging. Afbeelding 5: Gravure van het observatorium Uraniborg op het eiland Ven. Astronomiae instauratae mechanica (1598).
 Ptolomeus | comm | Claudius Ptolemaeus (87–c. 150) was een Griekse astronoom en de bedenker van een geocentrisch beeld van het zonnestelsel.
 Copernicus | comm | Nicolaas Copernicus (1473–1543) was een Poolse astronoom en wiskundige, die als reactie op Ptolemaeus de heliocentrische theorie van het zonnestelsel poneerde.
@@ -498,11 +498,11 @@ Daar is … gingen bezien | comm | De universiteit van Lund werd opgericht in 16
 quasi | w | alsof.
 als een … en paardevoeten | comm | In folklore wordt de duivel afgebeeld met hoorns en hoeven.
 force | w | kracht.
-Ik zag … pilaer aangrijpende | comm | In de crypte van de dom van Lund staat een beeld van een man die een van de zuilen lijkt te omarmen. Het beeld wordt geïdentificeerd als het Bijbelse figuur Samson of de legendarische trol Finn.
+Ik zag … pilaar aangrijpende | comm | In de crypte van de dom van Lund staat een beeld van een man die een van de zuilen lijkt te omarmen. Het beeld wordt geïdentificeerd als het Bijbelse figuur Samson of de legendarische trol Finn.
 stemmig | w | ernstig, statig.
 staatig weeze | w | statige uitstraling, air.
 papiste | w | papen, katholieken.
-de staart van Billiams ezel | comm | Volgens het bijbelboek Numeri begon de ezel van de profeet Bileam te spreken toen hij een engel van God zag. Cf. Numeri 22. Voorts is Bileams ezel een Nederlands spreekwoord voor iemand die te snel of voor zijn beurt spreekt. Hier wordt de term spottend gebruikt.
+de staart van Biliams ezel | comm | Volgens het bijbelboek Numeri begon de ezel van de profeet Bileam te spreken toen hij een engel van God zag. Cf. Numeri 22. Voorts is Bileams ezel een Nederlands spreekwoord voor iemand die te snel of voor zijn beurt spreekt. Hier wordt de term spottend gebruikt.
 bestek | w | tijdsbestek.
 drift | w | vaart.
 onder de hand | w | onderhand, intussen.
@@ -516,7 +516,7 @@ avanceerde | w | vorderde.
 besolliciteeren | w | vragen, verzoeken.
 maar kost niet op doen | w | maar kreeg het niet voor elkaar.
 sinjeur | comm | meneer. Kaart 4: Van Kopenhagen naar Helsingborg
-'t Was dan … gezien word | comm | Het beschreven verhaal loopt ietwat anders dan de overlevering van de Zweedse sprookjesschrijver Herman Hofberg (1823–1883). Volgens dat laatste verhaal stelde de trol Finn aan een priester voor een kerk te bouwen, onder de voorwaarde dat de priester na het karwei de naam van de trol zou raden. Was het antwoord fout, dan zou de trol als geschenk de zon en de maan krijgen of, als dat niet zou lukken, de ogen van de priester. Tijdens een van de laatste werkdagen hoorde de priester de trol met zijn kinderen spreken en leerde hij zijn naam. Toen de priester luidkeels 'Finn' riep, probeerde de trol uit woede de kerk te vernietigen door een pilaar weg te trekken. Die poging mislukte en de trol veranderde plotseling in steen. Soortgelijke ontstaanslegendes bestaan op meerdere plaatsen in Scandinavië: een kerk in Kalundborg in Denemarken bijvoorbeeld heeft een soortgelijk verhaal. In feite werd de dom gebouwd in het begin van de twaalfde eeuw onder het aartsbisdom van Asser Thorkilsen.
+bezogt en nog gezien word | comm | Het beschreven verhaal loopt ietwat anders dan de overlevering van de Zweedse sprookjesschrijver Herman Hofberg (1823–1883). Volgens dat laatste verhaal stelde de trol Finn aan een priester voor een kerk te bouwen, onder de voorwaarde dat de priester na het karwei de naam van de trol zou raden. Was het antwoord fout, dan zou de trol als geschenk de zon en de maan krijgen of, als dat niet zou lukken, de ogen van de priester. Tijdens een van de laatste werkdagen hoorde de priester de trol met zijn kinderen spreken en leerde hij zijn naam. Toen de priester luidkeels 'Finn' riep, probeerde de trol uit woede de kerk te vernietigen door een pilaar weg te trekken. Die poging mislukte en de trol veranderde plotseling in steen. Soortgelijke ontstaanslegendes bestaan op meerdere plaatsen in Scandinavië: een kerk in Kalundborg in Denemarken bijvoorbeeld heeft een soortgelijk verhaal. In feite werd de dom gebouwd in het begin van de twaalfde eeuw onder het aartsbisdom van Asser Thorkilsen.
 bakhuijs | w | bakkes, bek.
 beswaarlijk | w | met moeite.
 Elsenburg | w | Helsingborg.
@@ -539,7 +539,7 @@ Het differeerde … te praalen | comm | Van der Meersch bespot hier rijke, maar 
 bosschagie | w | bos.
 “Jij moet … drinke pennij.” | comm | “Jij moet nu verder doorrijden, dan krijg je een fooi.”
 katjes | w | De eerder genoemde knollen.
-een opgeknopte … zag hangen | comm | Mogelijk was de wolf in een val terechtgekomen of werd hij ter afschrikking van andere wolven opgeknoopt.
+een opgeknoopte … zag hangen | comm | Mogelijk was de wolf in een val terechtgekomen of werd hij ter afschrikking van andere wolven opgeknoopt.
 Kol | w | het schiereiland Kullen of Kullahalvön.
 daerse moeten … geweest hebben | comm | Onduidelijke woordbetekenis. Waarschijnlijk is 'hensen' een scheepsterm. Mogelijk slaat het op het betalen van tol.
 gestalte | w | hoedanigheid.
@@ -611,17 +611,17 @@ steuve | w | stee, plaats.
 laudeerde | w | prees.
 brost | w | borst, mogelijke verschrijving.
 goede artzenij | w | goed geneesmiddel.
-aenenaam | w | aengenaam.
+aengenaam | w | aengenaam.
 brande die uijt | w | verdampte.
 soet | w | zoete geur.
 Over | w | Voor.
 mingelen | comm | Een mengel is een oude inhoudsmaat voor wijn of bier.
 verteert | w | opgemaakt, besteed.
 gravitijt | w | ernst, plechtstatigheid.
-“Der Her schimpf mier nigt.” | w | “U moet mij niet beledigen.”
+“Der Her schimf mier nigt.” | w | “U moet mij niet beledigen.”
 weezends | w | ernst, expressie.
 helder of penning | comm | Een penning is een munt van kleine waarde. De Duitse heller heeft de waarde van ongeveer een halve penning.
-“Das waren … eerlichje koufflieden.” | comm | Het zijn hondsvotten die een heller of penning van eerlijke kooplieden willen hebben.”
+eerliche koufflieden | comm | Het zijn hondsvotten die een heller of penning van eerlijke kooplieden willen hebben.”
 eijn goldene ducaat | comm | De gouden dukaat was een Nederlandse munt van hoge waarde.
 fris | w | gezond.
 pretendeeren | w | eisen, vorderen.
@@ -644,12 +644,12 @@ aestaand | w | aanstaande.
 conserveeren | w | bewaren, reserveren.
 Christiania | w | Oslo.
 daar ik … doen had | comm | waar ik ook zaken te doen had.
-Stolholm | w | Stockholm.
+Stokholm | w | Stockholm.
 Ragelun | w | Rågelund.
 Een persoon … aldaar getrouwt | w | Deze persoon kon niet geïdentificeerd worden.
 as | w | als.
 driegde | w | afwachtte.
-soo haast alst | w | zo spoedig als het.
+soo haast | w | zo spoedig als het.
 alst oopen water was | w | als het water zonder ijs was.
 assureeren | w | verzekeren.
 hups | w | mooie, vrolijke.
@@ -700,4 +700,4 @@ vader | comm | Van der Meersch spreekt hier in algemene termen. Zijn eigen vader
 Gij zijt … hier naa | comm | Dit is een passage uit het gedicht 'Gewillige Patientie, ofte: Lydens Remedie' uit de postume bundel Stichtelijcke rijmen (1660) van de de doopsgezinde schrijver Dirk Rafaelsz. Camphuysen (1586–1627). De gedichten van Camphuysen hebben ook een centrale plaats in de autobiografie van Van der Meersch.
 Deeze … weegaa | comm | De volgende pagina hoort niet bij het oorspronkelijke reisverslag. Wanneer de pagina gemaakt is, is echter onduidelijk
 wanneert | w | wanneer het.
-Onder dit fragment staat nog een passage over een winter in 1728, maar dit is niet meer in zijn volledigheid te lezen. | w | 
+Continueerende tot 17 meert | comm | Onder dit fragment staat nog een passage over een winter in 1728, maar dit is niet meer in zijn volledigheid te lezen.
