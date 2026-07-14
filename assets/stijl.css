@@ -229,6 +229,10 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .kantnoten-aan > .kant-rechts { display: block; position: absolute; top: 0; width: 12rem; }
 .kantnoten-aan .kant-links { left: 0; }
 .kantnoten-aan .kant-rechts { right: 0; }
+/* Laag voor de paginanummers: spant de volledige editiebreedte, kinderen
+   plaatsen zichzelf in de gutter naast de tekstkolom. */
+.kant-nrs { display: none; }
+.kantnoten-aan > .kant-nrs { display: block; position: absolute; top: 0; left: 0; right: 0; height: 0; pointer-events: none; }
 .kantnoot {
   position: absolute; width: 12rem; font-family: var(--sans); font-size: .76rem; line-height: 1.4;
   color: var(--inkt-zacht); border-top: 2px solid var(--kleur); padding: .25rem 0 0;
@@ -236,11 +240,20 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .kant-links .kantnoot { left: 0; }
 .kant-rechts .kantnoot { right: 0; }
 .pagina-nr {
-  position: absolute; top: 0; right: 0; width: 12rem; text-align: right;
+  position: absolute; top: 0;
+  /* Net rechts van de gecentreerde tekstkolom (halve breedte = 17rem). */
+  left: calc(50% + 17rem + .75rem);
+  transform: translateY(-50%);        /* verticaal gecentreerd op de stippellijn */
   font-family: var(--sans); font-size: .72rem; letter-spacing: .03em; color: var(--accent);
+  white-space: nowrap; pointer-events: auto;
+}
+/* Kort dashed streepje dat de scheidingslijn doortrekt naar het nummer. */
+.pagina-nr::before {
+  content: ""; position: absolute; right: 100%; top: 50%; width: .55rem;
+  border-top: 1px dashed var(--lijn);
 }
 .pagina-nr.klikbaar { cursor: pointer; }
-.pagina-nr.klikbaar:hover { text-decoration: underline; }
+.pagina-nr.klikbaar:hover { color: var(--accent); text-decoration: underline; }
 .geen-editiemark .pagina-nr { display: none; }
 .kantnoot .kn-lemma { font-weight: 600; color: var(--inkt); }
 .kantnoot .kn-lemma::after { content: " |"; color: var(--inkt-zacht); font-weight: 400; }

@@ -532,22 +532,27 @@
 
       var links = root.querySelector(':scope > .kant-links') || maakKant('links');
       var rechts = root.querySelector(':scope > .kant-rechts') || maakKant('rechts');
-      links.innerHTML = ''; rechts.innerHTML = '';
+      var nrs = root.querySelector(':scope > .kant-nrs') || maakKant('nrs');
+      links.innerHTML = ''; rechts.innerHTML = ''; nrs.innerHTML = '';
       if (!actief) return;
       var rootTop = root.getBoundingClientRect().top;
       var perZijde = { links: [], rechts: [] };
 
-      // Paginanummers: draaien mee in de rechterstapel (zo geen overlap met noten)
+      // Paginanummers: los in de gutter tussen tekst en zijbalk, verticaal op de
+      // paginascheidingslijn (bovenrand van de tekstkolom). Niet in de
+      // notenstapel, zodat ze niet meeschuiven met de noten.
       root.querySelectorAll('.pagina').forEach(function (pag) {
         if (pag.offsetParent === null) return; // verborgen (bladermodus)
         var pbInline = pag.querySelector('.tekst .pb');
         if (!pbInline) return;
+        var tekstEl = pag.querySelector('.tekst');
         var nr = document.createElement('div');
         nr.className = 'pagina-nr';
         nr.textContent = pbInline.textContent.replace('∣', '');
         var doel = pbInline.getAttribute('data-doel');
         if (doel) { nr.setAttribute('data-doel', doel); nr.classList.add('klikbaar'); }
-        perZijde.rechts.push({ el: nr, top: pag.getBoundingClientRect().top - rootTop });
+        nr.style.top = (tekstEl.getBoundingClientRect().top - rootTop) + 'px';
+        nrs.appendChild(nr);
       });
 
       // Kantnoten
