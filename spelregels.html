@@ -20,6 +20,7 @@
       <span class="merk"><a href="index.html">Edities</a></span>
       <nav>
         <a href="index.html">Overzicht</a>
+        <a href="editor.html">Editor</a>
         <a href="spelregels.html">Spelregels</a>
         <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
       </nav>
@@ -249,7 +250,23 @@ plaats  | Kopenhagen  | Coppenhagen, Kopenhagen</code></pre>
     springt telkens naar de bijbehorende plaats (en, in de modus per pagina, naar de juiste pagina).
     Links vindt de lezer de zoekbalk, rechts de knop <strong>Weergave</strong>.</p>
 
-    <h2>11. Lokaal bekijken</h2>
+    <h2>11. Invoeren: editor of importscript</h2>
+    <p>Een editie schrijft u in het <code>editie.md</code>-formaat (schone tekst plus een
+    <code>=== NOTEN ===</code>- en eventueel <code>=== REGISTER ===</code>-blok). Er zijn twee
+    manieren om daar het runtime-bestand <code>bron.txt</code> van te maken:</p>
+    <ul>
+      <li><strong>De <a href="editor.html">editor</a> in de browser</strong> — schrijf of open een
+      <code>editie.md</code>, zie meteen het resultaat met verankerde noten, en download het
+      <code>bron.txt</code>. Handig voor los werk; geen installatie nodig.</li>
+      <li><strong>Het importscript</strong> <code>importeer.py</code> — voor wie in Obsidian of een
+      teksteditor werkt en meerdere bestanden ineens wil verwerken:
+      <pre><code>python3 importeer.py edities/mijn-editie/editie.md</code></pre>
+      Beide gebruiken exact dezelfde logica en geven hetzelfde <code>bron.txt</code>.</li>
+    </ul>
+    <p>De editor en importer verankeren elk lemma uit het notenblok in de tekst en melden welke niet
+    gevonden zijn, zodat u spelvarianten kunt bijwerken.</p>
+
+    <h2>12. Lokaal bekijken</h2>
     <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
     webserver openen, niet rechtstreeks als bestand. Bijvoorbeeld:</p>
     <pre><code>python3 -m http.server

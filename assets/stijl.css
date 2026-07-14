@@ -414,6 +414,82 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .kaart .k-tag { display: inline-block; font-family: var(--sans); font-size: .72rem; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .05rem .55rem; color: var(--inkt-zacht); }
 .kaart p { margin: .5rem 0 0; font-size: .98rem; }
 
+/* ---- Editor / werkbank -------------------------------------------------- */
+.editor-body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+.ed-werkbank { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+.ed-balk {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .5rem 1rem; border-bottom: 1px solid var(--lijn);
+  background: color-mix(in srgb, var(--papier) 90%, var(--accent)); font-family: var(--sans);
+}
+.ed-balk-links { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.ed-knop {
+  display: inline-flex; align-items: center; gap: .35rem; cursor: pointer;
+  font-family: var(--sans); font-size: .85rem; color: var(--inkt);
+  border: 1px solid var(--lijn-sterk); background: var(--papier); border-radius: 7px; padding: .3rem .7rem;
+}
+.ed-knop:hover { border-color: var(--accent); color: var(--accent); }
+.ed-scheiding { width: 1px; height: 1.4rem; background: var(--lijn-sterk); }
+.ed-status { font-size: .82rem; color: var(--inkt-zacht); }
+.ed-status.goed { color: #0f766e; }
+.ed-status.waarschuwing { color: var(--rubriek); }
+.ed-status.fout { color: var(--rubriek); font-weight: 600; }
+
+.ed-panelen { flex: 1 1 auto; display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
+.ed-bron, .ed-voorbeeld { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.ed-bron { border-right: 1px solid var(--lijn); position: relative; }
+.ed-paneelkop {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .35rem .8rem; font-family: var(--sans); font-size: .78rem; color: var(--inkt-zacht);
+  text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--lijn);
+  background: color-mix(in srgb, var(--papier) 96%, var(--inkt));
+}
+.ed-paneelkop code { text-transform: none; letter-spacing: 0; }
+.ed-mini {
+  font-family: var(--sans); font-size: .75rem; cursor: pointer; color: var(--inkt-zacht);
+  background: none; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .1rem .6rem;
+}
+.ed-mini:hover { border-color: var(--accent); color: var(--accent); }
+#ed-invoer {
+  flex: 1 1 auto; width: 100%; resize: none; border: none; outline: none;
+  padding: 1rem 1.1rem; background: var(--papier); color: var(--inkt);
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: .9rem; line-height: 1.55; tab-size: 2;
+}
+#ed-preview { flex: 1 1 auto; width: 100%; border: none; background: var(--papier); }
+
+.ed-legenda {
+  position: absolute; right: .6rem; top: 2.4rem; width: min(24rem, 80%); z-index: 5;
+  max-height: 70%; overflow-y: auto;
+  background: var(--papier); border: 1px solid var(--lijn-sterk); border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.18); padding: .5rem .7rem; font-family: var(--sans);
+}
+.ed-legenda[hidden] { display: none; }
+.ed-legenda table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+.ed-legenda th { text-align: left; font-weight: 600; padding: .2rem .5rem .2rem 0; white-space: nowrap; vertical-align: top; }
+.ed-legenda td { padding: .2rem 0; }
+.ed-legenda code { font-size: .92em; color: var(--accent); }
+.ed-legenda-meer { margin: .5rem 0 0; font-size: .8rem; }
+
+.ed-rapport {
+  border-top: 1px solid var(--lijn); background: color-mix(in srgb, var(--papier) 92%, var(--rubriek));
+  font-family: var(--sans); font-size: .82rem; padding: .4rem 1rem; max-height: 9rem; overflow-y: auto;
+}
+.ed-rapport[hidden] { display: none; }
+.ed-rapport summary { cursor: pointer; color: var(--rubriek); font-weight: 600; }
+.ed-rapport ul { margin: .5rem 0 0; padding-left: 1.2rem; }
+.ed-rapport li { margin: .15rem 0; }
+.ed-mis-code { color: var(--inkt-zacht); }
+.sitehoofd nav a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+
+@media (max-width: 760px) {
+  .editor-body { overflow: auto; height: auto; }
+  .ed-panelen { grid-template-columns: 1fr; }
+  .ed-bron { border-right: none; border-bottom: 1px solid var(--lijn); }
+  #ed-invoer { min-height: 40vh; }
+  #ed-preview { min-height: 50vh; }
+}
+
 /* ---- Editie-secties (inleiding / verantwoording / tabs) ----------------- */
 .tabs { display: flex; gap: .3rem; border-bottom: 1px solid var(--lijn); margin: 1.5rem 0 2rem; font-family: var(--sans); flex-wrap: wrap; }
 .tabs button {

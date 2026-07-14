@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor — Edities</title>
+  <link rel="stylesheet" href="assets/stijl.css">
+</head>
+<body class="editor-body">
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="index.html">Edities</a></span>
+      <nav>
+        <a href="index.html">Overzicht</a>
+        <a href="editor.html" aria-current="page">Editor</a>
+        <a href="spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="ed-werkbank">
+    <div class="ed-balk">
+      <div class="ed-balk-links">
+        <label class="ed-knop" title="Open een editie.md-bestand">
+          Openen…
+          <input type="file" id="ed-open" accept=".md,.txt,text/markdown,text/plain" hidden>
+        </label>
+        <button type="button" class="ed-knop" id="ed-nieuw" title="Begin met een leeg sjabloon">Nieuw</button>
+        <span class="ed-scheiding" aria-hidden="true"></span>
+        <button type="button" class="ed-knop" id="ed-dl-md">↓ editie.md</button>
+        <button type="button" class="ed-knop" id="ed-dl-bron">↓ bron.txt</button>
+      </div>
+      <div class="ed-balk-rechts">
+        <span class="ed-status" id="ed-status" aria-live="polite">—</span>
+      </div>
+    </div>
+
+    <div class="ed-panelen">
+      <section class="ed-bron">
+        <div class="ed-paneelkop">
+          <span>Bron — <code>editie.md</code></span>
+          <button type="button" class="ed-mini" id="ed-legenda-knop" title="Toon/verberg de beknopte spelregels">? spelregels</button>
+        </div>
+        <textarea id="ed-invoer" spellcheck="false" autocomplete="off" autocapitalize="off"
+          placeholder="Schrijf of open hier een editie.md…"></textarea>
+        <div class="ed-legenda" id="ed-legenda" hidden></div>
+      </section>
+      <section class="ed-voorbeeld">
+        <div class="ed-paneelkop"><span>Voorbeeld</span></div>
+        <iframe id="ed-preview" title="Voorbeeldweergave van de editie"></iframe>
+      </section>
+    </div>
+
+    <details class="ed-rapport" id="ed-rapport" hidden>
+      <summary>Niet-verankerde noten (<span id="ed-mis-aantal">0</span>)</summary>
+      <ul id="ed-mis-lijst"></ul>
+    </details>
+  </div>
+
+  <script src="assets/importeer.js"></script>
+  <script src="assets/site.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var invoer = document.getElementById('ed-invoer');
+    var preview = document.getElementById('ed-preview');
+    var status = document.getElementById('ed-status');
+    var rapportBox = document.getElementById('ed-rapport');
+    var misAantal = document.getElementById('ed-mis-aantal');
+    var misLijst = document.getElementById('ed-mis-lijst');
+    var OPSLAG = 'editor-bron';
+
+    var SJABLOON = [
+      '---',
+      'titel: Titel van de editie',
+      'auteur: Naam van de auteur',
+      'jaar: 1600',
+      'bron: Vindplaats van het origineel',
+      'type: handschrift',
+      'transcriptie: kritisch',
+      'regelnummering: 0',
+      'apparaat: w    | Woordverklaringen         | editeur   | links',
+      'apparaat: comm | Toelichting en commentaar | editeur   | rechts',
+      'apparaat: auteur | Noten van de auteur      | origineel | rechts',
+      '---',
+      '',
+      '# Titel van de editie',
+      '',
+      '~ p. 1 |',
+      '',
+      'Begin hier de schone hoofdtekst. Markeer géén noten in de tekst zelf; die',
+      'koppelt u onderaan via het notenblok aan een woord of woordgroep.',
+      '',
+      '=== NOTEN ===',
+      'woordgroep | w | Een woordverklaring bij deze woordgroep.',
+      '',
+      '=== REGISTER ===',
+      'plaats | Amsterdam | Amsterdam'
+    ].join('\n');
+
+    var LEGENDA = [
+      ['Kop', '# / ## / ###'],
+      ['Alinea', 'lege regel'],
+      ['Paginagrens', '~ p. 1 | doel'],
+      ['Dagtekening', '@ 1600-01-02 | 2 januari'],
+      ['Cursief / vet', '*cursief*  **vet**'],
+      ['Kleinkapitaal', '{sc:tekst}'],
+      ['Opgeloste afkorting', '{ex:woord}  ·  Ho{ab:og}Mo'],
+      ['Toevoeging editeur', '{add:tekst} → ⟨tekst⟩'],
+      ['Onzekere lezing', '{unc:tekst}'],
+      ['Lacune', '{gap:reden}'],
+      ['Opsomming', '- item   /   1. item'],
+      ['Tabel', '| cel | cel |  +  | --- | ---: |'],
+      ['Noot', 'lemma | code | inhoud   (in === NOTEN ===)'],
+      ['Lange passage', 'eerste … laatste | code | …'],
+      ['N-de voorkomen', 'lemma (2) | code | …'],
+      ['Geneste noot', 'lemma | auteur | tekst [[woord|comm|…]]'],
+      ['Register', 'soort | naam | variant, variant  (in === REGISTER ===)']
+    ];
+    document.getElementById('ed-legenda').innerHTML =
+      '<table>' + LEGENDA.map(function (r) {
+        return '<tr><th>' + r[0] + '</th><td><code>' + r[1].replace(/</g, '&lt;') + '</code></td></tr>';
+      }).join('') + '</table>' +
+      '<p class="ed-legenda-meer"><a href="spelregels.html" target="_blank">Volledige spelregels →</a></p>';
+
+    // ---- Voorbeeld-iframe: geïsoleerde render via postMessage --------------
+    var previewKlaar = false, laatsteBron = '';
+    preview.srcdoc =
+      '<!doctype html><html lang="nl"><head><meta charset="utf-8">' +
+      '<link rel="stylesheet" href="assets/stijl.css"></head>' +
+      '<body style="padding:1.5rem 1rem"><div id="paneel"></div>' +
+      '<script src="assets/editie.js"><\/script><script>' +
+      'window.addEventListener("message",function(e){' +
+      ' if(!e.data||e.data.type!=="bron")return;' +
+      ' var p=document.getElementById("paneel");p.textContent="";' +
+      ' var r=document.createElement("div");r.id="editie";p.appendChild(r);' +
+      ' try{Editie.render(r,e.data.bron);}catch(err){p.innerHTML="<p class=\\"fout\\">"+String(err.message||err)+"</p>";}' +
+      '});parent.postMessage({type:"klaar"},"*");' +
+      '<\/script></body></html>';
+
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'klaar') {
+        previewKlaar = true;
+        if (laatsteBron) preview.contentWindow.postMessage({ type: 'bron', bron: laatsteBron }, '*');
+      }
+    });
+
+    function stuurNaarVoorbeeld(bron) {
+      laatsteBron = bron;
+      if (previewKlaar) preview.contentWindow.postMessage({ type: 'bron', bron: bron }, '*');
+    }
+
+    // ---- Verwerken (debounced) --------------------------------------------
+    var laatsteResultaat = { bron: '', rapport: [] };
+    function verwerk() {
+      var res;
+      try {
+        res = Importeer.naarBron(invoer.value);
+      } catch (err) {
+        status.textContent = 'Fout: ' + (err.message || err);
+        status.className = 'ed-status fout';
+        return;
+      }
+      laatsteResultaat = res;
+      stuurNaarVoorbeeld(res.bron);
+
+      var ok = res.rapport.filter(function (r) { return r.status === 'ok'; }).length;
+      var mis = res.rapport.filter(function (r) { return r.status === 'mis'; });
+      status.textContent = res.rapport.length
+        ? ok + '/' + res.rapport.length + ' noten verankerd'
+        : 'geen noten';
+      status.className = 'ed-status' + (mis.length ? ' waarschuwing' : ' goed');
+
+      rapportBox.hidden = mis.length === 0;
+      misAantal.textContent = mis.length;
+      misLijst.innerHTML = mis.map(function (r) {
+        return '<li><code>' + escapeHtml(r.tekst) + '</code> <span class="ed-mis-code">(' +
+          escapeHtml(r.code) + ')</span></li>';
+      }).join('');
+
+      try { localStorage.setItem(OPSLAG, invoer.value); } catch (e) {}
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    var timer;
+    invoer.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(verwerk, 350);
+    });
+
+    // ---- Openen / nieuw / downloaden --------------------------------------
+    document.getElementById('ed-open').addEventListener('change', function (e) {
+      var f = e.target.files[0];
+      if (!f) return;
+      var r = new FileReader();
+      r.onload = function () { invoer.value = r.result; verwerk(); };
+      r.readAsText(f, 'utf-8');
+      e.target.value = '';
+    });
+    document.getElementById('ed-nieuw').addEventListener('click', function () {
+      if (invoer.value.trim() && !confirm('De huidige inhoud vervangen door een leeg sjabloon?')) return;
+      invoer.value = SJABLOON;
+      verwerk();
+    });
+    function download(naam, inhoud) {
+      var blob = new Blob([inhoud], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = naam;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    }
+    document.getElementById('ed-dl-md').addEventListener('click', function () {
+      download('editie.md', invoer.value);
+    });
+    document.getElementById('ed-dl-bron').addEventListener('click', function () {
+      download('bron.txt', laatsteResultaat.bron || Importeer.naarBron(invoer.value).bron);
+    });
+
+    document.getElementById('ed-legenda-knop').addEventListener('click', function () {
+      var l = document.getElementById('ed-legenda');
+      l.hidden = !l.hidden;
+    });
+
+    // ---- Herstel vorige sessie of toon sjabloon ---------------------------
+    var bewaard = null;
+    try { bewaard = localStorage.getItem(OPSLAG); } catch (e) {}
+    invoer.value = bewaard || SJABLOON;
+    verwerk();
+  })();
+  </script>
+</body>
+</html>
