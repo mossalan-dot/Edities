@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proefeditie — overzicht van de opmaak — Edities</title>
+  <link rel="stylesheet" href="../../assets/stijl.css">
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="../../index.html">Edities</a></span>
+      <nav>
+        <a href="../../index.html">Overzicht</a>
+        <a href="../../spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap wrap-ruim">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-paneel="inleiding" aria-selected="false">Inleiding</button>
+      <button role="tab" data-paneel="tekst" aria-selected="true">Tekst &amp; apparaat</button>
+    </div>
+
+    <section class="paneel prozasectie" data-paneel="inleiding">
+      <h1>Proefeditie — overzicht van de opmaak</h1>
+      <p>Deze proefeditie laat álle opmaak en alle notensoorten zien: typografie
+      (cursief, kleinkapitaal, super-/subscript, doorhaling), editeursingrepen (toevoeging,
+      onzekere lezing, lacune, opgeloste afkortingen), de vier apparaten met links/rechts-indeling,
+      een lemma dat een hele passage bestrijkt, een geneste woordverklaring binnen een
+      commentaarnoot, een geneste editeursnoot óp een auteursnoot, en een noot die met een
+      telling aan het tweede voorkomen van een woord is gekoppeld.</p>
+      <p>Het bronbestand <code>editie.md</code> bevat bovenaan een <strong>legenda</strong> (tussen
+      <code>%% … %%</code>, Obsidian-commentaar dat de importer negeert) waarin elke constructie
+      wordt uitgelegd. Zie ook de volledige <a href="../../spelregels.html">spelregels</a>.</p>
+      <p>Beweeg op een breed scherm over de gemarkeerde woorden: de noten verschijnen in de
+      kantlijn (woordverklaringen en tekstkritiek links, toelichting en auteursnoten rechts).</p>
+    </section>
+
+    <section class="paneel actief" data-paneel="tekst">
+      <div id="editie" data-bron="bron.txt">
+        <p class="fout">Bezig met laden…</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/editie.js"></script>
+  <script src="../../assets/site.js"></script>
+  <script>Editie.laad(document.getElementById('editie'));</script>
+</body>
+</html>

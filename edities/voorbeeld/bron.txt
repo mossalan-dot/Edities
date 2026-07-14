@@ -1,0 +1,35 @@
+---
+titel: Proefeditie — overzicht van de opmaak
+auteur: (voorbeeldbestand)
+jaar: 2026
+bron: Voorbeeldbestand ter demonstratie van de editie-opmaak
+type: druk
+transcriptie: kritisch
+apparaat: w      | Woordverklaringen          | editeur   | links
+apparaat: krit   | Tekstkritisch apparaat     | editeur   | links
+apparaat: comm   | Toelichting en commentaar  | editeur   | rechts
+apparaat: auteur | Noten van de auteur        | origineel | rechts
+---
+
+# Proefeditie — overzicht van de opmaak
+
+~ p. 1 |
+
+## {sc:Typografie}
+
+In de lopende tekst kan een woord *cursief* staan, in {sc:kleinkapitaal}, met een superscript zoals den 3.{sup:e}, of een subscript zoals in H{sub:2}O. Een {del:doorgehaalde} lezing toont een schrapping in het origineel.
+
+## {sc:Editeursingrepen}
+
+De editeur vult tekst aan tussen punthaken, zoals dit {add:aangevulde} woord, markeert een {unc:onzekere} lezing, en geeft een {gap:onleesbare passage} aan. Afkortingen worden opgelost — hetzij als heel woord, {ex:videlicet}, hetzij door alleen de aangevulde letters te tonen, zoals in de aanhef aan de Ho{ab:og}Mo{ab:genden} heeren.
+
+## {sc:De vier apparaten}
+
+Bij het woord [[kompas|w|instrument voor de navigatie.]] hoort een woordverklaring; bij [[Constantinopel|comm|Het huidige Istanbul; in de vroegmoderne tijd de hoofdstad van het Ottomaanse Rijk.]] een historische toelichting; bij [[deze lezing|krit|hs.: deeze leezing; hier genormaliseerd naar de moderne spelling.]] een tekstkritische aantekening; en bij [[dit sterretje|auteur|Oorspronkelijke voetnoot van de auteur. De editeur tekent hierbij aan dat [[deze noot|comm|dit is een geneste editeursnoot, geplaatst óp de noot van de auteur]] van later datum lijkt.]] een oorspronkelijke noot van de auteur. Een noot hoeft niet één woord te betreffen: zij kan een gehele zinsnede [[van het eerste tot het laatste woord|w|Voorbeeld van een lemma dat meerdere woorden bestrijkt; in de kantlijn verschijnt het ingekort als «eerste … woord».]] omvatten.
+Een commentaarnoot kan bovendien [[een lange passage bestrijken waarin zelf een woordverklaring genest is, zoals hier bij het woord [[galjoen|w|versierde boeg van een schip; ook het schip zelf.]] dat midden in de becommentarieerde zin|comm|Voorbeeld van een commentaarnoot die een hele passage omvat; de woordverklaring galjoen staat er genest in.]] valt.
+
+~ p. 2 |
+
+### {sc:Bijzondere gevallen}
+
+Het woord anker komt in deze alinea twee keer voor. De noot hoort bij het tweede [[anker|comm|Deze noot is met «(2)» aan het tweede voorkomen van 'anker' gekoppeld.]], niet bij het eerste. Zo kies je met een telling het juiste voorkomen.

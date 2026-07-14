@@ -214,6 +214,9 @@ def main():
     with open(invoer, encoding='utf-8') as f:
         tekst = f.read()
 
+    # Obsidian-commentaar %% ... %% wordt genegeerd (bv. voor een legenda).
+    tekst = re.sub(r'%%[\s\S]*?%%', '', tekst)
+
     frontmatter, hoofdtekst, noten = parse_bestand(tekst)
     blokken = maak_blokken(hoofdtekst)
     para, inserts, rapport = anker_noten(blokken, noten)

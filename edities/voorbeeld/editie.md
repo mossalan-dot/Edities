@@ -1,0 +1,110 @@
+---
+titel: Proefeditie — overzicht van de opmaak
+auteur: (voorbeeldbestand)
+jaar: 2026
+bron: Voorbeeldbestand ter demonstratie van de editie-opmaak
+type: druk
+transcriptie: kritisch
+apparaat: w      | Woordverklaringen          | editeur   | links
+apparaat: krit   | Tekstkritisch apparaat     | editeur   | links
+apparaat: comm   | Toelichting en commentaar  | editeur   | rechts
+apparaat: auteur | Noten van de auteur        | origineel | rechts
+---
+
+%%
+================================================================================
+ LEGENDA — opmaak van een editie.md
+================================================================================
+Een editie bestaat uit DRIE delen:
+  1. De kop (frontmatter) tussen ---  en  --- : gegevens over de editie.
+  2. De schone hoofdtekst.
+  3. Een notenblok, ingeleid door een regel:  === NOTEN ===
+
+Deze legenda staat in Obsidian-commentaar (procent-procent … procent-procent)
+en wordt door de importer genegeerd.
+Draai:  python3 importeer.py edities/voorbeeld/editie.md
+
+--- DE KOP -------------------------------------------------------------------
+  titel / auteur / jaar / bron      vrije tekst
+  type                              handschrift  of  druk
+  transcriptie                      kritisch / diplomatisch (informatief)
+  regelnummering: 5                 optioneel; toont een nummer om de 5 regels
+  origineel_type: afbeelding|pdf    voor de facsimilekoppeling (zie ~ hieronder)
+  origineel_afbeeldingen: origineel/pagina-{n}.jpg
+  origineel_pdf: origineel/handschrift.pdf
+  apparaat: code | label | soort | zijde
+        code   verwijst naar de noten (w, comm, krit, auteur, …)
+        soort  editeur  of  origineel (auteursnoten)
+        zijde  links of rechts (kantlijn); leeg = editeur links, origineel rechts
+
+--- DE HOOFDTEKST ------------------------------------------------------------
+  # / ## / ###          koppen, van groot naar klein
+  (lege regel)          nieuwe alinea
+  ~ label | doel        paginagrens; opent facsimile 'doel' (pdf-pagina of {n}).
+                        Laat 'doel' leeg als er (nog) geen scan is.
+  Typografie:
+     *cursief*
+     {sc:kleinkapitaal}
+     {sup:tekst}  superscript        {sub:tekst}  subscript
+     {del:tekst}  doorhaling
+  Editeursingrepen:
+     {add:tekst}  toevoeging door de editeur  →  ⟨tekst⟩
+     {unc:tekst}  onzekere lezing             →  tekst[?]
+     {gap:reden}  lacune / onleesbaar         →  [reden]
+     {ex:tekst}   opgeloste afkorting, heel woord (cursief; schakelbaar)
+     Ho{ab:og}Mo{ab:genden}   opgeloste letters binnen een woord: Ho(og)Mo(genden)
+
+--- DE NOTEN (=== NOTEN ===) -------------------------------------------------
+  Per regel:   lemma | code | inhoud
+     lemma   het woord of de woordgroep in de tekst. Voor een lange passage:
+             eerste woord … laatste woord   (met … of ...).
+             Komt het lemma vaker voor? Kies met  lemma (2)  het 2e voorkomen.
+     code    de apparaatcode uit de kop (w, comm, krit, auteur, …)
+     inhoud  de noottekst. Mag *cursief* e.d. bevatten, en een GENESTE noot
+             met  [[lemma|code|inhoud]]  (zie de auteursnoot hieronder).
+  De hoofdtekst blijft schoon: de importer zoekt elk lemma op en verankert de
+  noot. In de tekst wordt de volledige woordgroep onderstreept; in de kantlijn
+  staat een lang lemma ingekort als «eerste … laatste».
+  NESTING in de hoofdtekst: overlapt een commentaarnoot een woordverklaring
+  (de ene ligt binnen de andere), dan nest de importer ze vanzelf.
+
+--- WEERGAVE (voor de lezer) -------------------------------------------------
+  Werkbalk: zoeken, doorlopend lezen of per pagina bladeren, apparaten aan/uit,
+  regelnummers, paginamarkeringen, en de kantlijnnoten (breed scherm) of het
+  apparaat onderaan (smal scherm).
+================================================================================
+%%
+
+# Proefeditie — overzicht van de opmaak
+
+~ p. 1 |
+
+## {sc:Typografie}
+
+In de lopende tekst kan een woord *cursief* staan, in {sc:kleinkapitaal}, met een superscript zoals den 3.{sup:e}, of een subscript zoals in H{sub:2}O. Een {del:doorgehaalde} lezing toont een schrapping in het origineel.
+
+## {sc:Editeursingrepen}
+
+De editeur vult tekst aan tussen punthaken, zoals dit {add:aangevulde} woord, markeert een {unc:onzekere} lezing, en geeft een {gap:onleesbare passage} aan. Afkortingen worden opgelost — hetzij als heel woord, {ex:videlicet}, hetzij door alleen de aangevulde letters te tonen, zoals in de aanhef aan de Ho{ab:og}Mo{ab:genden} heeren.
+
+## {sc:De vier apparaten}
+
+Bij het woord kompas hoort een woordverklaring; bij Constantinopel een historische toelichting; bij deze lezing een tekstkritische aantekening; en bij dit sterretje een oorspronkelijke noot van de auteur. Een noot hoeft niet één woord te betreffen: zij kan een gehele zinsnede van het eerste tot het laatste woord omvatten.
+
+Een commentaarnoot kan bovendien een lange passage bestrijken waarin zelf een woordverklaring genest is, zoals hier bij het woord galjoen dat midden in de becommentarieerde zin valt.
+
+~ p. 2 |
+
+### {sc:Bijzondere gevallen}
+
+Het woord anker komt in deze alinea twee keer voor. De noot hoort bij het tweede anker, niet bij het eerste. Zo kies je met een telling het juiste voorkomen.
+
+=== NOTEN ===
+kompas | w | instrument voor de navigatie.
+Constantinopel | comm | Het huidige Istanbul; in de vroegmoderne tijd de hoofdstad van het Ottomaanse Rijk.
+deze lezing | krit | hs.: deeze leezing; hier genormaliseerd naar de moderne spelling.
+dit sterretje | auteur | Oorspronkelijke voetnoot van de auteur. De editeur tekent hierbij aan dat [[deze noot|comm|dit is een geneste editeursnoot, geplaatst óp de noot van de auteur]] van later datum lijkt.
+van het eerste … laatste woord | w | Voorbeeld van een lemma dat meerdere woorden bestrijkt; in de kantlijn verschijnt het ingekort als «eerste … woord».
+een lange passage bestrijken … becommentarieerde zin | comm | Voorbeeld van een commentaarnoot die een hele passage omvat; de woordverklaring galjoen staat er genest in.
+galjoen | w | versierde boeg van een schip; ook het schip zelf.
+anker (2) | comm | Deze noot is met «(2)» aan het tweede voorkomen van 'anker' gekoppeld.
