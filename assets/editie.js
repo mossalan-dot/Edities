@@ -36,6 +36,10 @@
         case 'ex':  return '<span class="ed-ex">' + body + '</span>';     // opgeloste afkorting (heel woord)
         case 'ab':  return '<span class="ed-ab">' + body + '</span>';     // opgeloste letters binnen woord
         case 'gap': return '<span class="ed-gap">[' + (body || 'lacune') + ']</span>';
+        case 'rood': return '<span class="ed-rood">' + body + '</span>'; // rubricatie / rode inkt
+        case 'init': return '<span class="ed-init">' + body + '</span>'; // initiaal / lombarde
+        case 'itl':  return '<span class="ed-itl" title="interlineaire toevoeging">' + body + '</span>';
+        case 'marg': return '<span class="ed-marg" title="marginale toevoeging">' + body + '</span>';
         default:    return body;
       }
     });

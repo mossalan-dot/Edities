@@ -134,7 +134,20 @@ apparaat: auteur | Noten van de auteur        | origineel
     Met de werkbalkoptie <em>“Opgeloste afkortingen markeren”</em> uit vervalt de cursivering en
     leest het als gewone tekst: <span style="font-style:normal">Hoogmogenden</span>.</p>
 
-    <h2>6. Pagina- en foliomarkeringen → het origineel</h2>
+    <h2>6. Bron- en handschriftkenmerken</h2>
+    <table class="regel-tabel">
+      <tr><th>Wat</th><th>Schrijf</th><th>Resultaat / weergave</th></tr>
+      <tr><td>Rubricatie (rode inkt)</td><td><code>{rood:tekst}</code></td><td><span class="ed-rood">tekst</span></td></tr>
+      <tr><td>Initiaal / lombarde</td><td><code>{init:D}e eerste…</code></td><td>grote sierletter aan het begin van een alinea</td></tr>
+      <tr><td>Interlineaire toevoeging</td><td><code>{itl:tekst}</code></td><td>klein en verhoogd, met invoegteken ‸ (boven de regel geschreven)</td></tr>
+      <tr><td>Marginale toevoeging</td><td><code>{marg:tekst}</code></td><td>klein inzetje met een “marge”-merkteken (in de marge geschreven)</td></tr>
+    </table>
+    <p>Interlineaire en marginale toevoegingen worden <em>op de plaats van inlassing in de
+    tekststroom</em> weergegeven, zodat de tekst doorloopbaar blijft, maar met een eigen stijl die
+    laat zien waar ze vandaan komen: interlineair verschijnt verhoogd (het stond boven de regel),
+    marginaal als een klein ingesprongen inzetje (het stond in de marge).</p>
+
+    <h2>7. Pagina- en foliomarkeringen → het origineel</h2>
     <p>Zet op een eigen regel een <code>~</code>, gevolgd door het label en het doel:</p>
     <pre><code>~ 12r | 1</code></pre>
     <p>Dit plaatst een klikbare markering <span class="pb">∣12r</span> in de tekst. Het tweede veld
@@ -148,12 +161,12 @@ apparaat: auteur | Noten van de auteur        | origineel
     paginakeuze). Bij het doorbladeren tonen de apparaten alleen de noten van de zichtbare pagina.
     Elke pagina is aan te linken met <code>#pagina-2</code> in de URL.</p>
 
-    <h2>7. Werkbalk (voor de lezer)</h2>
+    <h2>8. Werkbalk (voor de lezer)</h2>
     <p>Boven de tekst kan de lezer aan/uit zetten: elk apparaat afzonderlijk, de regelnummers,
     de paginamarkeringen, de onderstreping van geannoteerde woorden, en of opgeloste afkortingen
     cursief worden getoond — plus, bij meerdere pagina's, de keuze tussen doorlopend en per pagina.</p>
 
-    <h2>8. Lokaal bekijken</h2>
+    <h2>9. Lokaal bekijken</h2>
     <p>Omdat de tekst met <code>fetch()</code> wordt geladen, moet u de site via een (lokale)
     webserver openen, niet rechtstreeks als bestand. Bijvoorbeeld:</p>
     <pre><code>python3 -m http.server

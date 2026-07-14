@@ -10,6 +10,7 @@
   --lijn-sterk: #cfc7b6;
   --accent: #7a5a2f;
   --accent-zacht: #f0e7d8;
+  --rubriek: #a12a1e;
   --gutter: 3.2rem;
   --leesbreedte: 42rem;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
@@ -25,15 +26,18 @@
     --lijn-sterk: #4a4334;
     --accent: #d0a866;
     --accent-zacht: #2a2416;
+    --rubriek: #e0857a;
   }
 }
 :root[data-thema="dark"] {
   --papier: #17150f; --inkt: #ece5d6; --inkt-zacht: #a89e8a;
   --lijn: #322d22; --lijn-sterk: #4a4334; --accent: #d0a866; --accent-zacht: #2a2416;
+  --rubriek: #e0857a;
 }
 :root[data-thema="light"] {
   --papier: #fbfaf7; --inkt: #1f1b16; --inkt-zacht: #5b5348;
   --lijn: #e3ddd0; --lijn-sterk: #cfc7b6; --accent: #7a5a2f; --accent-zacht: #f0e7d8;
+  --rubriek: #a12a1e;
 }
 
 * { box-sizing: border-box; }
@@ -224,6 +228,23 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 /* Overige brontypografie */
 .ed-ul { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .ed-sp { letter-spacing: 0.22em; }
+.ed-rood { color: var(--rubriek); }
+.ed-init {
+  float: left; font-family: var(--serif); color: var(--rubriek);
+  font-size: 3.1em; line-height: .82; padding: .05em .1em 0 0;
+}
+/* Interlineaire toevoeging: boven de regel geschreven -> klein, verhoogd, met
+   invoegteken ‸ dat de plaats van inlassing markeert. */
+.ed-itl { font-size: .8em; vertical-align: .38em; color: var(--accent); }
+.ed-itl::before { content: "‸"; font-size: .85em; vertical-align: -.1em; margin-right: .04em; }
+/* Marginale toevoeging: in de marge geschreven -> als een klein inzetje in de
+   tekststroom, met een marge-merkteken. */
+.ed-marg {
+  font-family: var(--sans); font-size: .8em; color: var(--inkt-zacht);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  padding: 0 .3rem; margin: 0 .1rem;
+}
+.ed-marg::before { content: "marge "; font-size: .85em; letter-spacing: .04em; color: var(--accent); }
 .ed-gap { font-family: var(--sans); font-size: .8em; color: var(--inkt-zacht); }
 .ed-del { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--inkt) 55%, transparent); color: var(--inkt-zacht); }
 

@@ -55,6 +55,14 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
      Ho{ab:og}Mo{ab:genden}   opgeloste (aangevulde) letters binnen een woord;
                               in de editie cursief zónder haken: Hoogmogenden
 
+  Bron- en handschriftkenmerken:
+     {rood:tekst}   rubricatie (rode inkt)
+     {init:tekst}   initiaal / lombarde (grote sierletter aan het begin)
+     {itl:tekst}    interlineaire toevoeging — boven de regel geschreven; klein
+                    en verhoogd, met invoegteken ‸ op de plaats van inlassing
+     {marg:tekst}   marginale toevoeging — in de marge geschreven; als klein
+                    inzetje in de tekststroom met een marge-merkteken
+
 --- DE NOTEN (=== NOTEN ===) -------------------------------------------------
   Per regel:   lemma | code | inhoud
      lemma   het woord of de woordgroep in de tekst. Voor een lange passage:
@@ -95,6 +103,10 @@ Bij het woord kompas hoort een woordverklaring; bij Constantinopel een historisc
 Een commentaarnoot kan bovendien een lange passage bestrijken waarin zelf een woordverklaring genest is, zoals hier bij het woord galjoen dat midden in de becommentarieerde zin valt.
 
 ~ p. 2 |
+
+## {sc:Bron- en handschriftkenmerken}
+
+{init:D}eze alinea begint met een lombarde. Een {rood:rubriek} staat in rode inkt. Boven de regel is later {itl:tussengeschreven}, en in de marge staat {marg:een aantekening} van de kopiist.
 
 ### {sc:Bijzondere gevallen}
 
