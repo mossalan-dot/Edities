@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <rect width="640" height="360" fill="#efe7d3"/>
+  <rect x="8" y="8" width="624" height="344" fill="none" stroke="#c8b98f" stroke-width="2"/>
+  <circle cx="320" cy="150" r="70" fill="none" stroke="#7a5a2f" stroke-width="3"/>
+  <path d="M320 90 L340 150 L320 210 L300 150 Z" fill="#7a5a2f" opacity="0.7"/>
+  <text x="320" y="285" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="22" fill="#5b4a30">voorbeeldafbeelding</text>
+  <text x="320" y="315" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#8a795a">vervang door uw eigen figuur in afbeeldingen/</text>
+</svg>

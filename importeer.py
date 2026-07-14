@@ -71,6 +71,8 @@ def maak_blokken(tekst):
             flush()
         elif re.match(r'^#{1,3}\s', s):
             flush(); blokken.append({'type': 'kop', 'tekst': s})
+        elif re.match(r'^!\[.*\]\(.*\)', s):
+            flush(); blokken.append({'type': 'fig', 'tekst': s})
         elif s.startswith('~'):
             flush(); blokken.append({'type': 'mark', 'tekst': s})
         else:
@@ -201,6 +203,10 @@ def bouw_bron(frontmatter, blokken):
             if vorig == 'para':
                 uit.append('')
             uit.append(b['tekst'])
+        elif b['type'] == 'fig':
+            uit.append('')
+            uit.append(b['tekst'])
+            uit.append('')
         else:  # para
             uit.append(b['tekst'])
         vorig = b['type']

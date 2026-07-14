@@ -155,6 +155,18 @@ apparaat: auteur | Noten van de auteur        | origineel
     (opent op die pagina); bij <code>origineel_type: afbeelding</code> vervangt het de
     <code>{n}</code> in het bestandspad (opent de scan in een lightbox).</p>
 
+    <h3>Afbeeldingen in de editie</h3>
+    <p>Een figuur (kaart, portret, tekening) zet u met de gewone Markdown-afbeeldingssyntax op
+    een eigen regel:</p>
+    <pre><code>![Bijschrift, met desgewenst een bron. — Bron: …](afbeeldingen/kaart.jpg)</code></pre>
+    <p>De figuur wordt automatisch genummerd (“Afbeelding 1”, “Afbeelding 2” …), gecentreerd
+    weergegeven met het bijschrift eronder, en is klikbaar om te vergroten. Voeg <code>{breed}</code>
+    toe voor een brede figuur die op een breed scherm buiten de tekstkolom uitloopt:</p>
+    <pre><code>![Bijschrift.](afbeeldingen/kaart.jpg){breed}</code></pre>
+    <p>Dit is iets anders dan de <em>facsimile</em> (de scans van het origineel), die via de
+    paginamarkeringen wordt geopend. Afbeeldingen horen in een map <code>afbeeldingen/</code> bij
+    de editie; in de Inleiding of Verantwoording kunt u ze ook rechtstreeks als HTML plaatsen.</p>
+
     <p>De <code>~</code>-markeringen bepalen tevens de <strong>paginagrenzen</strong>: heeft een
     editie meer dan één markering, dan kan de lezer in de werkbalk kiezen tussen <em>doorlopend</em>
     lezen (alles onder elkaar) en <em>per pagina</em> doorbladeren (met vorige/volgende en een

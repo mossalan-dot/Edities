@@ -110,6 +110,20 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .wb-app .wb-stip { width: .7rem; height: .7rem; border-radius: 50%; background: var(--kleur); display: inline-block; }
 .werkbalk input[type=checkbox] { accent-color: var(--accent); }
 
+/* ---- Afbeeldingen in de editie ----------------------------------------- */
+.editie-figuur { margin: 1.6rem auto; text-align: center; cursor: zoom-in; }
+.editie-figuur img {
+  max-width: 100%; height: auto; border-radius: 4px;
+  border: 1px solid var(--lijn); background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+.editie-figuur figcaption {
+  font-family: var(--sans); font-size: .82rem; color: var(--inkt-zacht);
+  margin-top: .5rem; line-height: 1.4; text-align: left;
+}
+.editie-figuur .fig-nr { font-weight: 600; color: var(--inkt); }
+.editie-figuur.breed { width: 48rem; max-width: 88vw; margin-left: 50%; transform: translateX(-50%); }
+
 /* ---- Pagina's en weergavemodus ----------------------------------------- */
 .modus-bladeren .pagina { display: none; }
 .modus-bladeren .pagina.actief { display: block; }

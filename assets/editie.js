@@ -173,6 +173,7 @@
     var stap = parseInt(config.meta.regelnummering, 10) || 0; // 0 = geen nummering
     var global = { n: 0 };   // globale nootteller (uniek over alle pagina's)
     var regelnr = 0;
+    var figuurnr = 0;
     var paginas = [];
     var cur = { label: null, doel: null, uit: [], noten: [], inAlinea: false };
 
@@ -192,6 +193,21 @@
         var hTag = 'h' + (niveau + 1);       // h2 / h3 / h4
         cur.uit.push('<' + hTag + ' class="tekstkop kop-' + niveau + '">' +
                      opmaak(escapeHtml(kop[2])) + '</' + hTag + '>');
+        continue;
+      }
+
+      // afbeelding:  ![bijschrift](pad){breed}
+      var fig = t.match(/^!\[([\s\S]*?)\]\(([^)]+)\)\s*(\{breed\})?\s*$/);
+      if (fig) {
+        sluit();
+        figuurnr++;
+        var bij = fig[1].trim(), pad = fig[2].trim(), breed = fig[3] ? ' breed' : '';
+        var bijHtml = opmaak(escapeHtml(bij));
+        cur.uit.push('<figure class="editie-figuur' + breed + '" data-vergroot="' + escapeHtml(pad) +
+          '" data-bij="Afbeelding ' + figuurnr + '. ' + escapeHtml(bij) + '">' +
+          '<img src="' + escapeHtml(pad) + '" alt="' + escapeHtml(bij) + '" loading="lazy">' +
+          (bij ? '<figcaption><span class="fig-nr">Afbeelding ' + figuurnr + '.</span> ' + bijHtml + '</figcaption>' : '') +
+          '</figure>');
         continue;
       }
 
@@ -600,6 +616,8 @@
       }
       var pb = e.target.closest('.pb');
       if (pb) { openOrigineel(config, pb.getAttribute('data-doel')); return; }
+      var fig = e.target.closest('.editie-figuur[data-vergroot]');
+      if (fig) { toonLightbox(fig.getAttribute('data-vergroot'), fig.getAttribute('data-bij') || ''); return; }
     });
 
     root.addEventListener('change', function (e) {
@@ -639,15 +657,15 @@
     if (config.meta.origineel_type === 'pdf' && config.meta.origineel_pdf) {
       window.open(config.meta.origineel_pdf + '#page=' + encodeURIComponent(doel), '_blank', 'noopener');
     } else if (config.meta.origineel_afbeeldingen) {
-      toonLightbox(config.meta.origineel_afbeeldingen.replace('{n}', doel), doel);
+      toonLightbox(config.meta.origineel_afbeeldingen.replace('{n}', doel), 'Origineel · ' + doel);
     }
   }
-  function toonLightbox(src, label) {
+  function toonLightbox(src, bijschrift) {
     var box = document.createElement('div');
     box.className = 'lightbox';
     box.innerHTML = '<div class="lb-binnen"><button class="lb-sluit" aria-label="Sluiten">×</button>' +
-      '<img src="' + src + '" alt="Origineel ' + escapeHtml(label) + '">' +
-      '<div class="lb-bijschrift">Origineel · ' + escapeHtml(label) + '</div></div>';
+      '<img src="' + src + '" alt="' + escapeHtml(bijschrift) + '">' +
+      '<div class="lb-bijschrift">' + escapeHtml(bijschrift) + '</div></div>';
     function sluit() { box.remove(); document.removeEventListener('keydown', esc); }
     function esc(e) { if (e.key === 'Escape') sluit(); }
     box.addEventListener('click', function (e) {

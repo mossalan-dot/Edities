@@ -42,6 +42,9 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   (lege regel)          nieuwe alinea
   ~ label | doel        paginagrens; opent facsimile 'doel' (pdf-pagina of {n}).
                         Laat 'doel' leeg als er (nog) geen scan is.
+  ![bijschrift](pad)    afbeelding met bijschrift (genummerd, klik om te vergroten).
+                        Voeg {breed} toe voor een brede figuur buiten de tekstkolom:
+                        ![bijschrift](afbeeldingen/kaart.jpg){breed}
   Typografie:
      *cursief*                 **vet**
      {sc:kleinkapitaal}        {sp:gesperd}   (spatiëring, gangbaar in oude drukken)
@@ -107,6 +110,8 @@ Een commentaarnoot kan bovendien een lange passage bestrijken waarin zelf een wo
 ## {sc:Bron- en handschriftkenmerken}
 
 {init:D}eze alinea begint met een lombarde. Een {rood:rubriek} staat in rode inkt. Boven de regel is later {itl:tussengeschreven}, en in de marge staat {marg:een aantekening} van de kopiist.
+
+![Een afbeelding met bijschrift; klik om te vergroten. — Bron: voorbeeld.](afbeeldingen/voorbeeld.svg)
 
 ### {sc:Bijzondere gevallen}
 

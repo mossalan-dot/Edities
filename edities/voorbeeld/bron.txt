@@ -34,6 +34,9 @@ Een commentaarnoot kan bovendien [[een lange passage bestrijken waarin zelf een 
 
 {init:D}eze alinea begint met een lombarde. Een {rood:rubriek} staat in rode inkt. Boven de regel is later {itl:tussengeschreven}, en in de marge staat {marg:een aantekening} van de kopiist.
 
+![Een afbeelding met bijschrift; klik om te vergroten. — Bron: voorbeeld.](afbeeldingen/voorbeeld.svg)
+
+
 ### {sc:Bijzondere gevallen}
 
 Het woord anker komt in deze alinea twee keer voor. De noot hoort bij het tweede [[anker|comm|Deze noot is met «(2)» aan het tweede voorkomen van 'anker' gekoppeld.]], niet bij het eerste. Zo kies je met een telling het juiste voorkomen.
