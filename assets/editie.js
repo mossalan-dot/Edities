@@ -29,15 +29,18 @@
         case 'sup': return '<sup>' + body + '</sup>';                     // superscript
         case 'sub': return '<sub>' + body + '</sub>';                     // subscript
         case 'del': return '<span class="ed-del">' + body + '</span>';    // doorhaling
+        case 'ul':  return '<span class="ed-ul">' + body + '</span>';     // onderstreping (bron)
+        case 'sp':  return '<span class="ed-sp">' + body + '</span>';     // gesperd / spatiëring
         case 'add': return '<span class="ed-add">⟨' + body + '⟩</span>'; // editeurstoevoeging
         case 'unc': return '<span class="ed-unc">' + body + '<span class="unc-teken">[?]</span></span>';
         case 'ex':  return '<span class="ed-ex">' + body + '</span>';     // opgeloste afkorting (heel woord)
-        case 'ab':  return '<span class="ed-ab">' + body + '</span>';     // opgeloste letters binnen woord: (…)
+        case 'ab':  return '<span class="ed-ab">' + body + '</span>';     // opgeloste letters binnen woord
         case 'gap': return '<span class="ed-gap">[' + (body || 'lacune') + ']</span>';
         default:    return body;
       }
     });
-    s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    s = s.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');          // **vet**
+    s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');                          // *cursief*
     return s;
   }
 
@@ -148,7 +151,8 @@
     noot.inhoudHtml = parseSegment(inhoud, ctx); // geneste noot in de inhoud
     noot.lemmaHtml = parseSegment(lemma, ctx);   // geneste noot in het lemma (hoofdtekst)
     noot.labelHtml = maakLabel(lemma, noot.lemmaHtml); // ingekort label voor apparaat/kantnoot
-    return '<span class="lemma app-' + code + '" data-noot="' + id + '" tabindex="0" ' +
+    var nest = lemma.indexOf('[[') !== -1 ? ' heeft-nest' : ''; // bevat geneste noot
+    return '<span class="lemma' + nest + ' app-' + code + '" data-noot="' + id + '" tabindex="0" ' +
            'role="button" aria-label="Toon noot" style="--kleur:' + app.kleur + '">' +
            noot.lemmaHtml + '</span>';
   }

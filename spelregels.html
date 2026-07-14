@@ -108,11 +108,16 @@ apparaat: auteur | Noten van de auteur        | origineel
     <table class="regel-tabel">
       <tr><th>Wat</th><th>Schrijf</th><th>Resultaat</th></tr>
       <tr><td>Cursief</td><td><code>*tekst*</code></td><td><em>tekst</em></td></tr>
+      <tr><td>Vet</td><td><code>**tekst**</code></td><td><strong>tekst</strong></td></tr>
       <tr><td>Kleinkapitaal</td><td><code>{sc:tekst}</code></td><td><span class="sc">tekst</span></td></tr>
+      <tr><td>Gesperd (spatiëring)</td><td><code>{sp:tekst}</code></td><td><span class="ed-sp">tekst</span></td></tr>
       <tr><td>Superscript</td><td><code>{sup:tekst}</code></td><td>x<sup>tekst</sup></td></tr>
       <tr><td>Subscript</td><td><code>{sub:tekst}</code></td><td>x<sub>tekst</sub></td></tr>
       <tr><td>Doorhaling</td><td><code>{del:tekst}</code></td><td><span class="ed-del">tekst</span></td></tr>
+      <tr><td>Onderstreping (bron)</td><td><code>{ul:tekst}</code></td><td><span class="ed-ul">tekst</span></td></tr>
     </table>
+    <p><em>Let op:</em> gebruik <code>{ul:…}</code> spaarzaam — geannoteerde woorden krijgen zelf al
+    een (gestippelde) onderstreping, dus te veel onderstreepte tekst kan verwarren.</p>
 
     <h2>5. Editeursingrepen (kritische editie)</h2>
     <table class="regel-tabel">
@@ -123,10 +128,11 @@ apparaat: auteur | Noten van de auteur        | origineel
       <tr><td>Opgeloste letters in een woord</td><td><code>Ho{ab:og}Mo{ab:genden}</code></td><td>Ho<span class="ed-ab">og</span>Mo<span class="ed-ab">genden</span></td></tr>
       <tr><td>Lacune / onleesbaar</td><td><code>{gap:reden}</code></td><td><span class="ed-gap">[reden]</span></td></tr>
     </table>
-    <p>Bij <code>{ab:…}</code> markeert u alleen de door de editeur aangevulde letters. Standaard
-    verschijnen die tussen ronde haken en cursief (diplomatische conventie: Ho<span class="ed-ab">og</span>Mo<span class="ed-ab">genden</span>).
-    Met de werkbalkoptie <em>“Opgeloste afkortingen markeren”</em> uit worden de haken en cursivering
-    verborgen en leest het als gewone tekst: <span style="font-style:normal">HoogMogenden</span>.</p>
+    <p>Bij <code>{ab:…}</code> markeert u alleen de door de editeur aangevulde letters. In de
+    transcriptie is de conventie ronde haken; in de <em>editie</em> verschijnt de aanvulling
+    <em>cursief zonder haken</em> (Ho<span class="ed-ab">og</span>Mo<span class="ed-ab">genden</span>).
+    Met de werkbalkoptie <em>“Opgeloste afkortingen markeren”</em> uit vervalt de cursivering en
+    leest het als gewone tekst: <span style="font-style:normal">Hoogmogenden</span>.</p>
 
     <h2>6. Pagina- en foliomarkeringen → het origineel</h2>
     <p>Zet op een eigen regel een <code>~</code>, gevolgd door het label en het doel:</p>

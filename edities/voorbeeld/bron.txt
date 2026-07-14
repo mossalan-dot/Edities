@@ -17,7 +17,7 @@ apparaat: auteur | Noten van de auteur        | origineel | rechts
 
 ## {sc:Typografie}
 
-In de lopende tekst kan een woord *cursief* staan, in {sc:kleinkapitaal}, met een superscript zoals den 3.{sup:e}, of een subscript zoals in H{sub:2}O. Een {del:doorgehaalde} lezing toont een schrapping in het origineel.
+In de lopende tekst kan een woord *cursief* of **vet** staan, in {sc:kleinkapitaal} of {sp:gesperd}, met een superscript zoals den 3.{sup:e}, een subscript zoals in H{sub:2}O, een stuk {ul:onderstreping} uit de bron, of een {del:doorgehaalde} lezing die een schrapping toont.
 
 ## {sc:Editeursingrepen}
 

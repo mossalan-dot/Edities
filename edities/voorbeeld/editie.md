@@ -43,16 +43,17 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
   ~ label | doel        paginagrens; opent facsimile 'doel' (pdf-pagina of {n}).
                         Laat 'doel' leeg als er (nog) geen scan is.
   Typografie:
-     *cursief*
-     {sc:kleinkapitaal}
-     {sup:tekst}  superscript        {sub:tekst}  subscript
-     {del:tekst}  doorhaling
+     *cursief*                 **vet**
+     {sc:kleinkapitaal}        {sp:gesperd}   (spatiëring, gangbaar in oude drukken)
+     {sup:tekst}  superscript  {sub:tekst}  subscript
+     {del:tekst}  doorhaling   {ul:tekst}   onderstreping uit de bron
   Editeursingrepen:
      {add:tekst}  toevoeging door de editeur  →  ⟨tekst⟩
      {unc:tekst}  onzekere lezing             →  tekst[?]
      {gap:reden}  lacune / onleesbaar         →  [reden]
      {ex:tekst}   opgeloste afkorting, heel woord (cursief; schakelbaar)
-     Ho{ab:og}Mo{ab:genden}   opgeloste letters binnen een woord: Ho(og)Mo(genden)
+     Ho{ab:og}Mo{ab:genden}   opgeloste (aangevulde) letters binnen een woord;
+                              in de editie cursief zónder haken: Hoogmogenden
 
 --- DE NOTEN (=== NOTEN ===) -------------------------------------------------
   Per regel:   lemma | code | inhoud
@@ -81,7 +82,7 @@ Draai:  python3 importeer.py edities/voorbeeld/editie.md
 
 ## {sc:Typografie}
 
-In de lopende tekst kan een woord *cursief* staan, in {sc:kleinkapitaal}, met een superscript zoals den 3.{sup:e}, of een subscript zoals in H{sub:2}O. Een {del:doorgehaalde} lezing toont een schrapping in het origineel.
+In de lopende tekst kan een woord *cursief* of **vet** staan, in {sc:kleinkapitaal} of {sp:gesperd}, met een superscript zoals den 3.{sup:e}, een subscript zoals in H{sub:2}O, een stuk {ul:onderstreping} uit de bron, of een {del:doorgehaalde} lezing die een schrapping toont.
 
 ## {sc:Editeursingrepen}
 
