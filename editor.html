@@ -47,8 +47,11 @@
         <div class="ed-legenda" id="ed-legenda" hidden></div>
       </section>
       <section class="ed-voorbeeld">
-        <div class="ed-paneelkop"><span>Voorbeeld</span></div>
-        <iframe id="ed-preview" title="Voorbeeldweergave van de editie"></iframe>
+        <div class="ed-paneelkop">
+          <span>Voorbeeld</span>
+          <span class="ed-tip">Selecteer tekst om er een noot bij te maken</span>
+        </div>
+        <iframe id="ed-preview" src="editor-frame.html" title="Voorbeeldweergave van de editie"></iframe>
       </section>
     </div>
 
@@ -56,6 +59,25 @@
       <summary>Niet-verankerde noten (<span id="ed-mis-aantal">0</span>)</summary>
       <ul id="ed-mis-lijst"></ul>
     </details>
+  </div>
+
+  <div class="ed-modaal" id="ed-nootform" hidden>
+    <div class="ed-modaal-kaart" role="dialog" aria-modal="true" aria-labelledby="nf-titel">
+      <h3 id="nf-titel">Nieuwe noot</h3>
+      <p class="nf-lemma">Lemma: <span id="nf-lemma"></span></p>
+      <label class="nf-veld">Apparaat
+        <select id="nf-app"></select>
+      </label>
+      <label class="nf-veld">Inhoud van de noot
+        <textarea id="nf-inhoud" rows="4" placeholder="De noottekst…"></textarea>
+      </label>
+      <p class="nf-hint">Tip: <kbd>Ctrl/Cmd + Enter</kbd> om toe te voegen. Voor een geneste noot
+      mag u in de inhoud <code>[[lemma|code|inhoud]]</code> gebruiken.</p>
+      <div class="nf-knoppen">
+        <button type="button" class="ed-knop" id="nf-annuleer">Annuleren</button>
+        <button type="button" class="ed-knop primair" id="nf-toevoegen">Noot toevoegen</button>
+      </div>
+    </div>
   </div>
 
   <script src="assets/importeer.js"></script>
@@ -124,25 +146,15 @@
       }).join('') + '</table>' +
       '<p class="ed-legenda-meer"><a href="spelregels.html" target="_blank">Volledige spelregels →</a></p>';
 
-    // ---- Voorbeeld-iframe: geïsoleerde render via postMessage --------------
+    // ---- Voorbeeld-iframe (editor-frame.html): render via postMessage ------
     var previewKlaar = false, laatsteBron = '';
-    preview.srcdoc =
-      '<!doctype html><html lang="nl"><head><meta charset="utf-8">' +
-      '<link rel="stylesheet" href="assets/stijl.css"></head>' +
-      '<body style="padding:1.5rem 1rem"><div id="paneel"></div>' +
-      '<script src="assets/editie.js"><\/script><script>' +
-      'window.addEventListener("message",function(e){' +
-      ' if(!e.data||e.data.type!=="bron")return;' +
-      ' var p=document.getElementById("paneel");p.textContent="";' +
-      ' var r=document.createElement("div");r.id="editie";p.appendChild(r);' +
-      ' try{Editie.render(r,e.data.bron);}catch(err){p.innerHTML="<p class=\\"fout\\">"+String(err.message||err)+"</p>";}' +
-      '});parent.postMessage({type:"klaar"},"*");' +
-      '<\/script></body></html>';
-
     window.addEventListener('message', function (e) {
-      if (e.data && e.data.type === 'klaar') {
+      if (!e.data) return;
+      if (e.data.type === 'klaar') {
         previewKlaar = true;
         if (laatsteBron) preview.contentWindow.postMessage({ type: 'bron', bron: laatsteBron }, '*');
+      } else if (e.data.type === 'nieuwe-noot') {
+        openNootForm(e.data);
       }
     });
 
@@ -223,6 +235,81 @@
     document.getElementById('ed-legenda-knop').addEventListener('click', function () {
       var l = document.getElementById('ed-legenda');
       l.hidden = !l.hidden;
+    });
+
+    // ---- WYSIWYG: noot toevoegen vanuit een selectie ----------------------
+    var nootModaal = document.getElementById('ed-nootform');
+    var nfLemma = document.getElementById('nf-lemma');
+    var nfApp = document.getElementById('nf-app');
+    var nfInhoud = document.getElementById('nf-inhoud');
+    var huidigeNoot = null;
+
+    function apparatenUit(bron) {
+      var m = bron.match(/^---\s*\n([\s\S]*?)\n---/);
+      var lijst = [];
+      if (m) m[1].split('\n').forEach(function (r) {
+        var mm = r.match(/^\s*apparaat\s*:\s*(.+)$/);
+        if (mm) { var d = mm[1].split('|').map(function (x) { return x.trim(); }); lijst.push({ code: d[0], label: d[1] || d[0] }); }
+      });
+      if (!lijst.length) lijst.push({ code: 'w', label: 'Woordverklaringen' });
+      return lijst;
+    }
+
+    function lemmaMetOcc(info) {
+      return info.occ > 1 ? info.lemma + ' (' + info.occ + ')' : info.lemma;
+    }
+
+    function openNootForm(info) {
+      huidigeNoot = info;
+      nfLemma.textContent = lemmaMetOcc(info);
+      nfApp.innerHTML = apparatenUit(invoer.value).map(function (a) {
+        return '<option value="' + escapeHtml(a.code) + '">' + escapeHtml(a.label) + ' (' + escapeHtml(a.code) + ')</option>';
+      }).join('');
+      nfInhoud.value = '';
+      nootModaal.hidden = false;
+      nfInhoud.focus();
+    }
+    function sluitNootForm() { nootModaal.hidden = true; huidigeNoot = null; }
+
+    // Voeg een  lemma | code | inhoud -regel toe aan het === NOTEN ===-blok.
+    function voegNootToe(bron, lemma, code, inhoud) {
+      var regel = lemma + ' | ' + code + ' | ' + inhoud;
+      var notenRe = /^[ \t]*={3,}\s*NOTEN\s*={3,}[ \t]*$/m;
+      var registerRe = /^[ \t]*={3,}\s*REGISTER\s*={3,}[ \t]*$/m;
+      var nm = notenRe.exec(bron);
+      if (nm) {
+        var rm = registerRe.exec(bron);
+        var eind = (rm && rm.index > nm.index) ? rm.index : bron.length;
+        var voor = bron.slice(0, eind).replace(/\s*$/, '');
+        var na = bron.slice(eind).replace(/^\n+/, '');
+        return voor + '\n' + regel + (na ? '\n\n' + na : '\n');
+      }
+      var rm2 = registerRe.exec(bron);
+      if (rm2) {
+        var voor2 = bron.slice(0, rm2.index).replace(/\s*$/, '');
+        var na2 = bron.slice(rm2.index);
+        return voor2 + '\n\n=== NOTEN ===\n' + regel + '\n\n' + na2;
+      }
+      return bron.replace(/\s*$/, '') + '\n\n=== NOTEN ===\n' + regel + '\n';
+    }
+
+    function bevestigNoot() {
+      if (!huidigeNoot) return;
+      var code = nfApp.value;
+      var inhoud = nfInhoud.value.trim() || '…';
+      invoer.value = voegNootToe(invoer.value, lemmaMetOcc(huidigeNoot), code, inhoud);
+      sluitNootForm();
+      verwerk();
+    }
+
+    document.getElementById('nf-annuleer').addEventListener('click', sluitNootForm);
+    document.getElementById('nf-toevoegen').addEventListener('click', bevestigNoot);
+    nootModaal.addEventListener('click', function (e) { if (e.target === nootModaal) sluitNootForm(); });
+    nfInhoud.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); bevestigNoot(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !nootModaal.hidden) sluitNootForm();
     });
 
     // ---- Herstel vorige sessie of toon sjabloon ---------------------------
