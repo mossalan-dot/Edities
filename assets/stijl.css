@@ -217,17 +217,13 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
   cursor: pointer; outline: none;
 }
 .lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 2px; }
-/* Omvattende noot (bevat een geneste noot): kleurband i.p.v. onderstreping,
-   zodat het geneste woord zijn eigen streep behoudt */
+/* Omvattende noot (bevat een geneste noot): dubbele onderstreping i.p.v. tint,
+   zodat het geneste woord zijn eigen enkele stippellijn behoudt */
 .lemma.heeft-nest {
-  border-bottom: none;
-  background: color-mix(in srgb, var(--kleur) 11%, transparent);
-  border-radius: 2px; padding: 0 1px;
+  border-bottom: 3px double color-mix(in srgb, var(--kleur) 70%, transparent);
 }
-.lemma.heeft-nest:hover, .lemma.heeft-nest:focus { background: color-mix(in srgb, var(--kleur) 20%, transparent); }
 /* "Markeer geannoteerde woorden" uit: onderstreping weg, hover blijft werken */
 .geen-markering .lemma { border-bottom: none; }
-.geen-markering .lemma.heeft-nest { background: none; }
 .geen-markering .lemma:hover, .geen-markering .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); }
 /* Per-apparaat verbergen wordt per code via een JS-stijlblok gezet */
 
