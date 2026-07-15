@@ -446,6 +446,16 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .kaart .k-tag { display: inline-block; font-family: var(--sans); font-size: .72rem; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .05rem .55rem; color: var(--inkt-zacht); }
 .kaart p { margin: .5rem 0 0; font-size: .98rem; }
 
+/* Facsimile-galerij: rooster met handschriftscans */
+.facsimile-galerij { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 1.1rem; margin-top: 1.5rem; }
+.fac-item { display: flex; flex-direction: column; align-items: center; gap: .35rem;
+  text-decoration: none; color: var(--inkt-zacht); font-family: var(--sans); font-size: .78rem; }
+.fac-item img { width: 100%; height: auto; border: 1px solid var(--lijn-sterk); border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.15); background: var(--papier);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+.fac-item:hover img { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,.28); border-color: var(--accent); }
+.fac-item:hover span { color: var(--accent); }
+
 /* ---- Editor / werkbank -------------------------------------------------- */
 .editor-body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 .ed-werkbank { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
