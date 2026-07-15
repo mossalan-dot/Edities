@@ -732,9 +732,7 @@
       if (!n) return;
       if (root.classList.contains('verberg-app-' + n.code)) return;
       var app = apparaatVan(config, n.code);
-      pop.innerHTML = '<span class="pop-label" style="color:' + app.kleur + '">' +
-        escapeHtml(app.label) + (n.regel ? ' · regel ' + n.regel : '') + '</span>' +
-        '<span class="pop-lemma">' + n.labelHtml + '</span>' +
+      pop.innerHTML = '<span class="pop-lemma">' + n.labelHtml + '</span>' +
         '<span class="pop-inhoud">' + n.inhoudHtml + '</span>';
       pop.style.setProperty('--kleur', app.kleur);
       pop.hidden = false;
