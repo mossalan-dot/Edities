@@ -11,6 +11,8 @@
   --accent: #7a5a2f;
   --accent-zacht: #f0e7d8;
   --rubriek: #a12a1e;
+  --kaart-zee: color-mix(in srgb, var(--papier) 96%, var(--accent));
+  --kaart-land: color-mix(in srgb, var(--papier) 78%, var(--accent));
   --gutter: 3.2rem;
   --leesbreedte: 42rem;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
@@ -455,6 +457,24 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
 .fac-item:hover img { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,.28); border-color: var(--accent); }
 .fac-item:hover span { color: var(--accent); }
+
+/* Reiskaart (zelfstandige SVG, thema-adaptief) */
+.reiskaart-omhulsel { margin: 1.5rem 0; border: 1px solid var(--lijn-sterk); border-radius: 6px; overflow: hidden; background: var(--kaart-zee); }
+.reiskaart { width: 100%; height: auto; display: block; max-height: 82vh; }
+.rk-zee { fill: var(--kaart-zee); }
+.rk-land path { fill: var(--kaart-land); stroke: var(--lijn-sterk); stroke-width: 0.8; stroke-linejoin: round; }
+.rk-route { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.rk-1672 { stroke: var(--accent); stroke-width: 3.2; stroke-dasharray: 9 7; }
+.rk-1674 { stroke: var(--rubriek); stroke-width: 3.6; }
+.rk-stops circle { fill: var(--inkt); stroke: var(--papier); stroke-width: 1.2; opacity: .82; cursor: help; transition: fill .1s; }
+.rk-stops circle:hover { fill: var(--rubriek); opacity: 1; }
+.rk-labels text { fill: var(--inkt); font-family: var(--sans); font-size: 21px; font-weight: 600;
+  paint-order: stroke; stroke: var(--papier); stroke-width: 4px; stroke-linejoin: round; }
+.rk-legenda { display: flex; flex-wrap: wrap; gap: 1.2rem; font-family: var(--sans); font-size: .85rem; color: var(--inkt-zacht); margin-top: .5rem; }
+.rk-legenda span { display: inline-flex; align-items: center; gap: .5rem; }
+.rk-staal { width: 2.2rem; height: 0; border-top-width: 3px; border-top-style: solid; }
+.rk-staal.s1672 { border-top-style: dashed; border-color: var(--accent); }
+.rk-staal.s1674 { border-color: var(--rubriek); }
 
 /* ---- Editor / werkbank -------------------------------------------------- */
 .editor-body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
