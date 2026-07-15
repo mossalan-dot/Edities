@@ -89,7 +89,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
   padding: .55rem .9rem; margin: 0 0 2rem;
   font-family: var(--sans); font-size: .88rem;
 }
-.wb-boven { display: flex; align-items: center; gap: 1rem; justify-content: space-between; }
+.wb-boven { display: flex; align-items: center; gap: 1rem; justify-content: space-between; flex-wrap: wrap; }
 .wb-boven .wb-zoek { flex: 1 1 auto; max-width: 30rem; }
 .wb-uitklap {
   flex: none; display: inline-flex; align-items: center; gap: .35rem;
@@ -109,7 +109,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 .wb-opt, .wb-app { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; user-select: none; }
 .wb-app .wb-stip { width: .7rem; height: .7rem; border-radius: 50%; background: var(--kleur); display: inline-block; }
 .werkbalk input[type=checkbox] { accent-color: var(--accent); }
-.wb-knoppen { display: flex; gap: .5rem; flex: none; }
+.wb-knoppen { display: flex; gap: .5rem; flex: none; flex-wrap: wrap; }
 
 /* ---- Inhoudsopgave (uitklap in de werkbalk) ---------------------------- */
 .wb-inhoud {
@@ -560,6 +560,13 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
   scrollbar-width: thin;
 }
 .tabs button { flex: none; white-space: nowrap; }
+/* Mobiel: tabs mogen wrappen en zijn niet sticky, anders lopen ze van het
+   scherm af naar rechts. De werkbalk blijft wel sticky bovenaan. */
+@media (max-width: 640px) {
+  .tabs { position: static; flex-wrap: wrap; overflow-x: visible; }
+  .werkbalk { top: 0; }
+  .pager { top: 3.6rem; }
+}
 .tabs button {
   background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
   font-size: .95rem; color: var(--inkt-zacht); padding: .5rem .8rem; margin-bottom: -1px;

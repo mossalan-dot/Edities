@@ -244,7 +244,7 @@
         var pm = t.slice(1).split('|').map(function (x) { return x.trim(); });
         var label = pm[0] || '?', doel = pm[1] || '';
         var pb = '<span class="pb" data-doel="' + escapeHtml(doel) +
-                 '" title="Toon origineel">∣' + escapeHtml(label) + '</span>';
+                 '" title="Toon origineel">' + escapeHtml(label) + '</span>';
         sluit();
         if (cur.label === null) {
           // eerste markering: label de huidige (eventueel voorafgaande) inhoud
@@ -404,7 +404,7 @@
       lijst.forEach(function (n) {
         var regelLink = n.regel
           ? '<a class="nr-terug" href="#r' + n.regel + '" title="Terug naar de tekst">' +
-            (heeftNummers ? n.regel : '↩') + '</a> '
+            (heeftNummers ? n.regel : '↑') + '</a> '
           : '';
         uit.push('<li id="n-' + n.id + '" data-noot="' + n.id + '">' + regelLink +
                  '<span class="noot-lemma">' + n.labelHtml + '</span><span class="l-scheid"> | </span>' +
@@ -474,10 +474,10 @@
     }
     uit.push('<div class="wb-groep"><span class="wb-kop">Tonen</span>');
     if (heeftNummers) uit.push(toggle('opt-regelnr', 'Regelnummers', true));
-    uit.push(toggle('opt-markering', 'Markeer geannoteerde woorden', true));
+    uit.push(toggle('opt-markering', 'Geannoteerde woorden', true));
     uit.push(toggle('opt-editie', 'Paginamarkeringen', true));
-    if (heeftDagen) uit.push(toggle('opt-dagen', 'Dagtekeningen', true));
-    uit.push(toggle('opt-afkorting', 'Opgeloste afkortingen markeren', true));
+    if (heeftDagen) uit.push(toggle('opt-dagen', 'Datumnotities', true));
+    uit.push(toggle('opt-afkorting', 'Abbreviaturen', true));
     uit.push('</div>');
     uit.push('<div class="wb-groep"><span class="wb-kop">Apparaten</span>');
     config.apparaten.forEach(function (app) {
@@ -770,6 +770,12 @@
       if (el && !root.classList.contains('kantnoten-aan')) toonPopover(el);
     });
     root.addEventListener('focusout', verbergPopover);
+    // Op touch/smal scherm: tik buiten een lemma of de popover sluit hem.
+    document.addEventListener('click', function (e) {
+      if (root.classList.contains('kantnoten-aan')) return;
+      if (e.target.closest('.tekst .lemma') || e.target.closest('.noot-popover')) return;
+      verbergPopover();
+    });
 
     // Klik op gemarkeerde tekst -> spring naar de noot in het apparaat en laat
     // die oplichten.
@@ -829,12 +835,16 @@
         var n = nootIndex[id];
         if (n && root.classList.contains('verberg-app-' + n.code)) return;
         var kantAan = root.classList.contains('kantnoten-aan');
+        if (!kantAan) {
+          // Smal/mobiel (geen kantnoten): toon de noot als popover, net als bij
+          // hover — niet springen naar het notenapparaat onderaan.
+          toonPopover(lemma);
+          return;
+        }
         // In kantnoot-modus: de bijbehorende noot volledig openklappen en
         // opnieuw plaatsen, zodat je de hele noot ziet op ooghoogte.
-        if (kantAan) { uitgeklapt[id] = true; herbereken(); }
-        var doel = kantAan
-          ? root.querySelector('.kantnoot[data-noot="' + id + '"]')
-          : document.getElementById('n-' + id);
+        uitgeklapt[id] = true; herbereken();
+        var doel = root.querySelector('.kantnoot[data-noot="' + id + '"]');
         if (doel) {
           doel.scrollIntoView({ behavior: 'smooth', block: 'center' });
           doel.classList.add('markeer');
