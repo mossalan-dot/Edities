@@ -13,11 +13,11 @@ edities.example.nl {
 	file_server
 	encode gzip zstd
 
-	# Statische assets langer cachen (styles/scripts/afbeeldingen).
-	@statisch path /assets/* *.jpg *.jpeg *.png *.svg *.webp
-	header @statisch Cache-Control "public, max-age=604800"
+	# Code en markup kort cachen zodat deploys snel doorkomen.
+	@kort path /assets/* *.html *.txt *.md
+	header @kort Cache-Control "public, max-age=300"
 
-	# bron.txt en edities kort cachen zodat updates snel doorkomen.
-	@data path *.txt *.md
-	header @data Cache-Control "public, max-age=300"
+	# Afbeeldingen langer cachen (veranderen zelden).
+	@afbeeldingen path *.jpg *.jpeg *.png *.svg *.webp
+	header @afbeeldingen Cache-Control "public, max-age=604800"
 }
