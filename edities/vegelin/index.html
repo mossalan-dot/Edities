@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mores animadversiones et consuetudines Parisienses (1669) — Edities</title>
+  <link rel="stylesheet" href="../../assets/stijl.css">
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="../../index.html">Edities</a></span>
+      <nav>
+        <a href="../../index.html">Overzicht</a>
+        <a href="../../spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap wrap-ruim">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-paneel="inleiding" aria-selected="false">Inleiding</button>
+      <button role="tab" data-paneel="tekst" aria-selected="true">Tekst</button>
+      <button role="tab" data-paneel="verantwoording" aria-selected="false">Verantwoording</button>
+    </div>
+
+    <section class="paneel prozasectie" data-paneel="inleiding">
+      <h1>Inleiding</h1>
+      <p>De Fries <strong>Ernst Frederik Vegelin van Claerbergen</strong> hield in 1669 in Parijs een journaal bij onder de Latijnse titel ‘Mores animadversiones et consuetudines Parisienses’ — waargenomen zeden en gewoonten van Parijs.</p>
+      <p>De tekst zet in op folio 193 van een groter handschrift en vermengt Latijn en Nederlands. Het origineel berust in Tresoar te Leeuwarden, in het familiearchief Van Eysinga-Vegelin van Claerbergen.</p>
+    </section>
+
+    <section class="paneel actief" data-paneel="tekst">
+      <div id="editie" data-bron="bron.txt">
+        <p class="fout">Bezig met laden…</p>
+      </div>
+    </section>
+
+    <section class="paneel prozasectie" data-paneel="verantwoording">
+      <h1>Verantwoording van de editie</h1>
+      <p>Deze editie volgt de transcriptie en editie van Alan Moss (Tresoar Leeuwarden, FA Van Eysinga-Vegelin van Claerbergen, 4785). De foliomarkeringen beginnen bij [193], de plaats waar de reisaantekeningen in het handschrift aanvangen.</p>
+      <h2>Transcriptieconventies</h2>
+      <p>De transcriptie hanteert een vast stelsel van tekens, dat in deze editie op de
+      volgende manier wordt weergegeven:</p>
+      <ul>
+        <li>Opgeloste <strong>abbreviaturen</strong> staan <em>cursief</em>; met de knop
+        <em>Weergave → Abbreviaturen</em> kunt u ze verbergen.</li>
+        <li><span class="ed-del">Doorgehaalde</span> tekst geeft een doorhaling in het handschrift weer.</li>
+        <li>Een <span class="ed-marg">toevoeging</span> in de marge of tussen de regels is
+        apart gemarkeerd.</li>
+        <li>Een <span class="ed-gap">[lacune]</span> markeert een beschadigde of onleesbare plaats.</li>
+        <li>De <strong>foliomarkeringen</strong> (bijvoorbeeld <span class="pb">[1r]</span>)
+        verdelen de tekst; blader er met <em>Weergave → Per pagina</em> doorheen of gebruik
+        <em>Inhoud</em>.</li>
+      </ul>
+      <p>Spelling, hoofdlettergebruik en de oorspronkelijke interpunctie zijn ongewijzigd
+      overgenomen uit de transcriptie.</p>
+    </section>
+  </main>
+
+  <script src="../../assets/editie.js"></script>
+  <script src="../../assets/site.js"></script>
+  <script>Editie.laad(document.getElementById('editie'));</script>
+</body>
+</html>

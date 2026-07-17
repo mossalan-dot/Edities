@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reisbeschrijving in Frankrijk (1663–1664) — Edities</title>
+  <link rel="stylesheet" href="../../assets/stijl.css">
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="../../index.html">Edities</a></span>
+      <nav>
+        <a href="../../index.html">Overzicht</a>
+        <a href="../../spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap wrap-ruim">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-paneel="inleiding" aria-selected="false">Inleiding</button>
+      <button role="tab" data-paneel="tekst" aria-selected="true">Tekst</button>
+      <button role="tab" data-paneel="verantwoording" aria-selected="false">Verantwoording</button>
+    </div>
+
+    <section class="paneel prozasectie" data-paneel="inleiding">
+      <h1>Inleiding</h1>
+      <p>In 1663 en 1664 reisde de Amsterdammer <strong>Joan Geelvinck</strong> door Frankrijk. Zijn reisbeschrijving is een dicht en levendig document, deels in het Frans en deels in het Nederlands geschreven, met tal van aantekeningen over steden, mensen en gebruiken van Nantes en Toulouse tot Parijs.</p>
+      <p>Het is de omvangrijkste van de hier ontsloten reisteksten. Het handschrift berust in het Nationaal Archief, in het familiearchief Hoeufft van Velsen.</p>
+    </section>
+
+    <section class="paneel actief" data-paneel="tekst">
+      <div id="editie" data-bron="bron.txt">
+        <p class="fout">Bezig met laden…</p>
+      </div>
+    </section>
+
+    <section class="paneel prozasectie" data-paneel="verantwoording">
+      <h1>Verantwoording van de editie</h1>
+      <p>Deze editie volgt de diplomatische transcriptie van Alan Moss (Nationaal Archief, FA Hoeufft van Velsen, 375). De transcriptie behoudt spellingsvarianten, hoofdlettergebruik en de oorspronkelijke interpunctie; allografen (lange s, æ) zijn naar een recente schrijfvorm overgezet en zinsafbrekingen stilzwijgend opgelost. Enkele bladen zijn los van de rest van het manuscript geraakt en op meer plaatsen is het schrift beschadigd of onleesbaar; zulke plaatsen zijn als lacune aangegeven.</p>
+      <h2>Transcriptieconventies</h2>
+      <p>De transcriptie hanteert een vast stelsel van tekens, dat in deze editie op de
+      volgende manier wordt weergegeven:</p>
+      <ul>
+        <li>Opgeloste <strong>abbreviaturen</strong> staan <em>cursief</em>; met de knop
+        <em>Weergave → Abbreviaturen</em> kunt u ze verbergen.</li>
+        <li><span class="ed-del">Doorgehaalde</span> tekst geeft een doorhaling in het handschrift weer.</li>
+        <li>Een <span class="ed-marg">toevoeging</span> in de marge of tussen de regels is
+        apart gemarkeerd.</li>
+        <li>Een <span class="ed-gap">[lacune]</span> markeert een beschadigde of onleesbare plaats.</li>
+        <li>De <strong>foliomarkeringen</strong> (bijvoorbeeld <span class="pb">[1r]</span>)
+        verdelen de tekst; blader er met <em>Weergave → Per pagina</em> doorheen of gebruik
+        <em>Inhoud</em>.</li>
+        <li>Aantekeningen van de <strong>transcribent</strong> verschijnen als noot: geannoteerde woorden zijn onderstreept en tonen de noot bij hover of klik.</li>
+      </ul>
+      <p>Spelling, hoofdlettergebruik en de oorspronkelijke interpunctie zijn ongewijzigd
+      overgenomen uit de transcriptie.</p>
+    </section>
+  </main>
+
+  <script src="../../assets/editie.js"></script>
+  <script src="../../assets/site.js"></script>
+  <script>Editie.laad(document.getElementById('editie'));</script>
+</body>
+</html>

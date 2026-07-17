@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Journaal van het plesier rijsje — Edities</title>
+  <link rel="stylesheet" href="../../assets/stijl.css">
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="../../index.html">Edities</a></span>
+      <nav>
+        <a href="../../index.html">Overzicht</a>
+        <a href="../../spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap wrap-ruim">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-paneel="inleiding" aria-selected="false">Inleiding</button>
+      <button role="tab" data-paneel="tekst" aria-selected="true">Tekst</button>
+      <button role="tab" data-paneel="verantwoording" aria-selected="false">Verantwoording</button>
+    </div>
+
+    <section class="paneel prozasectie" data-paneel="inleiding">
+      <h1>Inleiding</h1>
+      <p>In de zomer van 1748 werd vanuit Middelburg een pleziertochtje — een ‘plesier rijsje’ —
+      ondernomen in gezelschap van de families Thibaut, Bomme en De Haeze. <strong>Cornelia
+      Carolina de Vassy</strong> bracht die reis niet in proza te boek, maar in luchtige, rijmende
+      verzen.</p>
+      <p>Het journaal beschrijft met humor de ongemakken van de schuit van schipper Claas van der
+      Zalm, de bezochte plaatsen in en om Bergen op Zoom en Wouw, en allerlei kleine voorvallen
+      onderweg. Het is met afstand de jongste én de enige berijmde tekst in deze reeks. Het
+      handschrift berust in Het Utrechts Archief.</p>
+    </section>
+
+    <section class="paneel actief" data-paneel="tekst">
+      <div id="editie" data-bron="bron.txt">
+        <p class="fout">Bezig met laden…</p>
+      </div>
+    </section>
+
+    <section class="paneel prozasectie" data-paneel="verantwoording">
+      <h1>Verantwoording van de editie</h1>
+      <p>Deze editie volgt de diplomatische transcriptie van Alan Moss (Het Utrechts Archief, FA
+      Mertens van Sevenhoven 984). De tekst is berijmd; elke versregel is als afzonderlijke regel
+      weergegeven en om de vijf regels genummerd.</p>
+      <p>Vierkante haken bevatten hier de eigen verklarende <em>glossen</em> bij de verzen
+      (bijvoorbeeld de aanduiding van een persoon of plaats); ze zijn ongewijzigd behouden. De
+      foliomarkeringen (bijvoorbeeld <span class="pb">[1]</span>) verdelen de tekst; blader er met
+      <em>Weergave → Per pagina</em> doorheen. Spelling, hoofdlettergebruik en de oorspronkelijke
+      interpunctie zijn overgenomen uit de transcriptie.</p>
+    </section>
+  </main>
+
+  <script src="../../assets/editie.js"></script>
+  <script src="../../assets/site.js"></script>
+  <script>Editie.laad(document.getElementById('editie'));</script>
+</body>
+</html>

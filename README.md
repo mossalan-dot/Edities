@@ -37,6 +37,12 @@ edities/
   wicher-pott/                 echte editie: 26 reisbrieven (1684–1686)
     index.html                 inleiding / brieven / verantwoording
     bron.txt                   transcriptie in editie-markup (brief = pagina)
+  hinlopen-1662/               echte editie: pleziertocht 1662
+  hinlopen-1667/               echte editie: reis door Frankrijk en Engeland 1667–1668
+  geelvinck/                   echte editie: reisbeschrijving Frankrijk 1663–1664
+  vegelin/                     echte editie: zeden van Parijs 1669 (Latijn/Nederlands)
+  anon-amsterdamse-vader/      echte editie: reisadvies 1677–1696
+  de-vassy/                    echte editie: berijmd reisjournaal 1748
   reisjournaal-demo/           demonstratie van alle functies
     index.html
     bron.txt
@@ -90,11 +96,16 @@ python3 -m http.server
 Prototype. `van-der-meersch` is een echte editie: het **volledige reisverhaal** (38
 handschriftpagina’s, ±486 oorspronkelijke editeursnoten), geautomatiseerd uit de bestaande
 PDF-uitgave overgezet met `edities/van-der-meersch/uit-pdf.py` en verankerd door de importer
-(±96% automatisch; de rest is proefleeswerk). `wicher-pott` is een echte editie van de
-**26 reisbrieven** die Wicher Pott (1661–1716) tussen 1684 en 1686 op zijn grand tour naar
-huis schreef; de diplomatische transcriptie is die van [alanmoss.nl](https://alanmoss.nl/ruysch/),
-waarbij elke brief als een aparte “pagina” doorbladerbaar is. `reisjournaal-demo` bevat
+(±96% automatisch; de rest is proefleeswerk). Daarnaast zijn **zeven reisteksten van [alanmoss.nl](https://alanmoss.nl/ruysch/)** als echte
+editie ontsloten: de 26 grand-tour-brieven van Wicher Pott (1684–1686), de twee reisjournalen
+van Gerard Hinlopen (1662 en 1667–1668), de reisbeschrijving van Joan Geelvinck (1663–1664),
+de Parijse zeden van Vegelin van Claerbergen (1669), het reisadvies van ‘de Amsterdamse vader’
+(1677–1696) en het berijmde plesier-rijsje van Cornelia Carolina de Vassy (1748). De
+diplomatische transcripties zijn geautomatiseerd omgezet uit de bron-docx/pdf: de
+transcriptieconventies van Alan Moss — `(x)` abbreviatuur, `[x]` doorhaling, `/x\` marge,
+`< >` lacune, `[1r]` folio — zijn op de editeursingrepen van het platform afgebeeld, en de
+voetnoten van de transcribent staan in het notenapparaat. `reisjournaal-demo` bevat
 **geen echte bron** maar een voorbeeldtekst in periodestijl, bedoeld om álle functies te tonen
-(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities:
-meer reisverslagen van [alanmoss.nl](https://alanmoss.nl/ruysch/) (o.a. Coenraad Ruysch,
-Gerard Hinlopen, Joan Geelvinck) en de gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz.
+(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities: het
+omvangrijke journaal van Coenraad Ruysch (1674–1677) en de gedrukte satire *Apollo sergeant*
+van Arend Fokke Simonsz.
