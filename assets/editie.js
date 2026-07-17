@@ -877,6 +877,16 @@
       }
     });
 
+    // Startmodus uit de kop: een grote editie kan met `weergave: bladeren`
+    // meteen per pagina openen, zodat niet alle paginanoten tegelijk berekend
+    // hoeven te worden (scheelt veel bij duizenden noten).
+    if (root.classList.contains('modus-bladeren')) {
+      var rbStart = root.querySelector('input[name="modus"][value="bladeren"]');
+      if (rbStart) rbStart.checked = true;
+      zetModus('bladeren');
+      activeer(huidig);
+    }
+
     // Dieplink: #pagina-N opent direct in bladermodus op die pagina
     var mh = location.hash.match(/^#pagina-(\d+)/);
     if (mh && secties.length > 1) {
@@ -1097,7 +1107,8 @@
       renderWerkbalk(config, body.noten, meerdere, body.koppen, body.dagen) +
       (meerdere ? bouwPager(body.paginas) : '') +
       paginasHtml;
-    root.classList.add('modus-doorlopend');
+    var startBladeren = body.paginas.length > 1 && meta.weergave === 'bladeren';
+    root.classList.add(startBladeren ? 'modus-bladeren' : 'modus-doorlopend');
     if (!heeftNummers) root.classList.add('geen-regelnr'); // geen lege nummer-goot
 
     var styleEl = document.createElement('style');

@@ -34,6 +34,9 @@ edities/
     index.html                 inleiding / tekst / verantwoording / origineel
     bron.txt                   transcriptie in editie-markup
     origineel/                 handschriftscan(s)
+  ruysch/                      echte editie: grand-tour-journaal (1674–1677)
+    index.html                 inleiding / reis / tekst / verantwoording
+    bron.txt                   kritische editie, ±7000 noten, maand = pagina
   wicher-pott/                 echte editie: 26 reisbrieven (1684–1686)
     index.html                 inleiding / brieven / verantwoording
     bron.txt                   transcriptie in editie-markup (brief = pagina)
@@ -96,7 +99,13 @@ python3 -m http.server
 Prototype. `van-der-meersch` is een echte editie: het **volledige reisverhaal** (38
 handschriftpagina’s, ±486 oorspronkelijke editeursnoten), geautomatiseerd uit de bestaande
 PDF-uitgave overgezet met `edities/van-der-meersch/uit-pdf.py` en verankerd door de importer
-(±96% automatisch; de rest is proefleeswerk). Daarnaast zijn **zeven reisteksten van [alanmoss.nl](https://alanmoss.nl/ruysch/)** als echte
+(±96% automatisch; de rest is proefleeswerk). Het pronkstuk is **`ruysch`**: de volledige kritische editie van het grand-tour-journaal van
+Coenraad Ruysch (1674–1677) met ruim 7000 editeursnoten, een routekaart van de heenreis (uit een
+KMZ) en navigatie per maand. Omdat het notenapparaat zo groot is, opent deze editie met de
+front-matter-optie `weergave: bladeren`, zodat alleen de noten van de zichtbare maand worden
+opgemaakt.
+
+Daarnaast zijn nog **zes reisteksten van [alanmoss.nl](https://alanmoss.nl/ruysch/)** als echte
 editie ontsloten: de 26 grand-tour-brieven van Wicher Pott (1684–1686), de twee reisjournalen
 van Gerard Hinlopen (1662 en 1667–1668), de reisbeschrijving van Joan Geelvinck (1663–1664),
 de Parijse zeden van Vegelin van Claerbergen (1669), het reisadvies van ‘de Amsterdamse vader’
@@ -106,6 +115,5 @@ transcriptieconventies van Alan Moss — `(x)` abbreviatuur, `[x]` doorhaling, `
 `< >` lacune, `[1r]` folio — zijn op de editeursingrepen van het platform afgebeeld, en de
 voetnoten van de transcribent staan in het notenapparaat. `reisjournaal-demo` bevat
 **geen echte bron** maar een voorbeeldtekst in periodestijl, bedoeld om álle functies te tonen
-(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities: het
-omvangrijke journaal van Coenraad Ruysch (1674–1677) en de gedrukte satire *Apollo sergeant*
-van Arend Fokke Simonsz.
+(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande editie: de
+gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz.
