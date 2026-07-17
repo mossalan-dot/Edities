@@ -34,6 +34,9 @@ edities/
     index.html                 inleiding / tekst / verantwoording / origineel
     bron.txt                   transcriptie in editie-markup
     origineel/                 handschriftscan(s)
+  wicher-pott/                 echte editie: 26 reisbrieven (1684–1686)
+    index.html                 inleiding / brieven / verantwoording
+    bron.txt                   transcriptie in editie-markup (brief = pagina)
   reisjournaal-demo/           demonstratie van alle functies
     index.html
     bron.txt
@@ -87,8 +90,11 @@ python3 -m http.server
 Prototype. `van-der-meersch` is een echte editie: het **volledige reisverhaal** (38
 handschriftpagina’s, ±486 oorspronkelijke editeursnoten), geautomatiseerd uit de bestaande
 PDF-uitgave overgezet met `edities/van-der-meersch/uit-pdf.py` en verankerd door de importer
-(±96% automatisch; de rest is proefleeswerk). `reisjournaal-demo` bevat
+(±96% automatisch; de rest is proefleeswerk). `wicher-pott` is een echte editie van de
+**26 reisbrieven** die Wicher Pott (1661–1716) tussen 1684 en 1686 op zijn grand tour naar
+huis schreef; de diplomatische transcriptie is die van [alanmoss.nl](https://alanmoss.nl/ruysch/),
+waarbij elke brief als een aparte “pagina” doorbladerbaar is. `reisjournaal-demo` bevat
 **geen echte bron** maar een voorbeeldtekst in periodestijl, bedoeld om álle functies te tonen
-(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities: de
-gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz, en meer reisverslagen
-(o.a. van [alanmoss.nl](https://alanmoss.nl)).
+(geneste noten, tekstkritisch apparaat, doorhaling, facsimile-lightbox). Geplande edities:
+meer reisverslagen van [alanmoss.nl](https://alanmoss.nl/ruysch/) (o.a. Coenraad Ruysch,
+Gerard Hinlopen, Joan Geelvinck) en de gedrukte satire *Apollo sergeant* van Arend Fokke Simonsz.

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reisbrieven van Wicher Pott — Edities</title>
+  <link rel="stylesheet" href="../../assets/stijl.css">
+</head>
+<body>
+  <header class="sitehoofd">
+    <div class="binnen">
+      <span class="merk"><a href="../../index.html">Edities</a></span>
+      <nav>
+        <a href="../../index.html">Overzicht</a>
+        <a href="../../spelregels.html">Spelregels</a>
+        <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap wrap-ruim">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-paneel="inleiding" aria-selected="false">Inleiding</button>
+      <button role="tab" data-paneel="tekst" aria-selected="true">Brieven</button>
+      <button role="tab" data-paneel="verantwoording" aria-selected="false">Verantwoording</button>
+    </div>
+
+    <!-- INLEIDING -->
+    <section class="paneel prozasectie" data-paneel="inleiding">
+      <h1>Inleiding</h1>
+      <p>Tussen de zomer van 1684 en het najaar van 1686 schreef de jonge <strong>Wicher Pott</strong>
+      (1661–1716) uit Groningen een reeks brieven naar huis, vrijwel alle gericht aan zijn vader
+      <strong>Pieter Pott</strong>. Ze vergezellen hem op een klassieke <em>grand tour</em>: eerst
+      een verblijf in Engeland, daarna een lange tocht door Frankrijk en Italië, en ten slotte de
+      terugreis over de Alpen en de Rijn naar de Republiek.</p>
+      <p>De vroegste brieven schrijft hij uit <strong>Londen</strong>, waar hij de beurs, de Tower met
+      haar leeuwen en wapenkamer, het Monument voor de brand van 1666 en Westminster bezoekt, en van
+      waaruit hij uitstapjes maakt naar Cambridge, Windsor en Oxford. In 1685 trekt hij naar
+      <strong>Orléans</strong> om zich in het Frans te bekwamen — bewust weg van Parijs, waar volgens
+      hem te veel Hollanders en Duitsers verblijven. Via <strong>Agen</strong> reist hij Italië in:
+      <strong>Genua</strong>, <strong>Florence</strong>, een lang verblijf te <strong>Rome</strong>,
+      <strong>Venetië</strong> en <strong>Turijn</strong>. De laatste brieven komen uit
+      <strong>Genève</strong>, <strong>Straatsburg</strong> en <strong>Frankfurt</strong>; op 5 oktober
+      1686 meldt hij zich weer op vaderlandse bodem, te <strong>Nijmegen</strong>.</p>
+      <p>De brieven zijn even nieuwsgierig als praktisch. Pott beschrijft bezienswaardigheden,
+      inscripties en curiosa, maar houdt zijn vader ook nauwgezet op de hoogte van wisselkoersen,
+      reiskosten, logies en het lot van meegestuurde brieven. Nu en dan klinkt de reiziger door die
+      op de kleintjes let: ‘dit vermaeck doet onse beursen niet lacchen’. Eén brief is in het Frans
+      geschreven en gericht aan zijn broer.</p>
+      <p>Hieronder zijn alle zesentwintig brieven ontsloten. Blader met de knop <em>Weergave →
+      Per pagina</em> door de brieven één voor één, of gebruik <em>Inhoud</em> om rechtstreeks naar een
+      brief te springen. De spelling is die van het handschrift; zeventiende-eeuwse vormen als
+      <em>twelck</em>, <em>UEE</em> en <em>nae</em> zijn bewust bewaard.</p>
+    </section>
+
+    <!-- BRIEVEN -->
+    <section class="paneel actief" data-paneel="tekst">
+      <div id="editie" data-bron="bron.txt">
+        <p class="fout">Bezig met laden…</p>
+      </div>
+    </section>
+
+    <!-- VERANTWOORDING -->
+    <section class="paneel prozasectie" data-paneel="verantwoording">
+      <h1>Verantwoording van de editie</h1>
+      <p>Deze uitgave presenteert de zesentwintig bewaard gebleven brieven van Wicher Pott uit de
+      jaren 1684–1686. De tekst volgt de <strong>diplomatische transcriptie</strong> die Alan Moss
+      beschikbaar stelde op <a href="https://alanmoss.nl/ruysch/" target="_blank" rel="noopener">alanmoss.nl</a>,
+      in het kader van zijn onderzoek naar vroegmoderne Nederlandse reisverslagen.</p>
+      <p>De spelling, woordkeuze en interpunctie van de transcriptie zijn ongewijzigd overgenomen;
+      ook eigenaardigheden en verschrijvingen van de briefschrijver zijn bewaard gebleven. Elke
+      brief is voorzien van een kop met de plaats en datum van schrijven en de geadresseerde, en
+      van een vermelding van de omvang (folia of pagina’s) zoals opgegeven in de transcriptie.
+      Waar Pott in de brief zelf een dagtekening of een aanhef plaatst, is die als eerste regel
+      behouden.</p>
+      <p>De brieven zijn gedateerd naar de gewone tijdrekening; op enkele plaatsen noteert Pott
+      zelf de oude en nieuwe stijl naast elkaar (bijvoorbeeld <em>den 10 [O.S.] / 30 junij
+      [N.S.]</em>), en die dubbeldateringen zijn in de tekst gehandhaafd.</p>
+      <h2>Weergave</h2>
+      <p>Deze editie kent geen apart notenapparaat: zij biedt de kale transcriptie, geschikt om
+      te lezen en te doorzoeken. Gebruik het zoekveld om door alle brieven tegelijk te zoeken, of
+      schakel met <em>Weergave</em> tussen doorlopend lezen en bladeren per brief. Woordverklaringen,
+      een register van personen en plaatsen en een koppeling naar de handschriften kunnen in een
+      later stadium worden toegevoegd.</p>
+    </section>
+  </main>
+
+  <script src="../../assets/editie.js"></script>
+  <script src="../../assets/site.js"></script>
+  <script>Editie.laad(document.getElementById('editie'));</script>
+</body>
+</html>
