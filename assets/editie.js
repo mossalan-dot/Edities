@@ -385,6 +385,8 @@
     if (!label) label = keyRuw;
     return {
       sleutel: dagSleutel(keyRuw, stijl),
+      key: keyRuw,
+      kal: stijl,
       label: label,
       stijl: stijl === 'sv' ? 'o.s.' : (stijl === 'sn' ? 'n.s.' : '')
     };
@@ -765,6 +767,13 @@
           '<p class="citeer-tekst">' + escapeHtml(link) + '</p>' +
           '<button type="button" class="wb-uitklap" data-kopieer="pagina">Kopieer permalink</button></div>';
       }
+      if (root._bron) {
+        html += '<div class="citeer-blok"><span class="wb-kop">Exporteren</span>' +
+          '<p class="citeer-tekst">TEI-XML voor uitwisseling met andere (DH-)gereedschappen, ' +
+          'of de kale leestekst zonder noten en markup.</p>' +
+          '<button type="button" class="wb-uitklap" data-export="tei">TEI-XML</button> ' +
+          '<button type="button" class="wb-uitklap" data-export="tekst">Platte tekst</button></div>';
+      }
       box.innerHTML = html;
     }
 
@@ -1004,6 +1013,17 @@
         }
         return;
       }
+      var ex = e.target.closest('[data-export]');
+      if (ex && root._bron) {
+        var exNaam = (config.meta.titel || 'editie').toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'editie';
+        if (ex.getAttribute('data-export') === 'tei') {
+          downloadBestand(exNaam + '.xml', naarTEI(root._bron), 'application/xml');
+        } else {
+          downloadBestand(exNaam + '.txt', naarTekst(root._bron), 'text/plain');
+        }
+        return;
+      }
       var kop = e.target.closest('[data-kopieer]');
       if (kop) {
         var citeerBox = kop.closest('.citeer-blok');
@@ -1149,6 +1169,23 @@
         }, 60);
       }
     }
+
+    // Sneltoetsen: '/' focust het zoekveld; ←/→ bladeren (in bladermodus).
+    document.addEventListener('keydown', function toetsen(e) {
+      if (!root.isConnected) { document.removeEventListener('keydown', toetsen); return; }
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === '/') {
+        var zv = root.querySelector('.zoekveld');
+        if (zv) { e.preventDefault(); zv.focus(); zv.select(); }
+        return;
+      }
+      if (!root.classList.contains('modus-bladeren')) return;
+      if (document.querySelector('.lightbox')) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); activeer(huidig - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); activeer(huidig + 1); }
+    });
 
     herbereken(); // kantlijnnoten plaatsen (indien breed genoeg)
     updateOrigineel(true);
@@ -1321,8 +1358,227 @@
     });
   }
 
+  // ---- Export: TEI-XML en platte tekst ------------------------------------
+  function xmlEsc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+  }
+  // Typografie en editeursingrepen naar TEI-elementen (invoer is al ge-escaped).
+  function teiOpmaak(s) {
+    s = s.replace(/\{(\w+):([\s\S]*?)\}/g, function (m, code, body) {
+      switch (code) {
+        case 'sc':   return '<hi rend="smallcaps">' + body + '</hi>';
+        case 'sup':  return '<hi rend="superscript">' + body + '</hi>';
+        case 'sub':  return '<hi rend="subscript">' + body + '</hi>';
+        case 'del':  return '<del>' + body + '</del>';
+        case 'ul':   return '<hi rend="underline">' + body + '</hi>';
+        case 'sp':   return '<hi rend="letterspace">' + body + '</hi>';
+        case 'add':  return '<supplied resp="#editeur">' + body + '</supplied>';
+        case 'unc':  return '<unclear>' + body + '</unclear>';
+        case 'ex':   return '<expan>' + body + '</expan>';
+        case 'ab':   return '<ex>' + body + '</ex>';
+        case 'gap':  return '<gap reason="' + (body || 'onleesbaar') + '"/>';
+        case 'rood': return '<hi rend="rubricated">' + body + '</hi>';
+        case 'init': return '<hi rend="initial">' + body + '</hi>';
+        case 'itl':  return '<add place="above">' + body + '</add>';
+        case 'marg': return '<add place="margin">' + body + '</add>';
+        default:     return body;
+      }
+    });
+    s = s.replace(/\*\*([\s\S]+?)\*\*/g, '<hi rend="bold">$1</hi>');
+    s = s.replace(/\*([^*]+)\*/g, '<hi rend="italic">$1</hi>');
+    return s;
+  }
+  // Noten ([[lemma|code|inhoud]], genest) naar seg/note.
+  function teiSegment(s, config) {
+    var out = '', i = 0;
+    while (i < s.length) {
+      var open = s.indexOf('[[', i);
+      if (open === -1) { out += teiOpmaak(s.slice(i)); break; }
+      out += teiOpmaak(s.slice(i, open));
+      var close = matchClose(s, open + 2);
+      if (close === -1) { out += teiOpmaak(s.slice(open)); break; }
+      var velden = splitTop(s.slice(open + 2, close));
+      var lemma = (velden[0] || '').trim();
+      var code = (velden[1] || '').trim();
+      var inhoud = velden.slice(2).join('|').trim();
+      var app = apparaatVan(config, code);
+      if (!app) {
+        out += teiSegment(lemma, config);
+      } else {
+        out += '<seg>' + teiSegment(lemma, config) +
+          '<note type="' + xmlEsc(code) + '" resp="' +
+          (app.soort === 'origineel' ? '#auteur' : '#editeur') + '">' +
+          teiSegment(inhoud, config) + '</note></seg>';
+      }
+      i = close + 2;
+    }
+    return out;
+  }
+  function naarTEI(tekst) {
+    var parsed = parseKop(tekst);
+    var config = parsed.config, meta = config.meta;
+    var regels = parsed.body.replace(/\r\n/g, '\n').split('\n');
+    var stap = parseInt(meta.regelnummering, 10) || 0;
+    var uit = [], inP = false, regelnr = 0;
+    function sluitP() { if (inP) { uit.push('</p>'); inP = false; } }
+
+    for (var i = 0; i < regels.length; i++) {
+      var t = regels[i].trim();
+      if (t === '') { sluitP(); continue; }
+      var kop = t.match(/^(#{1,3})\s+(.*)$/);
+      if (kop) {
+        sluitP();
+        uit.push('<head type="niveau-' + kop[1].length + '">' +
+          teiSegment(xmlEsc(kop[2]), config) + '</head>');
+        continue;
+      }
+      var fig = t.match(/^!\[([\s\S]*?)\]\(([^)]+)\)\s*(\{breed\})?\s*$/);
+      if (fig) {
+        sluitP();
+        uit.push('<figure><graphic url="' + xmlEsc(fig[2].trim()) + '"/>' +
+          (fig[1].trim() ? '<figDesc>' + teiOpmaak(xmlEsc(fig[1].trim())) + '</figDesc>' : '') +
+          '</figure>');
+        continue;
+      }
+      if (/^@\s/.test(t)) {
+        var dm = parseDag(t.slice(1).trim());
+        if (dm) {
+          sluitP();
+          uit.push('<milestone unit="day" when="' + xmlEsc(dm.key) + '"' +
+            (dm.kal === 'sv' ? ' style="julian"' : '') +
+            ' n="' + xmlEsc(dm.label) + '"/>');
+          continue;
+        }
+      }
+      if (t.charAt(0) === '~') {
+        var pm = t.slice(1).split('|').map(function (x) { return x.trim(); });
+        sluitP();
+        uit.push('<pb n="' + xmlEsc(pm[0] || '') + '"' +
+          (pm[1] ? ' facs="' + xmlEsc(pm[1]) + '"' : '') + '/>');
+        continue;
+      }
+      if (t.charAt(0) === '|') {
+        sluitP();
+        var rijen = [];
+        while (i < regels.length && regels[i].trim().charAt(0) === '|') { rijen.push(regels[i].trim()); i++; }
+        i--;
+        uit.push('<table>');
+        rijen.forEach(function (rij) {
+          if (isScheidingsrij(rij)) return;
+          uit.push('<row>' + tabelCellen(rij).map(function (c) {
+            return '<cell>' + teiSegment(xmlEsc(c), config) + '</cell>';
+          }).join('') + '</row>');
+        });
+        uit.push('</table>');
+        continue;
+      }
+      var li = t.match(/^([-*]|\d+\.)\s+(.*)$/);
+      if (li) {
+        sluitP();
+        uit.push('<list rend="' + (/\d/.test(li[1]) ? 'numbered' : 'bulleted') + '">');
+        while (i < regels.length) {
+          var lm = regels[i].trim().match(/^([-*]|\d+\.)\s+(.*)$/);
+          if (!lm) break;
+          uit.push('<item>' + teiSegment(xmlEsc(lm[2]), config) + '</item>');
+          i++;
+        }
+        i--;
+        uit.push('</list>');
+        continue;
+      }
+      // gewone tekstregel
+      regelnr++;
+      if (!inP) { uit.push('<p>'); inP = true; }
+      uit.push((stap > 0 ? '<lb n="' + regelnr + '"/>' : '') +
+        teiSegment(xmlEsc(regels[i]), config));
+    }
+    sluitP();
+
+    var kopj = [];
+    kopj.push('<?xml version="1.0" encoding="UTF-8"?>');
+    kopj.push('<TEI xmlns="http://www.tei-c.org/ns/1.0">');
+    kopj.push('<teiHeader><fileDesc><titleStmt>');
+    kopj.push('<title>' + xmlEsc(meta.titel || 'Editie') + '</title>');
+    if (meta.auteur) kopj.push('<author>' + xmlEsc(meta.auteur) + '</author>');
+    kopj.push('<respStmt xml:id="editeur"><resp>editeursnoten</resp><name>de editeur</name></respStmt>');
+    kopj.push('<respStmt xml:id="auteur"><resp>oorspronkelijke noten</resp><name>' +
+      xmlEsc(meta.auteur || 'de auteur') + '</name></respStmt>');
+    kopj.push('</titleStmt>');
+    kopj.push('<publicationStmt><p>Automatische TEI-export uit het Edities-platform.</p></publicationStmt>');
+    kopj.push('<sourceDesc><p>' + xmlEsc([meta.bron, meta.jaar, meta.type]
+      .filter(function (x) { return x; }).join(' · ') || 'Onbekende bron') + '</p></sourceDesc>');
+    kopj.push('</fileDesc>');
+    if (config.apparaten.length) {
+      kopj.push('<encodingDesc><editorialDecl>');
+      kopj.push('<p>Notenapparaten (het type-attribuut van elke note): ' +
+        xmlEsc(config.apparaten.map(function (a) {
+          return a.code + ' = ' + a.label + ' (' + a.soort + ')';
+        }).join('; ')) + '.</p>');
+      kopj.push('</editorialDecl></encodingDesc>');
+    }
+    kopj.push('</teiHeader>');
+    var personen = config.register.filter(function (r) { return r.soort === 'persoon'; });
+    var plaatsen = config.register.filter(function (r) { return r.soort === 'plaats'; });
+    if (personen.length || plaatsen.length) {
+      kopj.push('<standOff>');
+      function naamlijst(items, lijstTag, itemTag, naamTag) {
+        var u = ['<' + lijstTag + '>'];
+        items.forEach(function (ing) {
+          u.push('<' + itemTag + '><' + naamTag + '>' + xmlEsc(ing.naam) + '</' + naamTag + '>' +
+            ing.varianten.filter(function (v) { return v !== ing.naam; }).map(function (v) {
+              return '<' + naamTag + ' type="variant">' + xmlEsc(v) + '</' + naamTag + '>';
+            }).join('') + '</' + itemTag + '>');
+        });
+        u.push('</' + lijstTag + '>');
+        return u.join('\n');
+      }
+      if (personen.length) kopj.push(naamlijst(personen, 'listPerson', 'person', 'persName'));
+      if (plaatsen.length) kopj.push(naamlijst(plaatsen, 'listPlace', 'place', 'placeName'));
+      kopj.push('</standOff>');
+    }
+    return kopj.join('\n') + '\n<text><body>\n' + uit.join('\n') + '\n</body></text>\n</TEI>\n';
+  }
+
+  // Kale leestekst: noten worden hun lemma, markup verdwijnt.
+  function naarTekst(tekst) {
+    var parsed = parseKop(tekst);
+    var regels = parsed.body.replace(/\r\n/g, '\n').split('\n');
+    var uit = [];
+    regels.forEach(function (r) {
+      var t = r.trim();
+      if (/^!\[/.test(t) || t.charAt(0) === '~' || /^@\s/.test(t)) return;
+      var kop = t.match(/^(#{1,3})\s+(.*)$/);
+      var inhoud = kop ? kop[2] : r;
+      var vorig;
+      do { // binnenste noten eerst, tot alles is teruggebracht tot het lemma
+        vorig = inhoud;
+        inhoud = inhoud.replace(/\[\[((?:(?!\[\[)[\s\S])*?)\]\]/g, function (m, p) {
+          return splitTop(p)[0];
+        });
+      } while (inhoud !== vorig);
+      do {
+        vorig = inhoud;
+        inhoud = inhoud.replace(/\{\w+:([^{}]*)\}/g, '$1');
+      } while (inhoud !== vorig);
+      inhoud = inhoud.replace(/\*+/g, '');
+      uit.push(inhoud.replace(/\s+$/, ''));
+    });
+    return uit.join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+  }
+
+  function downloadBestand(naam, inhoud, mime) {
+    var blob = new Blob([inhoud], { type: mime + ';charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = naam;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
   // ---- Publiek ------------------------------------------------------------
   function render(root, tekst) {
+    root._bron = tekst; // voor export (TEI / platte tekst)
     var parsed = parseKop(tekst);
     var config = parsed.config;
     // achterwaartse compatibiliteit: facsimile_* -> origineel_*
@@ -1386,5 +1642,8 @@
       });
   }
 
-  global.Editie = { laad: laad, render: render, parseKop: parseKop };
+  global.Editie = {
+    laad: laad, render: render, parseKop: parseKop,
+    naarTEI: naarTEI, naarTekst: naarTekst
+  };
 })(window);

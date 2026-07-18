@@ -28,7 +28,10 @@ alleen HTML, CSS en een beetje JavaScript. Klaar om te hosten op bijvoorbeeld Gi
   `#pagina-N` / `#rN` die direct naar de juiste plaats springen.
 - **Bewaarde weergave-instellingen**: apparaat-toggles, leesmodus en weergaveopties blijven
   per editie bewaard (localStorage).
-- Licht/donker thema, afdrukvriendelijk.
+- **Export**: TEI-XML (voor uitwisseling met andere DH-gereedschappen) en platte leestekst,
+  te downloaden via de Citeer-knop in de werkbalk.
+- **Sneltoetsen**: `/` focust het zoekveld; `←`/`→` bladeren in de paginaweergave.
+- Licht/donker thema, afdrukvriendelijk, description/Open-Graph-metadata per pagina.
 
 ## Structuur
 
