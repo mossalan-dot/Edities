@@ -30,7 +30,9 @@ alleen HTML, CSS en een beetje JavaScript. Klaar om te hosten op bijvoorbeeld Gi
   per editie bewaard (localStorage).
 - **Spellingtolerant zoeken** (aan/uit te zetten): vroegmoderne spellingvariatie wordt
   meegezocht — u/v, i/j/y, c/k, s/z, d/t, g(h), klinkerclusters en accenten. Zo vindt
-  *Enkhuizen* ook *Enchuijzen*, en *jaar* ook *jaer*.
+  *Enkhuizen* ook *Enchuijzen*, en *jaar* ook *jaer*. Het zoeken beslaat ook de
+  **noten** (van de aanstaande apparaten); een treffer in een noot opent de
+  bijbehorende kantnoot.
 - **Facsimile-zoom**: in de lightbox kan met scrollwiel, dubbelklik, knoppen of toetsen
   (+/−/0) worden gezoomd en gesleept.
 - **Export**: TEI-XML (voor uitwisseling met andere DH-gereedschappen) en platte leestekst,

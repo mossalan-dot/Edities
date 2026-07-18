@@ -613,6 +613,13 @@
           laatsteBodem = top + item.el.offsetHeight;
         });
       });
+
+      // De kantnoten zijn zojuist opnieuw opgebouwd: markeer een actieve
+      // zoekterm ook daar (de navigatie loopt via het apparaat eronder).
+      if (huidigPatroon) {
+        wrapMatches(links, huidigPatroon);
+        wrapMatches(rechts, huidigPatroon);
+      }
     }
     var herTimer;
     function herberekenLater() { clearTimeout(herTimer); herTimer = setTimeout(herbereken, 120); }
@@ -863,6 +870,7 @@
     var zoekMarks = [];
     var zoekIdx = -1;
     var zoekTimer;
+    var huidigPatroon = null; // actief zoekpatroon, ook voor kantnoten/popover
 
     function veldWaarde() { return veld ? veld.value.trim() : ''; }
 
@@ -882,8 +890,8 @@
       root.querySelectorAll('.zoektreffer').forEach(function (m) {
         m.parentNode.replaceChild(document.createTextNode(m.textContent), m);
       });
-      root.querySelectorAll('.pagina .tekst').forEach(function (c) { c.normalize(); });
-      zoekMarks = []; zoekIdx = -1;
+      root.querySelectorAll('.pagina .tekst, .apparaat .noot-inhoud').forEach(function (c) { c.normalize(); });
+      zoekMarks = []; zoekIdx = -1; huidigPatroon = null;
     }
 
     function wrapMatches(container, patroon) {
@@ -919,7 +927,22 @@
       zoekIdx = i;
       var sec = mark.closest('.pagina');
       if (sec && root.classList.contains('modus-bladeren')) activeer(+sec.getAttribute('data-i'));
-      mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Treffer in een noot terwijl de apparaten verborgen zijn (kantnoot-
+      // modus): klap de bijbehorende kantnoot open en laat die oplichten.
+      var nootLi = mark.closest('.apparaat li[data-noot]');
+      if (nootLi && root.classList.contains('kantnoten-aan')) {
+        var nootId = nootLi.getAttribute('data-noot');
+        uitgeklapt[nootId] = true;
+        herbereken();
+        var kn = root.querySelector('.kantnoot[data-noot="' + nootId + '"]');
+        if (kn) {
+          kn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          kn.classList.add('markeer');
+          setTimeout(function () { kn.classList.remove('markeer'); }, 1800);
+        }
+      } else {
+        mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       updateZoekStatus();
     }
 
@@ -930,8 +953,16 @@
       var tolerantKnop = root.querySelector('#opt-tolerant');
       var patroon = maakZoekPatroon(q, !tolerantKnop || tolerantKnop.checked);
       if (!patroon) { updateZoekStatus(); return; }
+      huidigPatroon = patroon;
       root.querySelectorAll('.pagina .tekst').forEach(function (c) { wrapMatches(c, patroon); });
-      zoekMarks = [].slice.call(root.querySelectorAll('.zoektreffer'));
+      // Ook de noten doorzoeken (alleen apparaten die aan staan).
+      root.querySelectorAll('.pagina .apparaat').forEach(function (sectie) {
+        if (root.classList.contains('verberg-app-' + sectie.getAttribute('data-code'))) return;
+        sectie.querySelectorAll('.noot-inhoud').forEach(function (c) { wrapMatches(c, patroon); });
+      });
+      zoekMarks = [].slice.call(root.querySelectorAll('.pagina .zoektreffer'));
+      // Kantnoten zijn kopieën van de noten: markeer de term daar ook.
+      if (root.classList.contains('kantnoten-aan')) herbereken();
       updateZoekStatus();
       if (zoekMarks.length) gaNaarTreffer(0);
     }
@@ -964,6 +995,7 @@
       var app = apparaatVan(config, n.code);
       pop.innerHTML = '<span class="pop-lemma">' + n.labelHtml + '</span>' +
         '<span class="pop-inhoud">' + n.inhoudHtml + '</span>';
+      if (huidigPatroon) wrapMatches(pop, huidigPatroon);
       pop.style.setProperty('--kleur', app.kleur);
       pop.hidden = false;
       var rect = el.getBoundingClientRect();
@@ -1124,6 +1156,8 @@
       if (t.matches('input[data-app]')) {
         root.classList.toggle('verberg-app-' + t.getAttribute('data-app'), !t.checked);
         herberekenLater();
+        // Trefferlijst bijwerken: noten van dit apparaat tellen wel/niet mee.
+        if (veldWaarde().length >= 2) zoek(veld.value);
       } else if (t.id === 'opt-regelnr') {
         root.classList.toggle('geen-regelnr', !t.checked);
       } else if (t.id === 'opt-editie') {
