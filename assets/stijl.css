@@ -640,8 +640,86 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .register-lijst dd .reg-link:hover { text-decoration: underline; }
 .register-lijst dd .reg-sep { color: var(--lijn); margin: 0 .35rem; }
 
+/* ---- Citeerhulp (uitklap in de werkbalk) -------------------------------- */
+.wb-citeer {
+  margin-top: .7rem; padding-top: .7rem; border-top: 1px solid var(--lijn);
+  display: flex; gap: 2rem; flex-wrap: wrap;
+}
+.wb-citeer[hidden] { display: none; }
+.citeer-blok { flex: 1 1 22rem; min-width: 0; }
+.citeer-tekst {
+  margin: .4rem 0 .6rem; font-size: .92em; line-height: 1.45;
+  color: var(--inkt); overflow-wrap: anywhere;
+}
+
+/* Klikbaar regelnummer (permalink) */
+.tregel .rnr { cursor: pointer; }
+.tregel .rnr:hover { color: var(--accent); font-weight: 600; }
+.tregel.spring-actief .rtekst {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-radius: 4px;
+  transition: background .2s ease;
+}
+
+/* ---- Melding (klembord e.d.) ------------------------------------------- */
+.editie-melding {
+  position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%) translateY(.6rem);
+  background: var(--inkt); color: var(--papier);
+  font-family: var(--sans); font-size: .88rem;
+  padding: .5rem 1rem; border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  z-index: 200;
+}
+.editie-melding.zichtbaar { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---- Origineel naast de tekst ------------------------------------------- */
+.origineel-paneel { display: none; }
+.wb-groep-origineel { display: none; }
+@media (min-width: 1000px) {
+  .wb-groep-origineel { display: flex; }
+  .met-origineel .paginas { position: relative; }
+  .met-origineel .pagina { margin-right: 47%; }
+  .met-origineel .origineel-paneel {
+    display: block; position: absolute; top: 0; right: 0; bottom: 0; width: 44%;
+  }
+  .origineel-paneel .op-binnen { position: sticky; top: 3.4rem; }
+  .op-kop {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    font-family: var(--sans); font-size: .82rem; color: var(--inkt-zacht);
+    margin-bottom: .45rem;
+  }
+  .op-open { color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .op-open:hover { text-decoration: underline; }
+  .op-scan {
+    display: block; width: 100%; max-height: 82vh; object-fit: contain;
+    border: 1px solid var(--lijn); border-radius: 8px; cursor: zoom-in;
+    background: var(--papier);
+  }
+  .op-pdf {
+    display: block; width: 100%; height: 82vh; border: 1px solid var(--lijn);
+    border-radius: 8px; background: var(--papier);
+  }
+  .op-leeg { color: var(--inkt-zacht); font-family: var(--sans); font-size: .88rem; }
+}
+
+/* ---- Reiskaart: koppeling met de tekst ---------------------------------- */
+.rk-stops circle.rk-koppelbaar { cursor: pointer; }
+.rk-stops circle.rk-puls {
+  fill: var(--rubriek); opacity: 1;
+  animation: rk-puls 1s ease-out 2;
+}
+@keyframes rk-puls {
+  0% { stroke: var(--rubriek); stroke-width: 1.2; }
+  50% { stroke: var(--rubriek); stroke-width: 10; }
+  100% { stroke: var(--papier); stroke-width: 1.2; }
+}
+.db.db-klikbaar { cursor: pointer; }
+.db.db-klikbaar:hover { color: var(--accent); }
+
 @media print {
-  .werkbalk, .sitehoofd, .tabs, .thema-knop, .pager { display: none !important; }
+  .werkbalk, .sitehoofd, .tabs, .thema-knop, .pager,
+  .origineel-paneel, .editie-melding { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .paneel { display: block !important; }
   .modus-bladeren .pagina { display: block !important; } /* print altijd alles */

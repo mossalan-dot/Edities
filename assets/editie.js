@@ -233,7 +233,7 @@
           sluit();
           var dagId = 'dag-' + (dagen.length + 1);
           dagen.push({ id: dagId, sleutel: dm.sleutel, label: dm.label, stijl: dm.stijl, pagina: paginas.length + 1 });
-          cur.uit.push('<span class="db" id="' + dagId + '">' +
+          cur.uit.push('<span class="db" id="' + dagId + '" data-sleutel="' + dm.sleutel + '">' +
             '<span class="db-diamant" aria-hidden="true">◈</span> ' + escapeHtml(dm.label) +
             (dm.stijl ? ' <span class="db-stijl">' + dm.stijl + '</span>' : '') + '</span>');
           continue;
@@ -441,10 +441,13 @@
       uit.push('<button type="button" class="wb-uitklap wb-dagen-knop" aria-expanded="false" aria-controls="wb-dagen">' +
                'Dagen <span class="wb-caret">▾</span></button>');
     }
+    uit.push('<button type="button" class="wb-uitklap wb-citeer-knop" aria-expanded="false" aria-controls="wb-citeer">' +
+             'Citeer <span class="wb-caret">▾</span></button>');
     uit.push('<button type="button" class="wb-uitklap" aria-expanded="false" aria-controls="wb-instellingen">' +
              'Weergave <span class="wb-caret">▾</span></button>');
     uit.push('</div>');
     uit.push('</div>'); // wb-boven
+    uit.push('<div class="wb-citeer" id="wb-citeer" hidden></div>');
     if (heeftInhoud) {
       uit.push('<nav class="wb-inhoud" id="wb-inhoud" hidden aria-label="Inhoudsopgave">');
       uit.push('<ol class="inhoud-lijst">');
@@ -466,11 +469,18 @@
       });
       uit.push('</ol></nav>');
     }
+    var heeftOrigineel = !!(config.meta.origineel_afbeeldingen ||
+      (config.meta.origineel_type === 'pdf' && config.meta.origineel_pdf));
     uit.push('<div class="wb-instellingen" id="wb-instellingen" hidden>');
     if (meerdere) {
       uit.push('<div class="wb-groep"><span class="wb-kop">Weergave</span>');
       uit.push('<label class="wb-opt"><input type="radio" name="modus" value="doorlopend" checked> Doorlopend</label>');
       uit.push('<label class="wb-opt"><input type="radio" name="modus" value="bladeren"> Per pagina</label>');
+      uit.push('</div>');
+    }
+    if (heeftOrigineel) {
+      uit.push('<div class="wb-groep wb-groep-origineel"><span class="wb-kop">Origineel</span>');
+      uit.push(toggle('opt-origineel', 'Naast de tekst', false));
       uit.push('</div>');
     }
     uit.push('<div class="wb-groep"><span class="wb-kop">Tonen</span>');
@@ -526,7 +536,10 @@
       return d;
     }
     function herbereken() {
-      var actief = window.matchMedia('(min-width: 1100px)').matches;
+      // Met het origineel naast de tekst is er geen ruimte voor kantnoten;
+      // noten verschijnen dan als popover (zoals op een smal scherm).
+      var actief = window.matchMedia('(min-width: 1100px)').matches &&
+                   !root.classList.contains('met-origineel');
       root.classList.toggle('kantnoten-aan', actief);
 
       var links = root.querySelector(':scope > .kant-links') || maakKant('links');
@@ -611,6 +624,192 @@
       if (kn) kn.classList.toggle('actief', aan);
     }
 
+    // ---- Klembord + melding ----------------------------------------------
+    function melding(tekst) {
+      var m = document.querySelector('.editie-melding');
+      if (!m) {
+        m = document.createElement('div');
+        m.className = 'editie-melding';
+        document.body.appendChild(m);
+      }
+      m.textContent = tekst;
+      m.classList.add('zichtbaar');
+      clearTimeout(m._timer);
+      m._timer = setTimeout(function () { m.classList.remove('zichtbaar'); }, 1800);
+    }
+    function kopieer(tekst, gelukt) {
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = tekst;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); gelukt(); } catch (e) { melding('Kopiëren mislukt'); }
+        ta.remove();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(tekst).then(gelukt, fallback);
+      } else fallback();
+    }
+
+    // De pagina die de lezer nu (grofweg) in beeld heeft.
+    function huidigePagina() {
+      var paginasEl = root.querySelectorAll('.pagina');
+      if (root.classList.contains('modus-bladeren')) {
+        return root.querySelector('.pagina.actief') || paginasEl[0] || null;
+      }
+      var anker = window.innerHeight * 0.35;
+      var beste = paginasEl[0] || null;
+      for (var i = 0; i < paginasEl.length; i++) {
+        if (paginasEl[i].getBoundingClientRect().top <= anker) beste = paginasEl[i];
+        else break;
+      }
+      return beste;
+    }
+
+    // ---- Origineel naast de tekst ----------------------------------------
+    var opDoel = null; // huidig getoonde scan/pdf-pagina
+    function origineelPaneel() {
+      var paneel = root.querySelector('.origineel-paneel');
+      if (paneel) return paneel;
+      paneel = document.createElement('aside');
+      paneel.className = 'origineel-paneel';
+      paneel.innerHTML = '<div class="op-binnen">' +
+        '<div class="op-kop"><span class="op-label"></span>' +
+        '<a class="op-open" target="_blank" rel="noopener" hidden>Open ↗</a></div>' +
+        '<div class="op-inhoud"></div></div>';
+      var houder = root.querySelector('.paginas') || root;
+      houder.appendChild(paneel);
+      return paneel;
+    }
+    function updateOrigineel(forceer) {
+      if (!root.classList.contains('met-origineel')) return;
+      var pag = huidigePagina();
+      if (!pag) return;
+      var doel = pag.getAttribute('data-doel') || '';
+      if (!forceer && doel === opDoel) return;
+      opDoel = doel;
+      var paneel = origineelPaneel();
+      var label = paneel.querySelector('.op-label');
+      var open = paneel.querySelector('.op-open');
+      var inhoud = paneel.querySelector('.op-inhoud');
+      label.textContent = 'Origineel · ' + (pag.getAttribute('data-label') || '');
+      if (!doel) {
+        inhoud.innerHTML = '<p class="op-leeg">Geen scan gekoppeld aan deze pagina.</p>';
+        open.hidden = true;
+        return;
+      }
+      if (config.meta.origineel_type === 'pdf' && config.meta.origineel_pdf) {
+        var pdfUrl = config.meta.origineel_pdf + '#page=' + encodeURIComponent(doel);
+        var frame = inhoud.querySelector('iframe');
+        if (!frame) {
+          inhoud.innerHTML = '';
+          frame = document.createElement('iframe');
+          frame.className = 'op-pdf';
+          frame.title = 'Origineel (pdf)';
+          inhoud.appendChild(frame);
+        }
+        frame.src = pdfUrl;
+        open.href = pdfUrl; open.hidden = false;
+      } else if (config.meta.origineel_afbeeldingen) {
+        var src = config.meta.origineel_afbeeldingen.replace('{n}', doel);
+        var img = inhoud.querySelector('img');
+        if (!img) {
+          inhoud.innerHTML = '';
+          img = document.createElement('img');
+          img.className = 'op-scan';
+          img.alt = 'Scan van het origineel';
+          img.addEventListener('click', function () {
+            toonLightbox(img.src, label.textContent);
+          });
+          inhoud.appendChild(img);
+        }
+        img.src = src;
+        open.href = src; open.hidden = false;
+      }
+    }
+    var opScrollBezig = false;
+    window.addEventListener('scroll', function opScroll() {
+      if (!root.isConnected) { window.removeEventListener('scroll', opScroll); return; }
+      if (!root.classList.contains('met-origineel') || opScrollBezig) return;
+      opScrollBezig = true;
+      requestAnimationFrame(function () { opScrollBezig = false; updateOrigineel(); });
+    }, { passive: true });
+
+    // ---- Citeerhulp -------------------------------------------------------
+    function citeerTekst() {
+      var meta = config.meta;
+      var mnd = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli',
+                 'augustus', 'september', 'oktober', 'november', 'december'];
+      var nu = new Date();
+      var url = location.origin + location.pathname;
+      var delen = [];
+      if (meta.auteur) delen.push(meta.auteur);
+      if (meta.titel) delen.push(meta.titel + (meta.jaar ? ' (' + meta.jaar + ')' : ''));
+      var s = delen.join(', ') + '. Digitale editie, ' + url +
+        ', geraadpleegd ' + nu.getDate() + ' ' + mnd[nu.getMonth()] + ' ' + nu.getFullYear() + '.';
+      if (meta.bron) s += ' Origineel: ' + meta.bron + '.';
+      return s;
+    }
+    function vulCiteer() {
+      var box = document.getElementById('wb-citeer');
+      if (!box) return;
+      var pag = huidigePagina();
+      var html = '<div class="citeer-blok"><span class="wb-kop">Verwijzing</span>' +
+        '<p class="citeer-tekst">' + escapeHtml(citeerTekst()) + '</p>' +
+        '<button type="button" class="wb-uitklap" data-kopieer="citaat">Kopieer verwijzing</button></div>';
+      if (pag && root.querySelectorAll('.pagina').length > 1) {
+        var link = location.origin + location.pathname + '#pagina-' + pag.getAttribute('data-i');
+        html += '<div class="citeer-blok"><span class="wb-kop">Permalink naar ' +
+          escapeHtml(pag.getAttribute('data-label') || 'deze pagina') + '</span>' +
+          '<p class="citeer-tekst">' + escapeHtml(link) + '</p>' +
+          '<button type="button" class="wb-uitklap" data-kopieer="pagina">Kopieer permalink</button></div>';
+      }
+      box.innerHTML = html;
+    }
+
+    // ---- Instellingen bewaren --------------------------------------------
+    var OPSLAG = 'editie-opts:' + location.pathname;
+    var herstelBezig = false;
+    function bewaarInstellingen() {
+      if (herstelBezig) return;
+      var st = { opts: {}, apps: {} };
+      root.querySelectorAll('.werkbalk input[id^="opt-"]').forEach(function (i) {
+        st.opts[i.id] = i.checked;
+      });
+      root.querySelectorAll('.werkbalk input[data-app]').forEach(function (i) {
+        st.apps[i.getAttribute('data-app')] = i.checked;
+      });
+      var modus = root.querySelector('input[name="modus"]:checked');
+      if (modus) st.modus = modus.value;
+      try { localStorage.setItem(OPSLAG, JSON.stringify(st)); } catch (e) {}
+    }
+    function herstelInstellingen() {
+      var st = null;
+      try { st = JSON.parse(localStorage.getItem(OPSLAG)); } catch (e) {}
+      if (!st) return;
+      herstelBezig = true;
+      function zet(input, waarde) {
+        if (!input || typeof waarde !== 'boolean' || input.checked === waarde) return;
+        input.checked = waarde;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      Object.keys(st.opts || {}).forEach(function (id) {
+        zet(root.querySelector('.werkbalk #' + id), st.opts[id]);
+      });
+      Object.keys(st.apps || {}).forEach(function (code) {
+        zet(root.querySelector('.werkbalk input[data-app="' + code + '"]'), st.apps[code]);
+      });
+      if (st.modus) {
+        var radio = root.querySelector('input[name="modus"][value="' + st.modus + '"]');
+        if (radio && !radio.checked) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+      herstelBezig = false;
+    }
+
     // Weergavemodus (doorlopend / per pagina) + pager
     var pager = root.querySelector('.pager');
     var secties = root.querySelectorAll('.pagina');
@@ -626,6 +825,7 @@
       if (vn) vn.disabled = i >= secties.length;
       huidig = i;
       history.replaceState(null, '', '#pagina-' + i);
+      updateOrigineel();
     }
     function zetModus(m) {
       if (m === 'bladeren') {
@@ -804,10 +1004,18 @@
         }
         return;
       }
+      var kop = e.target.closest('[data-kopieer]');
+      if (kop) {
+        var citeerBox = kop.closest('.citeer-blok');
+        var citeerP = citeerBox && citeerBox.querySelector('.citeer-tekst');
+        if (citeerP) kopieer(citeerP.textContent, function () { melding('Gekopieerd naar het klembord'); });
+        return;
+      }
       var up = e.target.closest('.wb-uitklap');
       if (up) {
         var panel = document.getElementById(up.getAttribute('aria-controls'));
         if (!panel) return;
+        if (panel.id === 'wb-citeer' && panel.hidden) vulCiteer();
         var open = panel.hidden;
         // Sluit eventuele andere open werkbalkpanelen.
         root.querySelectorAll('.wb-uitklap').forEach(function (b) {
@@ -843,6 +1051,17 @@
       if (zb) { gaNaarTreffer(zoekIdx + (zb.getAttribute('data-zoek') === 'volgende' ? 1 : -1)); return; }
       var pg = e.target.closest('[data-pager]');
       if (pg) { activeer(huidig + (pg.getAttribute('data-pager') === 'volgende' ? 1 : -1)); return; }
+      // Klik op een zichtbaar regelnummer: kopieer een permalink naar de regel.
+      var rnr = e.target.closest('.tekst .rnr');
+      if (rnr && rnr.textContent) {
+        var tregel = rnr.closest('.tregel');
+        if (tregel) {
+          kopieer(location.origin + location.pathname + '#' + tregel.id, function () {
+            melding('Link naar regel ' + tregel.getAttribute('data-n') + ' gekopieerd');
+          });
+        }
+        return;
+      }
       var lemma = e.target.closest('.tekst .lemma');
       if (lemma) {
         var id = lemma.getAttribute('data-noot');
@@ -874,7 +1093,7 @@
 
     root.addEventListener('change', function (e) {
       var t = e.target;
-      if (t.name === 'modus') { zetModus(t.value); herberekenLater(); return; }
+      if (t.name === 'modus') { zetModus(t.value); herberekenLater(); bewaarInstellingen(); return; }
       if (t.classList.contains('pager-select')) { activeer(+t.value); return; }
       if (t.matches('input[data-app]')) {
         root.classList.toggle('verberg-app-' + t.getAttribute('data-app'), !t.checked);
@@ -890,11 +1109,23 @@
         herberekenLater();
       } else if (t.id === 'opt-markering') {
         root.classList.toggle('geen-markering', !t.checked);
+      } else if (t.id === 'opt-origineel') {
+        root.classList.toggle('met-origineel', t.checked);
+        opDoel = null;
+        if (t.checked) updateOrigineel(true);
+        herberekenLater();
       }
+      if (t.closest('.werkbalk')) bewaarInstellingen();
     });
 
+    // Bewaarde weergave-instellingen van een vorig bezoek toepassen.
+    // De hash eerst vastleggen: het herstellen kan hem overschrijven.
+    var beginHash = location.hash;
+    herstelInstellingen();
+
     // Dieplink: #pagina-N opent direct in bladermodus op die pagina
-    var mh = location.hash.match(/^#pagina-(\d+)/);
+    // (een expliciete link wint van de bewaarde instellingen).
+    var mh = beginHash.match(/^#pagina-(\d+)/);
     if (mh && secties.length > 1) {
       var radio = root.querySelector('input[name="modus"][value="bladeren"]');
       if (radio) radio.checked = true;
@@ -902,7 +1133,25 @@
       activeer(+mh[1]);
     }
 
+    // Dieplink: #rN springt naar (en markeert) die regel.
+    var mr = beginHash.match(/^#r(\d+)$/);
+    if (mr) {
+      var regelEl = document.getElementById('r' + mr[1]);
+      if (regelEl) {
+        var regelPag = regelEl.closest('.pagina');
+        if (regelPag && root.classList.contains('modus-bladeren')) {
+          activeer(+regelPag.getAttribute('data-i'));
+        }
+        setTimeout(function () {
+          regelEl.scrollIntoView({ block: 'center' });
+          regelEl.classList.add('spring-actief');
+          setTimeout(function () { regelEl.classList.remove('spring-actief'); }, 2500);
+        }, 60);
+      }
+    }
+
     herbereken(); // kantlijnnoten plaatsen (indien breed genoeg)
+    updateOrigineel(true);
   }
 
   // ---- Origineel (scan of pdf) --------------------------------------------
@@ -1101,8 +1350,8 @@
     var heeftNummers = parseInt(meta.regelnummering, 10) > 0;
     var meerdere = body.paginas.length > 1;
     var paginasHtml = body.paginas.map(function (p, idx) {
-      return '<section class="pagina" data-i="' + (idx + 1) + '" data-label="' +
-        escapeHtml(p.label || ('[' + (idx + 1) + ']')) + '">' +
+      return '<section class="pagina" data-i="' + (idx + 1) + '" data-doel="' + escapeHtml(p.doel || '') +
+        '" data-label="' + escapeHtml(p.label || ('[' + (idx + 1) + ']')) + '">' +
         '<div class="tekst">' + p.uit.join('\n') + '</div>' +
         renderApparaten(config, p.noten, heeftNummers) +
         '</section>';
@@ -1112,7 +1361,7 @@
       kop +
       renderWerkbalk(config, body.noten, meerdere, body.koppen, body.dagen) +
       (meerdere ? bouwPager(body.paginas) : '') +
-      paginasHtml;
+      '<div class="paginas">' + paginasHtml + '</div>';
     root.classList.add('modus-doorlopend');
     if (!heeftNummers) root.classList.add('geen-regelnr'); // geen lege nummer-goot
 

@@ -312,5 +312,98 @@
   <script src="../../assets/editie.js"></script>
   <script src="../../assets/site.js"></script>
   <script>Editie.laad(document.getElementById('editie'));</script>
+  <script>
+  /* Koppeling tussen de routekaart en de dagtekeningen in de tekst:
+     klik op een stip -> spring naar die dag in de tekst; klik op een
+     dagtekening -> toon de bijbehorende pleisterplaats(en) op de kaart. */
+  (function () {
+    'use strict';
+    var kaart = document.querySelector('.reiskaart');
+    var editieRoot = document.getElementById('editie');
+    if (!kaart || !editieRoot) return;
+
+    // Sleutel (jjjjmmdd) per stip; het jaar loopt door de reeks heen mee.
+    var jaar = 0;
+    kaart.querySelectorAll('.rk-stops circle').forEach(function (c) {
+      var t = c.querySelector('title');
+      if (!t) return;
+      var deel = t.textContent.split(':')[0].trim();
+      var p = deel.split('-').map(Number);
+      if (p.some(isNaN)) return;
+      var d = 0, mnd = 0;
+      if (p.length === 3) { d = p[0]; mnd = p[1]; jaar = p[2]; }
+      else if (p.length === 2 && p[1] > 12) { mnd = p[0]; jaar = p[1]; }
+      else if (p.length === 2) { d = p[0]; mnd = p[1]; }
+      else return;
+      if (!jaar) return;
+      c.setAttribute('data-sleutel', jaar * 10000 + mnd * 100 + d);
+      c.classList.add('rk-koppelbaar');
+    });
+
+    // Dagtekeningen klikbaar maken zodra de tekst gerenderd is.
+    var poging = setInterval(function () {
+      var dbs = editieRoot.querySelectorAll('.db[data-sleutel]');
+      if (!dbs.length) return;
+      dbs.forEach(function (d) {
+        d.classList.add('db-klikbaar');
+        d.title = 'Toon deze dag op de kaart';
+      });
+      clearInterval(poging);
+    }, 300);
+    setTimeout(function () { clearInterval(poging); }, 15000);
+
+    function springActief(el, ms) {
+      el.classList.add('spring-actief');
+      setTimeout(function () { el.classList.remove('spring-actief'); }, ms || 2200);
+    }
+
+    // Stip -> tekst: de dag zelf, of anders de dichtstbijzijnde eerdere dag.
+    kaart.addEventListener('click', function (e) {
+      var c = e.target.closest('circle[data-sleutel]');
+      if (!c) return;
+      var doel = +c.getAttribute('data-sleutel');
+      var beste = null, besteSleutel = -1;
+      editieRoot.querySelectorAll('.db[data-sleutel]').forEach(function (d) {
+        var s = +d.getAttribute('data-sleutel');
+        if (s <= doel && s > besteSleutel) { besteSleutel = s; beste = d; }
+      });
+      if (!beste) return;
+      var tab = document.querySelector('.tabs [data-paneel="tekst"]');
+      if (tab) tab.click();
+      var pag = beste.closest('.pagina');
+      if (pag && editieRoot._toonPagina) editieRoot._toonPagina(+pag.getAttribute('data-i'));
+      var doelEl = beste;
+      setTimeout(function () {
+        doelEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        springActief(doelEl);
+      }, 60);
+    });
+
+    // Dagtekening -> kaart: laat de stips van (rond) die dag oplichten.
+    document.addEventListener('click', function (e) {
+      var db = e.target.closest('#editie .db[data-sleutel]');
+      if (!db) return;
+      var sl = +db.getAttribute('data-sleutel');
+      var beste = [], besteAfstand = Infinity;
+      kaart.querySelectorAll('circle[data-sleutel]').forEach(function (c) {
+        var afstand = Math.abs(+c.getAttribute('data-sleutel') - sl);
+        if (afstand < besteAfstand) { besteAfstand = afstand; beste = [c]; }
+        else if (afstand === besteAfstand) beste.push(c);
+      });
+      if (!beste.length || besteAfstand > 10000) return; // niets in de buurt
+      var tabReis = document.querySelector('.tabs [data-paneel="reis"]');
+      if (tabReis) tabReis.click();
+      setTimeout(function () {
+        kaart.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        beste.forEach(function (c) {
+          c.classList.remove('rk-puls');
+          void c.getBoundingClientRect(); // herstart de animatie
+          c.classList.add('rk-puls');
+          setTimeout(function () { c.classList.remove('rk-puls'); }, 2400);
+        });
+      }, 60);
+    });
+  })();
+  </script>
 </body>
 </html>

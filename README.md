@@ -18,6 +18,16 @@ alleen HTML, CSS en een beetje JavaScript. Klaar om te hosten op bijvoorbeeld Gi
 - **Typografie**: cursief, kleinkapitaal, doorhaling, super-/subscript, drie kopniveaus.
 - **Koppeling naar het origineel**: pagina-/foliomarkeringen die een pdf-pagina of een scan openen.
 - **Inleiding / Tekst / Verantwoording / Facsimile** als tabbladen per editie.
+- **Origineel naast de tekst**: togglebare gesplitste weergave waarin de scan (of pdf-pagina)
+  van de pagina die u leest meescrollend naast de transcriptie staat.
+- **Dagtekeningen** (`@ 1674-02-23 | 23 februari 1674`): navigatie per dag, met
+  stilo-vetus/novo-normalisatie; op de Van der Meersch-editie gekoppeld aan de routekaart
+  (klik op een stip → die dag in de tekst, en andersom).
+- **Citeerhulp en permalinks**: een Citeer-knop in de werkbalk (verwijzing + permalink naar
+  de huidige pagina), klikbare regelnummers die een `#rN`-link kopiëren, en dieplinks
+  `#pagina-N` / `#rN` die direct naar de juiste plaats springen.
+- **Bewaarde weergave-instellingen**: apparaat-toggles, leesmodus en weergaveopties blijven
+  per editie bewaard (localStorage).
 - Licht/donker thema, afdrukvriendelijk.
 
 ## Structuur
