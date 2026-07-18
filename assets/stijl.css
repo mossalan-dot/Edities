@@ -476,6 +476,23 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .rk-staal.s1672 { border-top-style: dashed; border-color: var(--accent); }
 .rk-staal.s1674 { border-color: var(--rubriek); }
 
+/* ---- Tijdlijn ----------------------------------------------------------- */
+.tl-omhulsel { margin: 1.2rem 0 0; border: 1px solid var(--lijn-sterk); border-radius: 6px;
+  background: color-mix(in srgb, var(--papier) 96%, var(--inkt)); padding: .4rem .5rem; }
+.tl-svg { width: 100%; height: auto; display: block; }
+.tl-as { stroke: var(--lijn-sterk); stroke-width: 1; }
+.tl-jaar { stroke: var(--lijn-sterk); stroke-width: 1; }
+.tl-maand { stroke: var(--lijn); stroke-width: 1; opacity: .7; }
+.tl-jaarlabel { fill: var(--inkt); font-family: var(--sans); font-weight: 600; font-size: 15px; }
+.tl-maandlabel { fill: var(--inkt-zacht); font-family: var(--sans); font-size: 11px; }
+.tl-dag { stroke: var(--rubriek); stroke-width: 1; opacity: .5; }
+.tl-cursor line { stroke: var(--accent); stroke-width: 1.5; }
+.tl-cursor circle { fill: var(--accent); }
+.tl-bijschrift { font-family: var(--sans); font-size: .9rem; color: var(--inkt-zacht);
+  margin: .5rem 0 .2rem; min-height: 1.4em; }
+.tl-bs-datum { color: var(--inkt); font-weight: 600; }
+.tl-bs-plaats { color: var(--rubriek); }
+
 /* ---- Editor / werkbank -------------------------------------------------- */
 .editor-body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 .ed-werkbank { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
