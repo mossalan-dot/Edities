@@ -33,6 +33,20 @@ Belangrijkste opties (zie `--help`):
 De eerste LineString in de KMZ wordt als route 1 getekend (klasse
 `rk-1672`, gestippeld), de tweede als route 2 (`rk-1674`, doorgetrokken).
 
+## controleer.py — validatie (CI)
+
+Controleert alle edities en pagina's zonder externe afhankelijkheden: geldige
+`--- … ---`-kop, gebalanceerde noten die naar een gedeclareerd apparaat
+verwijzen, geen geneste `{typografie}` (die het platform niet kan weergeven),
+geldige `@`-dagtekeningen en bestaande relatieve verwijzingen (src/href/
+data-bron) in alle `.html`-bestanden.
+
+```bash
+python3 scripts/controleer.py       # exitcode 1 bij fouten
+```
+
+Draait automatisch bij elke push/PR via `.github/workflows/controleer.yml`.
+
 ## editiekaart.py — kustlijn-routekaart per editie
 
 Als `reiskaart.py`, maar tekent alle routelijnen doorgetrokken in één kleur (voor

@@ -27,6 +27,7 @@
           <input type="file" id="ed-open" accept=".md,.txt,text/markdown,text/plain" hidden>
         </label>
         <button type="button" class="ed-knop" id="ed-nieuw" title="Begin met een leeg sjabloon">Nieuw</button>
+        <button type="button" class="ed-knop" id="ed-kop" title="Bewerk de kop (titel, auteur, apparaten…) met velden">Kop…</button>
         <span class="ed-scheiding" aria-hidden="true"></span>
         <button type="button" class="ed-knop" id="ed-dl-md">↓ editie.md</button>
         <button type="button" class="ed-knop" id="ed-dl-bron">↓ bron.txt</button>
@@ -80,6 +81,40 @@
       <summary>Niet-verankerde noten (<span id="ed-mis-aantal">0</span>)</summary>
       <ul id="ed-mis-lijst"></ul>
     </details>
+  </div>
+
+  <div class="ed-modaal" id="ed-kopform" hidden>
+    <div class="ed-modaal-kaart kf-kaart" role="dialog" aria-modal="true" aria-labelledby="kf-titel">
+      <h3 id="kf-titel">Kop van de editie</h3>
+      <div class="kf-grid">
+        <label>Titel<input id="kf-in-titel" type="text"></label>
+        <label>Auteur<input id="kf-in-auteur" type="text"></label>
+        <label>Jaar<input id="kf-in-jaar" type="text"></label>
+        <label>Bron / vindplaats<input id="kf-in-bron" type="text"></label>
+        <label>Type<input id="kf-in-type" type="text" list="kf-typen" placeholder="handschrift"></label>
+        <label>Regelnummering<input id="kf-in-regel" type="number" min="0" step="1" placeholder="0"></label>
+        <label>Weergave
+          <select id="kf-in-weergave">
+            <option value="">doorlopend</option>
+            <option value="bladeren">per pagina (grote editie)</option>
+          </select>
+        </label>
+      </div>
+      <datalist id="kf-typen">
+        <option>handschrift</option><option>druk</option><option>brieven</option>
+      </datalist>
+      <div class="kf-app">
+        <span class="kf-sublabel">Notenapparaten</span>
+        <div id="kf-app-lijst"></div>
+        <button type="button" class="ed-mini" id="kf-app-toevoegen">+ apparaat</button>
+      </div>
+      <p class="nf-hint">De velden werken de <code>--- … ---</code>-kop van
+      <code>editie.md</code> bij. Overige regels blijven ongemoeid.</p>
+      <div class="nf-knoppen">
+        <button type="button" class="ed-knop" id="kf-annuleer">Annuleren</button>
+        <button type="button" class="ed-knop primair" id="kf-toepassen">Toepassen</button>
+      </div>
+    </div>
   </div>
 
   <div class="ed-modaal" id="ed-nootform" hidden>
@@ -377,6 +412,108 @@
       if (b.dataset.wrap != null) { var p = b.dataset.wrap.split('|'); omhul(p[0], p[1] || ''); return; }
       if (b.dataset.regel != null) { regelPrefix(b.dataset.regel); return; }
       if (b.dataset.blok != null) { blokInvoegen(b.dataset.blok); return; }
+    });
+
+    // ---- Kop / front-matter via een formulier -----------------------------
+    var kopModaal = document.getElementById('ed-kopform');
+    var kfAppLijst = document.getElementById('kf-app-lijst');
+    var SOORTEN = ['editeur', 'origineel'];
+    var ZIJDEN = ['', 'links', 'rechts'];
+
+    function opties(waarden, gekozen) {
+      return waarden.map(function (w) {
+        return '<option value="' + w + '"' + (w === gekozen ? ' selected' : '') + '>' +
+          (w || 'auto') + '</option>';
+      }).join('');
+    }
+    function appRij(a) {
+      a = a || { code: '', label: '', soort: 'editeur', zijde: '' };
+      var div = document.createElement('div');
+      div.className = 'kf-app-rij';
+      div.innerHTML =
+        '<input class="kf-a-code" placeholder="code" value="' + escAttr(a.code) + '">' +
+        '<input class="kf-a-label" placeholder="label" value="' + escAttr(a.label) + '">' +
+        '<select class="kf-a-soort">' + opties(SOORTEN, a.soort || 'editeur') + '</select>' +
+        '<select class="kf-a-zijde">' + opties(ZIJDEN, a.zijde || '') + '</select>' +
+        '<button type="button" class="kf-a-weg" title="Verwijderen" aria-label="Verwijderen">×</button>';
+      div.querySelector('.kf-a-weg').addEventListener('click', function () { div.remove(); });
+      kfAppLijst.appendChild(div);
+    }
+    function escAttr(s) { return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+    function leesKop(bron) {
+      var m = bron.match(/^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/);
+      var meta = {}, app = [];
+      if (m) m[1].split('\n').forEach(function (r) {
+        var i = r.indexOf(':'); if (i === -1) return;
+        var k = r.slice(0, i).trim(), v = r.slice(i + 1).trim();
+        if (k === 'apparaat') {
+          var d = v.split('|').map(function (x) { return x.trim(); });
+          app.push({ code: d[0] || '', label: d[1] || '', soort: d[2] || 'editeur', zijde: d[3] || '' });
+        } else if (k) meta[k] = v;
+      });
+      return { meta: meta, app: app, match: m };
+    }
+    function bouwKop(meta, app) {
+      var L = ['---'];
+      ['titel', 'auteur', 'jaar', 'bron', 'type'].forEach(function (k) {
+        if (meta[k]) L.push(k + ': ' + meta[k]);
+      });
+      L.push('regelnummering: ' + (meta.regelnummering || '0'));
+      if (meta.weergave) L.push('weergave: ' + meta.weergave);
+      app.forEach(function (a) {
+        if (a.code) L.push('apparaat: ' + a.code + ' | ' + a.label + ' | ' + a.soort + ' | ' + a.zijde);
+      });
+      L.push('---');
+      return L.join('\n');
+    }
+    function openKopForm() {
+      var k = leesKop(invoer.value);
+      document.getElementById('kf-in-titel').value = k.meta.titel || '';
+      document.getElementById('kf-in-auteur').value = k.meta.auteur || '';
+      document.getElementById('kf-in-jaar').value = k.meta.jaar || '';
+      document.getElementById('kf-in-bron').value = k.meta.bron || '';
+      document.getElementById('kf-in-type').value = k.meta.type || '';
+      document.getElementById('kf-in-regel').value = k.meta.regelnummering || '';
+      document.getElementById('kf-in-weergave').value = k.meta.weergave || '';
+      kfAppLijst.innerHTML = '';
+      (k.app.length ? k.app : []).forEach(appRij);
+      kopModaal.hidden = false;
+      document.getElementById('kf-in-titel').focus();
+    }
+    function sluitKopForm() { kopModaal.hidden = true; }
+    function pasKopToe() {
+      var meta = {
+        titel: document.getElementById('kf-in-titel').value.trim(),
+        auteur: document.getElementById('kf-in-auteur').value.trim(),
+        jaar: document.getElementById('kf-in-jaar').value.trim(),
+        bron: document.getElementById('kf-in-bron').value.trim(),
+        type: document.getElementById('kf-in-type').value.trim(),
+        regelnummering: document.getElementById('kf-in-regel').value.trim(),
+        weergave: document.getElementById('kf-in-weergave').value
+      };
+      var app = [].map.call(kfAppLijst.querySelectorAll('.kf-app-rij'), function (r) {
+        return {
+          code: r.querySelector('.kf-a-code').value.trim(),
+          label: r.querySelector('.kf-a-label').value.trim(),
+          soort: r.querySelector('.kf-a-soort').value,
+          zijde: r.querySelector('.kf-a-zijde').value
+        };
+      });
+      var kop = bouwKop(meta, app);
+      var k = leesKop(invoer.value);
+      if (k.match) invoer.value = kop + '\n' + invoer.value.slice(k.match[0].length).replace(/^\n+/, '\n');
+      else invoer.value = kop + '\n\n' + invoer.value;
+      sluitKopForm();
+      verwerk();
+    }
+    document.getElementById('ed-kop').addEventListener('click', openKopForm);
+    document.getElementById('kf-app-toevoegen').addEventListener('click', function () { appRij(); });
+    document.getElementById('kf-annuleer').addEventListener('click', sluitKopForm);
+    document.getElementById('kf-toepassen').addEventListener('click', pasKopToe);
+    kopModaal.addEventListener('click', function (e) { if (e.target === kopModaal) sluitKopForm(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !kopModaal.hidden) sluitKopForm();
     });
 
     // ---- Herstel vorige sessie of toon sjabloon ---------------------------

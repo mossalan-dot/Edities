@@ -1,0 +1,19 @@
+name: Controleer edities
+
+# Draait de validatie (scripts/controleer.py) bij elke push en pull request.
+# Alleen de Python-standaardbibliotheek is nodig — geen installaties.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  controleer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Valideer edities en verwijzingen
+        run: python3 scripts/controleer.py
