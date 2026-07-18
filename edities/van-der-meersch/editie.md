@@ -140,7 +140,7 @@ Sie daar vrinden, nu ben ik in Coppenhagen in zulk een plaijzierig saijsoen, de 
 
 
 ~ p. 16 | 16
-koning Cristianus Quintus, een goedaerdig vorst, broeder van prins Jurge, getrouwt met princes Anna in Engeland, die na koning William, als koningin Groot Brittanje regeerde. Deezen koning Cristianus heb ik doen diverse reijzen gezien, ook eens in zijn hoffkapel, daar int Deensch voor hem gepredikt wier. Ik konder wijnig van verstaan, maar den Phar Herr had dog goede mienen en ordentelijke gesten, veel zeediger als magister Lang in Hamborg. Die teerde en battemente op den kansel, als een broer Cornelis te Brugge. Men vint onder Luterianen ook al veel koddige quanten. Wij vertoefden dan in Coppenhagen van 26 februari tot 27, 28 dito den eerste en 2 maert. Tussen beijde bezagen wij het notabelste. De stad legt wel gecitueert en wel geforticiceert. Alles is daar van leeftogt abondant en goed– koop. Over 3 a 400 jaren zijn eenige familien uijt Vriesland daarheen gelokt en geplaatst op Amak zijnde, zijnde een vet en vruchtbaar eijlantje dat met een brug aen Coppenhage gehegt is. Deeze Vriessen en nu Amakker boeren zijn tans zo vermeenigvuldigt dat dit geheele eijlandje nu alleen van haar lieden bebouwd word met vee, boter, melk en moeskruijden, even gelijk de kinderen Jacobs het vetste van Egipten, het land Gosen, bewoonde. Het vernieuwde mij doe ik op een martdag de geheele mart in Coppenhaege vervult zag met deeze boeren en boerinnen in hun onveranderlijke, sindelijke boeredragt opt Fries, in haer ongesteeve witte linne mutsjes, lijfjes etc., en de mannen met een geplakt kraagje en een Vriesse drommede muts opt hooft,
+koning Cristianus Quintus, een goedaerdig vorst, broeder van prins Jurge, getrouwt met princes Anna in Engeland, die na koning William, als koningin Groot Brittanje regeerde. Deezen koning Cristianus heb ik doen diverse reijzen gezien, ook eens in zijn hoffkapel, daar int Deensch voor hem gepredikt wier. Ik konder wijnig van verstaan, maar den Phar Herr had dog goede mienen en ordentelijke gesten, veel zeediger als magister Lang in Hamborg. Die teerde en battemente op den kansel, als een broer Cornelis te Brugge. Men vint onder Luterianen ook al veel koddige quanten. Wij vertoefden dan in Coppenhagen van 26 februari tot 27, 28 dito den eerste en 2 maert. Tussen beijde bezagen wij het notabelste. De stad legt wel gecitueert en wel geforticiceert. Alles is daar van leeftogt abondant en goed–koop. Over 3 a 400 jaren zijn eenige familien uijt Vriesland daarheen gelokt en geplaatst op Amak zijnde, zijnde een vet en vruchtbaar eijlantje dat met een brug aen Coppenhage gehegt is. Deeze Vriessen en nu Amakker boeren zijn tans zo vermeenigvuldigt dat dit geheele eijlandje nu alleen van haar lieden bebouwd word met vee, boter, melk en moeskruijden, even gelijk de kinderen Jacobs het vetste van Egipten, het land Gosen, bewoonde. Het vernieuwde mij doe ik op een martdag de geheele mart in Coppenhaege vervult zag met deeze boeren en boerinnen in hun onveranderlijke, sindelijke boeredragt opt Fries, in haer ongesteeve witte linne mutsjes, lijfjes etc., en de mannen met een geplakt kraagje en een Vriesse drommede muts opt hooft,
 
 
 ~ p. 17 | 17
@@ -296,8 +296,8 @@ Reisverhaal van … September 1728 | comm | Het titelblad is gemaakt door een la
 't Was int jaar 1672 | comm | Van der Meersch beschrijft hier de gebeurtenissen tijdens het Nederlandse Rampjaar, toen de Republiek werd aangevallen door Engeland, Frankrijk en de bisdommen van Keulen en Munster.
 Louis de XIV | comm | Lodewijk XIV (1638–1715) was koning van Frankrijk en gedurende de zeventiende eeuw een veelvuldig opponent van Nederland en stadhouder Willem III.
 de 7 geunieerde provinciën | w | De Republiek der Zeven Verenigde Nederlanden.
-den koning … de 2 | comm | f II (1630–1685) was koning van Engeland, Schotland en Ierland tussen 1660 en 1685.
-die vooraf … was afgekaatst | comm | Op 23 maart 1672 werd de Nederlandse handelskonvooi uit Smyrna, beladen met zijde en specerijen, aangevallen door de Engelse zeekapitein Robert Holmes (c. 1622– 1692). De Nederlandse koopvaardijschepen wisten zich gezien de situatie goed te verdedigen, zodat de buit voor Engeland gering bleek. Dit conflict luidde het Rampjaar (1672) en de Derde Nederlands– Engelse Oorlog (1672–1674) in.
+den koning … de 2 | comm | Karel II (1630–1685) was koning van Engeland, Schotland en Ierland tussen 1660 en 1685.
+die vooraf … was afgekaatst | comm | Op 23 maart 1672 werd de Nederlandse handelskonvooi uit Smyrna, beladen met zijde en specerijen, aangevallen door de Engelse zeekapitein Robert Holmes (c. 1622–1692). De Nederlandse koopvaardijschepen wisten zich gezien de situatie goed te verdedigen, zodat de buit voor Engeland gering bleek. Dit conflict luidde het Rampjaar (1672) en de Derde Nederlands–Engelse Oorlog (1672–1674) in.
 de keurvorst … van Munster | comm | Maximiliaan Hendrik van Beieren (1621–1688) was prelaat van Keulen. Christoph Bernhard von Galen (1606–1678), ook bekend als Bommen Berend, was bisschop van Munster en een beruchte legeraanvoerder. Beiden waren bondgenoten van Lodewijk XIV tijdens het Rampjaar.
 amointie | w | ammunitie, mogelijke verschrijving van 'amonitie'.
 den 20e … van Naarden | comm | Op 19 juni 1672 werd de stad Naarden overmeesterd door Franse troepen.
@@ -360,7 +360,7 @@ Haarburg | w | Hamburg–Harburg.
 Elff | w | Elbe.
 Rensborg | w | Rendsburg.
 koning van Deenemarken | comm | Christiaan V (1646–1699) was koning van Denemarken en Zweden tussen 1670 en 1699.
-een sterke … Deenemarken behoorende | comm | Rendsburg is gesitueerd in de Duitse deelstaat Sleeswijk– Holstein dichtbij Denemarken. Gezien zijn status als grensstad is Rendsburg door oorlogen vaak van eigenaar gewisseld.
+een sterke … Deenemarken behoorende | comm | Rendsburg is gesitueerd in de Duitse deelstaat Sleeswijk–Holstein dichtbij Denemarken. Gezien zijn status als grensstad is Rendsburg door oorlogen vaak van eigenaar gewisseld.
 int particulier | w | in het bijzonder, afzonderlijk.
 spoeijen | w | spoeden.
 foliant | w | groot boek, boek in folioformaat.
@@ -471,14 +471,14 @@ niet wel | w | niet meer dan.
 lijfsberging | w | onderdak, verblijf.
 occagien | w | omstandigheden.
 Daarop staat een huijsje | comm | In 1571 gaf koning Frederik II opdracht aan Axel Viffert om een noodhuis te bouwen op Sprogø.
-'t Was … te overwinteren | comm | Tijdens hun expeditie naar Indië via de Noordkaap in 1596 strandden de Nederlandse ontdekkingsreizigers Willem Barentsz (c. 1550–1597) en Jacob van Heemskerck (1567– 1607) op de noordelijke archipel Nova Zembla. Zij waren genoodzaakt op het eiland te overwinteren en bouwden als onderdak het beroemde 'behouden huis'.
+'t Was … te overwinteren | comm | Tijdens hun expeditie naar Indië via de Noordkaap in 1596 strandden de Nederlandse ontdekkingsreizigers Willem Barentsz (c. 1550–1597) en Jacob van Heemskerck (1567–1607) op de noordelijke archipel Nova Zembla. Zij waren genoodzaakt op het eiland te overwinteren en bouwden als onderdak het beroemde 'behouden huis'.
 gemeenzaam | w | minzaam, vriendelijk.
 die ook … anno 1665 | comm | Von Cicignon was commandant van de vesting Bergenhus in 1665 en vocht mee in de slag in de baai van Bergen.
 onze Oostindise retourvloot | comm | Tweemaal per jaar stuurde de VOC een 'retourvloot' naar de Republiek. In 1665 probeerde de schout–bij–nacht Pieter de Bitter de rijkbeladen Nederlandse koopvaardijschepen te beschermen tegen de vijandige Engelse vloot door het Kanaal te vermijden en via Schotland te varen. Deze manoeuvre mislukte en na een nederlaag vaarde het Nederlandse konvooi naar de neutrale stad Bergen, waar de beschadigde schepen gerepareerd konden worden.
 deftig | w | goed, aanzienlijk.
 gedefendeert | w | verdedigd.
 want zij … sonder mostert | comm | De Engelsen hadden geen succes. Nederlands spreekwoord.
-Doen onze … alle behouden | comm | Op 12 augustus 1665 viel de Engelse oorlogsvloot de Nederlandse koopvaardijschepen aan in Bergen. De slag in de baai van Bergen tijdens de Tweede Engels– Nederlandse Oorlog (1665–1667) werd door de Nederlanders gewonnen. Door miscommunicatie tussen de Deense koning en zijn onderdanen assisteerde het Noorse leger de Nederlandse vloot.
+Doen onze … alle behouden | comm | Op 12 augustus 1665 viel de Engelse oorlogsvloot de Nederlandse koopvaardijschepen aan in Bergen. De slag in de baai van Bergen tijdens de Tweede Engels–Nederlandse Oorlog (1665–1667) werd door de Nederlanders gewonnen. Door miscommunicatie tussen de Deense koning en zijn onderdanen assisteerde het Noorse leger de Nederlandse vloot.
 auctoritijt | w | gezag.
 wel | w | net.
 wel Barrataria … gouverneur was | comm | In het tweede deel van Don Quichot (1615) van de Spaanse auteur Miguel de Cervantes Saavedra (c. 1547–1622) wordt Sancho Panza, de metgezel van Don Quichot, beloond met het eiland Barataria (barato is Spaans voor goedkoop). Het gouverneurschap wil echter niet lukken, waardoor Sancho Panza zijn kersverse positie moet opgeven. Hier wordt de naam spottend gebruikt voor de eigenaar van deze hut. De episode van het eiland Barataria heeft tot enkele Nederlandse bewerkingen geleid. In 1681 publiceerde Simon van der Cruyssen het blijspel Het gouvernement van Sanche Panche op het eyland Barataria, in 1700 gaf Guilielmus Ignatius Kerricx de muzikale klucht 't Gouvernement van Sancho Panca in 't Eylandt Baratia uit en in 1712 ten slotte verscheen Don Quichot op de bruiloft van Kamacho van Pieter Langendijk.
@@ -568,7 +568,7 @@ bepaalt | w | beperkte, begrensde.
 gewisheijt | w | zekerheid.
 “O! Diepte … raadsman geweest.” | w | Cf. Romeinen 11:33–34.
 en laat … des leevens | comm | In het Bijbelboek Genesis worden Adam en Eva geconfronteerd met de boom des levens en de boom van de kennis van goed en kwaad. God verbiedt hen van de tweede boom te eten, maar Eva wordt door een slang misleid en eet alsnog een van de vruchten. Daarop verbant God het tweetal uit het paradijs en verbiedt hij hen ooit van de andere boom te eten, waarvan de vruchten het eeuwige leven schenken.
-“De heel … om zichselven.” | comm | Dit fragment komt uit het gedicht 'Beklagh over d'ydele Weet–en Eer– lust' uit de postume bundel Stichtelijcke rijmen (1660) van de doopsgezinde schrijver Dirk Rafaelsz. Camphuysen (1586–1627). De gedichten van Camphuysen hebben een centrale plaats in de autobiografie van Van der Meersch.
+“De heel … om zichselven.” | comm | Dit fragment komt uit het gedicht 'Beklagh over d'ydele Weet– en Eer–lust' uit de postume bundel Stichtelijcke rijmen (1660) van de doopsgezinde schrijver Dirk Rafaelsz. Camphuysen (1586–1627). De gedichten van Camphuysen hebben een centrale plaats in de autobiografie van Van der Meersch.
 Lundun | w | Lund.
 goetijds | w | op tijd.
 Daar is … gingen bezien | comm | De universiteit van Lund werd opgericht in 1666. De dom van Lund bestond al sinds de twaalfde eeuw.
@@ -636,7 +636,7 @@ gestooven | w | gestorven. Mogelijk een synoniem van 'gevloogen'.
 beval mij … genadige hoede | comm | ik gaf me over aan de genadige bescherming van God.
 voortijd | w | lente
 lienie | w | lijn, evenaar.
-doen ik … Spangie rijsden | comm | Als leerling van de doperse linnenkoopman Lodewijk Oosterling (c. 1623– 1701) trok Van der Meersch in 1662 door Spanje en Portugal.
+doen ik … Spangie rijsden | comm | Als leerling van de doperse linnenkoopman Lodewijk Oosterling (c. 1623–1701) trok Van der Meersch in 1662 door Spanje en Portugal.
 Victoria | w | Vitoria–Gasteiz.
 Pampalona | w | Pamplona.
 Bajonne | w | Bayonne.

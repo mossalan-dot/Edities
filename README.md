@@ -28,6 +28,11 @@ alleen HTML, CSS en een beetje JavaScript. Klaar om te hosten op bijvoorbeeld Gi
   `#pagina-N` / `#rN` die direct naar de juiste plaats springen.
 - **Bewaarde weergave-instellingen**: apparaat-toggles, leesmodus en weergaveopties blijven
   per editie bewaard (localStorage).
+- **Spellingtolerant zoeken** (aan/uit te zetten): vroegmoderne spellingvariatie wordt
+  meegezocht — u/v, i/j/y, c/k, s/z, d/t, g(h), klinkerclusters en accenten. Zo vindt
+  *Enkhuizen* ook *Enchuijzen*, en *jaar* ook *jaer*.
+- **Facsimile-zoom**: in de lightbox kan met scrollwiel, dubbelklik, knoppen of toetsen
+  (+/−/0) worden gezoomd en gesleept.
 - **Export**: TEI-XML (voor uitwisseling met andere DH-gereedschappen) en platte leestekst,
   te downloaden via de Citeer-knop in de werkbalk.
 - **Sneltoetsen**: `/` focust het zoekveld; `←`/`→` bladeren in de paginaweergave.

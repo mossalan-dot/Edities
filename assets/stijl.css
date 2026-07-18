@@ -211,6 +211,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
   border: 1px solid var(--lijn-sterk); border-radius: 6px; background: var(--papier); color: var(--inkt);
 }
 .zoek-status { color: var(--inkt-zacht); font-size: .82rem; min-width: 4.5rem; }
+.wb-tolerant { font-size: .82rem; color: var(--inkt-zacht); white-space: nowrap; }
 .zoek-knop {
   border: 1px solid var(--lijn-sterk); background: var(--papier); color: var(--inkt);
   border-radius: 6px; padding: .2rem .6rem; cursor: pointer; font-family: var(--sans); line-height: 1;
@@ -422,6 +423,22 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 }
 .lb-binnen { position: relative; max-width: 92vw; max-height: 90vh; }
 .lb-binnen img { max-width: 92vw; max-height: 82vh; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #fff; }
+.lb-canvas {
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  max-width: 92vw; max-height: 82vh; touch-action: none; cursor: zoom-in;
+}
+.lb-canvas img { transform-origin: center center; user-select: none; }
+.lb-canvas.gezoomd { cursor: grab; }
+.lb-canvas.sleept { cursor: grabbing; }
+.lb-knoppen {
+  position: absolute; top: -1rem; left: -1rem; z-index: 2;
+  display: flex; gap: .4rem;
+}
+.lb-zoomknop {
+  width: 2.2rem; height: 2.2rem; border-radius: 50%; border: none;
+  background: #fff; color: #000; font-size: 1.1rem; cursor: pointer; line-height: 1;
+}
+.lb-zoomknop:hover { background: #eee; }
 .lb-sluit {
   position: absolute; top: -1rem; right: -1rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;
   border: none; background: #fff; color: #000; font-size: 1.4rem; cursor: pointer; line-height: 1;
@@ -723,4 +740,10 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .paneel { display: block !important; }
   .modus-bladeren .pagina { display: block !important; } /* print altijd alles */
+  /* Kantnoten zijn absoluut gepositioneerd en passen niet op papier:
+     print het verzamelde apparaat onder elke pagina in plaats daarvan. */
+  .kant-links, .kant-rechts, .kant-nrs { display: none !important; }
+  .kantnoten-aan .apparaten { display: block !important; }
+  .kantnoten-aan .tekst { max-width: none; }
+  .kantnoten-aan .tekst .pb { display: inline !important; }
 }

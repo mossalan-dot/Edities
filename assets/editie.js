@@ -433,6 +433,8 @@
     uit.push('<span class="zoek-status" aria-live="polite"></span>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled hidden>‹</button>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled hidden>›</button>');
+    uit.push('<label class="wb-opt wb-tolerant" title="Vind ook historische spellingvarianten: u/v, i/j/y, c/k, s/z, d/t, g(h), klinkerclusters en accenten — bijv. Enkhuizen vindt Enchuijzen">' +
+             '<input type="checkbox" id="opt-tolerant" checked> ≈ spelling</label>');
     uit.push('</div>');
     uit.push('<div class="wb-knoppen">');
     if (heeftInhoud) {
@@ -884,24 +886,25 @@
       zoekMarks = []; zoekIdx = -1;
     }
 
-    function wrapMatches(container, q) {
-      var ql = q.toLowerCase();
+    function wrapMatches(container, patroon) {
       var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
       var nodes = [];
       while (walker.nextNode()) nodes.push(walker.currentNode);
       nodes.forEach(function (node) {
-        var text = node.nodeValue, lower = text.toLowerCase(), idx = lower.indexOf(ql);
-        if (idx === -1) return;
-        var frag = document.createDocumentFragment(), last = 0;
-        while (idx !== -1) {
-          if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+        var text = node.nodeValue;
+        patroon.lastIndex = 0;
+        var frag = null, last = 0, m;
+        while ((m = patroon.exec(text))) {
+          if (!m[0]) { patroon.lastIndex++; continue; }
+          if (!frag) frag = document.createDocumentFragment();
+          if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
           var mark = document.createElement('mark');
           mark.className = 'zoektreffer';
-          mark.textContent = text.slice(idx, idx + q.length);
+          mark.textContent = m[0];
           frag.appendChild(mark);
-          last = idx + q.length;
-          idx = lower.indexOf(ql, last);
+          last = m.index + m[0].length;
         }
+        if (!frag) return;
         if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
         node.parentNode.replaceChild(frag, node);
       });
@@ -924,7 +927,10 @@
       wisZoek();
       q = q.trim();
       if (q.length < 2) { updateZoekStatus(); return; }
-      root.querySelectorAll('.pagina .tekst').forEach(function (c) { wrapMatches(c, q); });
+      var tolerantKnop = root.querySelector('#opt-tolerant');
+      var patroon = maakZoekPatroon(q, !tolerantKnop || tolerantKnop.checked);
+      if (!patroon) { updateZoekStatus(); return; }
+      root.querySelectorAll('.pagina .tekst').forEach(function (c) { wrapMatches(c, patroon); });
       zoekMarks = [].slice.call(root.querySelectorAll('.zoektreffer'));
       updateZoekStatus();
       if (zoekMarks.length) gaNaarTreffer(0);
@@ -1129,6 +1135,8 @@
         herberekenLater();
       } else if (t.id === 'opt-markering') {
         root.classList.toggle('geen-markering', !t.checked);
+      } else if (t.id === 'opt-tolerant') {
+        if (veld && veld.value.trim().length >= 2) zoek(veld.value);
       } else if (t.id === 'opt-origineel') {
         root.classList.toggle('met-origineel', t.checked);
         opDoel = null;
@@ -1191,6 +1199,39 @@
     updateOrigineel(true);
   }
 
+  // ---- Spellingtolerant zoeken --------------------------------------------
+  // Vroegmoderne spelling varieert sterk (jaer/jair/yaer, Enchuijzen/Enkhuizen,
+  // Coppenhagen/Kopenhagen). Het tolerante zoekpatroon behandelt daarom
+  // letterklassen als inwisselbaar en klinkerclusters als één geheel.
+  var Z_VOCAAL = 'aeoàáâäãæèéêëòóôöõø';             // a/e/o-klinkers (clusteren onderling)
+  var Z_IJY = 'ijyìíîïýÿĲĳ';                        // i/j/y (aparte klasse: jaer/iaer/yaer)
+  var Z_KLASSEN = { u: 'uvùúûü', v: 'uvùúûü', s: 'sz', z: 'sz',
+                    c: 'ckç', k: 'ckç', d: 'dt', t: 'dt' };
+  function zoekEscape(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function maakZoekPatroon(q, tolerant) {
+    if (q.normalize) q = q.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    q = q.toLowerCase();
+    if (!tolerant) {
+      try { return new RegExp(zoekEscape(q), 'gi'); } catch (e) { return null; }
+    }
+    var stukken = [], vorige = null;
+    for (var i = 0; i < q.length; i++) {
+      var c = q.charAt(i);
+      var stuk;
+      if (Z_IJY.indexOf(c) !== -1) stuk = '[' + Z_IJY + ']+';
+      else if (Z_VOCAAL.indexOf(c) !== -1) stuk = '[' + Z_VOCAAL + ']+';
+      else if (Z_KLASSEN[c]) stuk = '[' + Z_KLASSEN[c] + ']+';
+      else if (c === 'g') stuk = 'g+h?';           // dagh / dag
+      else if (c === ' ') stuk = '\\s+';
+      else if (/[a-z0-9]/.test(c)) stuk = zoekEscape(c) + '+';
+      else stuk = zoekEscape(c);
+      if (stuk === vorige) continue;               // klinker-/lettercluster samenvouwen
+      stukken.push(stuk);
+      vorige = stuk;
+    }
+    try { return new RegExp(stukken.join(''), 'gi'); } catch (e) { return null; }
+  }
+
   // ---- Origineel (scan of pdf) --------------------------------------------
   function openOrigineel(config, doel) {
     if (!doel) return;
@@ -1204,14 +1245,82 @@
     var box = document.createElement('div');
     box.className = 'lightbox';
     box.innerHTML = '<div class="lb-binnen"><button class="lb-sluit" aria-label="Sluiten">×</button>' +
-      '<img src="' + src + '" alt="' + escapeHtml(bijschrift) + '">' +
+      '<div class="lb-knoppen">' +
+      '<button class="lb-zoomknop" data-lb="uit" title="Uitzoomen (−)">−</button>' +
+      '<button class="lb-zoomknop" data-lb="in" title="Inzoomen (+)">+</button>' +
+      '<button class="lb-zoomknop" data-lb="reset" title="Herstel (0)">⟲</button>' +
+      '</div>' +
+      '<div class="lb-canvas"><img src="' + escapeHtml(src) + '" alt="' + escapeHtml(bijschrift) + '" draggable="false"></div>' +
       '<div class="lb-bijschrift">' + escapeHtml(bijschrift) + '</div></div>';
-    function sluit() { box.remove(); document.removeEventListener('keydown', esc); }
-    function esc(e) { if (e.key === 'Escape') sluit(); }
+
+    var canvas = box.querySelector('.lb-canvas');
+    var img = box.querySelector('.lb-canvas img');
+    var schaal = 1, tx = 0, ty = 0;
+    function pasToe() {
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + schaal + ')';
+      canvas.classList.toggle('gezoomd', schaal > 1);
+    }
+    // Zoom naar een punt (px,py in canvas-coördinaten t.o.v. het midden).
+    function zoomNaar(px, py, nieuw) {
+      nieuw = Math.max(1, Math.min(8, nieuw));
+      if (nieuw === 1) { tx = 0; ty = 0; }
+      else {
+        tx = px - (px - tx) * (nieuw / schaal);
+        ty = py - (py - ty) * (nieuw / schaal);
+      }
+      schaal = nieuw;
+      pasToe();
+    }
+    function midden(e) {
+      var r = canvas.getBoundingClientRect();
+      return [e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2];
+    }
+    canvas.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      var p = midden(e);
+      zoomNaar(p[0], p[1], schaal * (e.deltaY < 0 ? 1.18 : 1 / 1.18));
+    }, { passive: false });
+    canvas.addEventListener('dblclick', function (e) {
+      var p = midden(e);
+      zoomNaar(p[0], p[1], schaal > 1.5 ? 1 : 2.5);
+    });
+    // Slepen (pan) met pointer events; werkt ook op touch.
+    var sleep = null;
+    canvas.addEventListener('pointerdown', function (e) {
+      if (schaal <= 1) return;
+      sleep = { x: e.clientX - tx, y: e.clientY - ty };
+      canvas.setPointerCapture(e.pointerId);
+      canvas.classList.add('sleept');
+    });
+    canvas.addEventListener('pointermove', function (e) {
+      if (!sleep) return;
+      tx = e.clientX - sleep.x;
+      ty = e.clientY - sleep.y;
+      pasToe();
+    });
+    function sleepKlaar() { sleep = null; canvas.classList.remove('sleept'); }
+    canvas.addEventListener('pointerup', sleepKlaar);
+    canvas.addEventListener('pointercancel', sleepKlaar);
+
+    function sluit() { box.remove(); document.removeEventListener('keydown', toetsen); }
+    function toetsen(e) {
+      if (e.key === 'Escape') sluit();
+      else if (e.key === '+' || e.key === '=') zoomNaar(0, 0, schaal * 1.4);
+      else if (e.key === '-') zoomNaar(0, 0, schaal / 1.4);
+      else if (e.key === '0') zoomNaar(0, 0, 1);
+    }
     box.addEventListener('click', function (e) {
+      var knop = e.target.closest('[data-lb]');
+      if (knop) {
+        var wat = knop.getAttribute('data-lb');
+        if (wat === 'in') zoomNaar(0, 0, schaal * 1.4);
+        else if (wat === 'uit') zoomNaar(0, 0, schaal / 1.4);
+        else zoomNaar(0, 0, 1);
+        return;
+      }
       if (e.target === box || e.target.closest('.lb-sluit')) sluit();
     });
-    document.addEventListener('keydown', esc);
+    document.addEventListener('keydown', toetsen);
     document.body.appendChild(box);
   }
 
