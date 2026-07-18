@@ -18,7 +18,8 @@
   var PALET = ['#0f766e', '#7c3aed', '#b45309', '#be123c', '#1d4ed8', '#4d7c0f'];
 
   function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
   }
 
   // Inline typografie en editeursingrepen (noten zijn hier al afgehandeld).
@@ -598,7 +599,12 @@
     }
     var herTimer;
     function herberekenLater() { clearTimeout(herTimer); herTimer = setTimeout(herbereken, 120); }
-    window.addEventListener('resize', herberekenLater);
+    window.addEventListener('resize', function opResize() {
+      // De editor rendert herhaaldelijk in hetzelfde document; koppel
+      // listeners van weggegooide renders los.
+      if (!root.isConnected) { window.removeEventListener('resize', opResize); return; }
+      herberekenLater();
+    });
 
     function markeerKant(id, aan) {
       var kn = root.querySelector('.kantnoot[data-noot="' + id + '"]');
@@ -631,6 +637,10 @@
         root.classList.add('modus-doorlopend');
         root.classList.remove('modus-bladeren');
         if (pager) pager.hidden = true;
+        // Anders heropent een herlaad-actie de bladermodus via de hash.
+        if (/^#pagina-/.test(location.hash)) {
+          history.replaceState(null, '', location.pathname + location.search);
+        }
       }
     }
     // Beschikbaar voor register en inhoudsopgave: toon (in bladermodus) de
@@ -721,10 +731,15 @@
       });
     }
 
-    var pop = document.createElement('div');
-    pop.className = 'noot-popover';
+    // Hergebruik één popover-element, ook als render() meermaals draait
+    // (zoals in het live voorbeeld van de editor).
+    var pop = document.querySelector('.noot-popover');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.className = 'noot-popover';
+      document.body.appendChild(pop);
+    }
     pop.hidden = true;
-    document.body.appendChild(pop);
 
     function toonPopover(el) {
       var id = el.getAttribute('data-noot');
@@ -769,7 +784,8 @@
     });
     root.addEventListener('focusout', verbergPopover);
     // Op touch/smal scherm: tik buiten een lemma of de popover sluit hem.
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function buitenKlik(e) {
+      if (!root.isConnected) { document.removeEventListener('click', buitenKlik); return; }
       if (root.classList.contains('kantnoten-aan')) return;
       if (e.target.closest('.tekst .lemma') || e.target.closest('.noot-popover')) return;
       verbergPopover();

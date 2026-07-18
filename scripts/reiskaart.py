@@ -181,10 +181,17 @@ def bouw_svg(stops, lijnen, ringen, bbox, labels):
                    f'd="{pad_d([proj(c[0], c[1]) for c in lijn])}"/>')
 
     uit.append('<g class="rk-stops">')
+    # De KMZ kan dezelfde pleisterplaats in meerdere lagen bevatten
+    # (route-stops én geannoteerde placemarks); toon elke stip één keer.
+    gezien_stops = set()
     for s in stops:
         x, y = proj(s["lon"], s["lat"])
         datum, plaats = plaats_van(s["naam"])
         tip = esc((datum + ": " if datum else "") + plaats)
+        sleutel = (round(x), round(y), tip)
+        if sleutel in gezien_stops:
+            continue
+        gezien_stops.add(sleutel)
         uit.append(f'<circle cx="{fmt(x)}" cy="{fmt(y)}" r="4.5"><title>{tip}</title></circle>')
     uit.append('</g>')
 
