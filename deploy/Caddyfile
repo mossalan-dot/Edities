@@ -10,8 +10,19 @@
 
 edities.example.nl {
 	root * /var/www/edities
-	file_server
 	encode gzip zstd
+
+	# --- Beheer / bewerkmodus achter een wachtwoord ------------------------
+	# De editor is de admin-omgeving: alleen met inlog te openen. De rest van
+	# de site (alle edities) blijft openbaar. Genereer de wachtwoord-hash met:
+	#   caddy hash-password        (of: caddy hash-password --plaintext 'geheim')
+	# en plak de hash hieronder. De gebruikersnaam mag je zelf kiezen.
+	@beheer path /editor.html /editor-frame.html
+	basicauth @beheer {
+		admin $2a$14$VERVANG.DEZE.HASH.DOOR.CADDY.HASH.PASSWORD.UITVOER.abcdefghi
+	}
+
+	file_server
 
 	# Code en markup kort cachen zodat deploys snel doorkomen.
 	@kort path /assets/* *.html *.txt *.md

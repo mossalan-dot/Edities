@@ -42,6 +42,27 @@
           <span>Bron — <code>editie.md</code></span>
           <button type="button" class="ed-mini" id="ed-legenda-knop" title="Toon/verberg de beknopte spelregels">? spelregels</button>
         </div>
+        <div class="ed-opmaakbalk" role="toolbar" aria-label="Opmaakknoppen">
+          <button type="button" class="ed-fmt" data-regel="# " title="Kop 1">H1</button>
+          <button type="button" class="ed-fmt" data-regel="## " title="Kop 2">H2</button>
+          <button type="button" class="ed-fmt" data-regel="### " title="Kop 3">H3</button>
+          <span class="ed-scheiding" aria-hidden="true"></span>
+          <button type="button" class="ed-fmt" data-wrap="**|**" title="Vet"><b>B</b></button>
+          <button type="button" class="ed-fmt" data-wrap="*|*" title="Cursief"><i>I</i></button>
+          <button type="button" class="ed-fmt" data-wrap="{sc:|}" title="Kleinkapitaal">Kk</button>
+          <button type="button" class="ed-fmt" data-wrap="{ab:|}" title="Opgeloste afkorting (letters binnen een woord)">afk</button>
+          <button type="button" class="ed-fmt" data-wrap="{add:|}" title="Toevoeging van de editeur ⟨ ⟩">⟨+⟩</button>
+          <button type="button" class="ed-fmt" data-wrap="{del:|}" title="Doorhaling">del</button>
+          <button type="button" class="ed-fmt" data-wrap="{unc:|}" title="Onzekere lezing [?]">[?]</button>
+          <button type="button" class="ed-fmt" data-wrap="{gap:|}" title="Lacune / onleesbaar">lac</button>
+          <button type="button" class="ed-fmt" data-wrap="{marg:|}" title="Toevoeging in de marge">marge</button>
+          <span class="ed-scheiding" aria-hidden="true"></span>
+          <button type="button" class="ed-fmt" data-blok="~ p. | " title="Paginagrens (begin van een nieuwe pagina/folio)">¶ pagina</button>
+          <button type="button" class="ed-fmt" data-blok="@ JJJJ-MM-DD | " title="Dagtekening (datum-navigatie)">◈ datum</button>
+          <button type="button" class="ed-fmt" data-regel="- " title="Opsommingsteken">• lijst</button>
+          <span class="ed-scheiding" aria-hidden="true"></span>
+          <button type="button" class="ed-fmt ed-fmt-noot" data-actie="noot" title="Maak een noot bij de geselecteerde tekst">＋ Noot</button>
+        </div>
         <textarea id="ed-invoer" spellcheck="false" autocomplete="off" autocapitalize="off"
           placeholder="Schrijf of open hier een editie.md…"></textarea>
         <div class="ed-legenda" id="ed-legenda" hidden></div>
@@ -310,6 +331,52 @@
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !nootModaal.hidden) sluitNootForm();
+    });
+
+    // ---- Opmaakbalk: knoppen die markup in het tekstvak invoegen ----------
+    function omhul(voor, na) {
+      var s = invoer.selectionStart, e = invoer.selectionEnd, v = invoer.value;
+      var sel = v.slice(s, e);
+      invoer.value = v.slice(0, s) + voor + sel + na + v.slice(e);
+      if (sel) { invoer.selectionStart = s + voor.length; invoer.selectionEnd = s + voor.length + sel.length; }
+      else { invoer.selectionStart = invoer.selectionEnd = s + voor.length; }
+      invoer.focus(); verwerk();
+    }
+    function regelPrefix(prefix) {
+      var s = invoer.selectionStart, v = invoer.value;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      invoer.value = v.slice(0, ls) + prefix + v.slice(ls);
+      invoer.selectionStart = invoer.selectionEnd = s + prefix.length;
+      invoer.focus(); verwerk();
+    }
+    function blokInvoegen(tekst) {
+      var s = invoer.selectionStart, v = invoer.value;
+      var voor = v.slice(0, s).replace(/[ \t]*$/, '');
+      var na = v.slice(s).replace(/^[ \t]*/, '');
+      var pre = voor ? (/\n\n$/.test(voor) ? '' : /\n$/.test(voor) ? '\n' : '\n\n') : '';
+      var ins = pre + tekst;
+      invoer.value = voor + ins + (na.charAt(0) === '\n' ? '' : '\n') + na;
+      invoer.selectionStart = invoer.selectionEnd = (voor + ins).length;
+      invoer.focus(); verwerk();
+    }
+    function toolbarNoot() {
+      var s = invoer.selectionStart, e = invoer.selectionEnd;
+      var lemma = invoer.value.slice(s, e).trim().replace(/\s+/g, ' ');
+      if (!lemma) {
+        status.textContent = 'Selecteer eerst het woord of de woordgroep waar de noot bij hoort.';
+        status.className = 'ed-status waarschuwing';
+        return;
+      }
+      var w = lemma.split(' ');
+      openNootForm({ lemma: w.length > 5 ? w[0] + ' … ' + w[w.length - 1] : lemma, occ: 0 });
+    }
+    document.querySelector('.ed-opmaakbalk').addEventListener('click', function (e) {
+      var b = e.target.closest('.ed-fmt');
+      if (!b) return;
+      if (b.dataset.actie === 'noot') { toolbarNoot(); return; }
+      if (b.dataset.wrap != null) { var p = b.dataset.wrap.split('|'); omhul(p[0], p[1] || ''); return; }
+      if (b.dataset.regel != null) { regelPrefix(b.dataset.regel); return; }
+      if (b.dataset.blok != null) { blokInvoegen(b.dataset.blok); return; }
     });
 
     // ---- Herstel vorige sessie of toon sjabloon ---------------------------

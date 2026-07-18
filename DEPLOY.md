@@ -52,6 +52,50 @@ gelijk aan je lokale map.
 Open `https://edities.example.nl/`. Loopt het via een subpad
 (`.../edities/`)? Dan werkt dat ook, want alle verwijzingen zijn relatief.
 
+## Beheer / bewerkmodus beveiligen
+
+De **editor** (`editor.html`) is de admin-omgeving waarin je edities schrijft en
+noten toevoegt. Omdat de site statisch is, wordt die niet in de pagina zelf
+afgeschermd maar **op de webserver**, met HTTP basic-auth. Alle edities blijven
+openbaar; alleen de editor vraagt om een wachtwoord.
+
+**Caddy** — de config (`deploy/Caddyfile`) schermt `/editor.html` en
+`/editor-frame.html` al af. Maak een wachtwoordhash en plak die in het
+`basicauth`-blok:
+
+```bash
+caddy hash-password            # typ je wachtwoord; kopieer de hash
+# vervang de VERVANG…-hash in de Caddyfile door deze uitvoer
+sudo systemctl reload caddy
+```
+
+**nginx** — de config (`deploy/edities.nginx.conf`) verwijst naar een
+`htpasswd`-bestand. Maak dat eenmalig aan:
+
+```bash
+sudo apt install -y apache2-utils
+sudo htpasswd -c /etc/nginx/edities.htpasswd admin   # vraagt om een wachtwoord
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Daarna vraagt de browser om gebruikersnaam + wachtwoord zodra je de editor
+opent; de rest van de site blijft vrij toegankelijk. Wil je meer beheerders?
+Voeg extra regels toe (`caddy hash-password` per persoon, of `htpasswd`
+zonder `-c` voor een extra gebruiker).
+
+## De editor gebruiken
+
+De editor heeft twee manieren van werken, door elkaar te gebruiken:
+
+- **Met knoppen** — de opmaakbalk boven het tekstvak zet de juiste markup neer:
+  koppen, vet/cursief, kleinkapitaal, opgeloste afkortingen, doorhaling, marge,
+  lacune, paginagrens, dagtekening en opsomming. Selecteer eerst tekst en klik
+  dan een knop om die te omhullen. De knop **＋ Noot** maakt een noot bij de
+  geselecteerde tekst (kies apparaat, typ de inhoud); dat kan ook door in het
+  voorbeeld rechts tekst te selecteren.
+- **In code** — je kunt alles ook rechtstreeks in de `editie.md`-markup typen;
+  het voorbeeld en de noot-verankering werken meteen mee.
+
 ## Nieuwe editie toevoegen
 
 1. Maak lokaal een map `edities/<naam>/` met een `index.html` (kopieer die van

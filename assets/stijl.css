@@ -512,6 +512,23 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
   background: none; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .1rem .6rem;
 }
 .ed-mini:hover { border-color: var(--accent); color: var(--accent); }
+
+.ed-opmaakbalk {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .25rem;
+  padding: .4rem .6rem; border-bottom: 1px solid var(--lijn);
+  background: color-mix(in srgb, var(--papier) 94%, var(--inkt));
+}
+.ed-opmaakbalk .ed-scheiding { height: 1.1rem; margin: 0 .15rem; }
+.ed-fmt {
+  font-family: var(--sans); font-size: .8rem; line-height: 1; cursor: pointer;
+  color: var(--inkt); background: var(--papier);
+  border: 1px solid var(--lijn-sterk); border-radius: 5px;
+  padding: .3rem .5rem; min-width: 1.9rem;
+}
+.ed-fmt:hover { border-color: var(--accent); color: var(--accent); }
+.ed-fmt b, .ed-fmt i { font-size: .92rem; }
+.ed-fmt-noot { font-weight: 600; color: #fff; background: var(--accent); border-color: var(--accent); }
+.ed-fmt-noot:hover { filter: brightness(1.08); color: #fff; }
 #ed-invoer {
   flex: 1 1 auto; width: 100%; resize: none; border: none; outline: none;
   padding: 1rem 1.1rem; background: var(--papier); color: var(--inkt);
