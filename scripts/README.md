@@ -33,6 +33,32 @@ Belangrijkste opties (zie `--help`):
 De eerste LineString in de KMZ wordt als route 1 getekend (klasse
 `rk-1672`, gestippeld), de tweede als route 2 (`rk-1674`, doorgetrokken).
 
+## overzichtskaart.py — alle reizen op één kaart
+
+Bouwt voort op `reiskaart.py` en tekent **meerdere reizen** samen, elk in een
+eigen kleur, op de bredere West-Europa-kustlijn. Levert de kaart voor
+`reizen.html`.
+
+```bash
+python3 scripts/overzichtskaart.py --uit /tmp/reizen.kaart.svg
+```
+
+Plak de inhoud van de SVG in `reizen.html` (tussen
+`<div class="reiskaart-omhulsel ov-kaart">` en `</div>`). De reizen (slug, KMZ,
+kleur, naam) staan bovenin het script in `REIZEN`; elke route wordt een
+klikbare `<g class="ov-reis" data-slug="…">`, zodat `reizen.html` er hover- en
+klikgedrag aan kan hangen. Elke editie heeft zijn eigen `reis.kmz` in de
+editiemap.
+
+## data/kust-west-europa.geojson
+
+Zelfde bron als hieronder (Natural Earth 1:50m land), maar geknipt op een groter
+gebied zodat óók de zuidelijke reizen (Frankrijk, Italië) een kustlijn krijgen:
+
+```bash
+python3 scripts/knip_kust.py /tmp/land50.geojson scripts/data/kust-west-europa.geojson -6,41,16,60
+```
+
 ## data/kust-nw-europa.geojson
 
 Een subset van **Natural Earth 1:50m land** (public domain,
