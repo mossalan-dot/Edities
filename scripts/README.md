@@ -33,6 +33,20 @@ Belangrijkste opties (zie `--help`):
 De eerste LineString in de KMZ wordt als route 1 getekend (klasse
 `rk-1672`, gestippeld), de tweede als route 2 (`rk-1674`, doorgetrokken).
 
+## editiekaart.py — kustlijn-routekaart per editie
+
+Als `reiskaart.py`, maar tekent alle routelijnen doorgetrokken in één kleur (voor
+edities met meerdere KMZ-segmenten) op de West-Europa-kustlijn. Genereert de
+kaarten van Ruysch, Hinlopen 1667–1668 en Geelvinck; per editie staan de KMZ,
+kleur, uitsnede (`bbox`) en labels in `EDITIES` bovenin het script.
+
+```bash
+python3 scripts/editiekaart.py /tmp        # schrijft <slug>.kaart.svg
+```
+
+Plak de SVG in het `data-paneel="reis"`-paneel van de editie (tussen
+`<div class="reiskaart-omhulsel">` en `</div>`).
+
 ## overzichtskaart.py — alle reizen op één kaart
 
 Bouwt voort op `reiskaart.py` en tekent **meerdere reizen** samen, elk in een
