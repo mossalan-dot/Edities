@@ -493,6 +493,55 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .tl-bs-datum { color: var(--inkt); font-weight: 600; }
 .tl-bs-plaats { color: var(--rubriek); }
 
+/* ---- Leescomfort -------------------------------------------------------- */
+/* Leesinstellingen sturen deze variabelen (per bezoeker onthouden via site.js). */
+.prozasectie, #editie .tekst {
+  font-size: calc(1.125rem * var(--lees-schaal, 1));
+  line-height: var(--lees-regel, 1.6);
+  font-family: var(--leesletter, var(--serif));
+}
+.lees-knop {
+  font-family: var(--sans); font-size: .85rem; background: none; cursor: pointer;
+  border: 1px solid var(--lijn-sterk); color: var(--inkt-zacht); border-radius: 999px;
+  padding: .2rem .6rem; margin-left: 1.1rem;
+}
+.lees-knop:hover { color: var(--accent); border-color: var(--accent); }
+.lees-paneel {
+  position: absolute; z-index: 200; right: 1.25rem; margin-top: .5rem;
+  background: var(--papier); border: 1px solid var(--lijn-sterk); border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.16); padding: .8rem .9rem; width: 17rem;
+  font-family: var(--sans);
+}
+.lees-paneel[hidden] { display: none; }
+.lees-groep { margin: 0 0 .7rem; }
+.lees-groep:last-child { margin-bottom: 0; }
+.lees-kop { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--inkt-zacht); margin: 0 0 .35rem; }
+.lees-rij { display: flex; gap: .3rem; align-items: center; }
+.lees-opt {
+  flex: 1 1 auto; font-family: var(--sans); font-size: .85rem; cursor: pointer;
+  border: 1px solid var(--lijn-sterk); background: var(--papier); color: var(--inkt);
+  border-radius: 6px; padding: .3rem .4rem; text-align: center;
+}
+.lees-opt:hover { border-color: var(--accent); }
+.lees-opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-zacht); color: var(--accent); font-weight: 600; }
+.lees-grootte { min-width: 2rem; text-align: center; font-variant-numeric: tabular-nums; color: var(--inkt-zacht); }
+.lees-herstel { margin-top: .3rem; font-size: .8rem; color: var(--inkt-zacht); background: none;
+  border: none; cursor: pointer; text-decoration: underline; padding: 0; font-family: var(--sans); }
+.lees-herstel:hover { color: var(--accent); }
+
+/* "Verder waar je was"-melding */
+.lees-hervat {
+  position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
+  z-index: 300; display: flex; align-items: center; gap: .6rem;
+  background: var(--inkt); color: var(--papier); font-family: var(--sans); font-size: .9rem;
+  border-radius: 999px; padding: .5rem .5rem .5rem 1rem; box-shadow: 0 6px 24px rgba(0,0,0,.28);
+}
+.lees-hervat button { font-family: var(--sans); cursor: pointer; border: none; border-radius: 999px;
+  padding: .3rem .8rem; font-size: .85rem; }
+.lees-hervat .lh-ga { background: var(--accent); color: #fff; font-weight: 600; }
+.lees-hervat .lh-sluit { background: transparent; color: var(--papier); opacity: .8; padding: .3rem .5rem; }
+
 /* ---- Editor / werkbank -------------------------------------------------- */
 .editor-body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 .ed-werkbank { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
