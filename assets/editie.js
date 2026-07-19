@@ -18,7 +18,8 @@
   var PALET = ['#0f766e', '#7c3aed', '#b45309', '#be123c', '#1d4ed8', '#4d7c0f'];
 
   function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
   }
 
   // Inline typografie en editeursingrepen (noten zijn hier al afgehandeld).
@@ -232,7 +233,7 @@
           sluit();
           var dagId = 'dag-' + (dagen.length + 1);
           dagen.push({ id: dagId, sleutel: dm.sleutel, label: dm.label, stijl: dm.stijl, pagina: paginas.length + 1 });
-          cur.uit.push('<span class="db" id="' + dagId + '">' +
+          cur.uit.push('<span class="db" id="' + dagId + '" data-sleutel="' + dm.sleutel + '">' +
             '<span class="db-diamant" aria-hidden="true">◈</span> ' + escapeHtml(dm.label) +
             (dm.stijl ? ' <span class="db-stijl">' + dm.stijl + '</span>' : '') + '</span>');
           continue;
@@ -384,6 +385,8 @@
     if (!label) label = keyRuw;
     return {
       sleutel: dagSleutel(keyRuw, stijl),
+      key: keyRuw,
+      kal: stijl,
       label: label,
       stijl: stijl === 'sv' ? 'o.s.' : (stijl === 'sn' ? 'n.s.' : '')
     };
@@ -430,6 +433,8 @@
     uit.push('<span class="zoek-status" aria-live="polite"></span>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled hidden>‹</button>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled hidden>›</button>');
+    uit.push('<label class="wb-opt wb-tolerant" title="Vind ook historische spellingvarianten: u/v, i/j/y, c/k, s/z, d/t, g(h), klinkerclusters en accenten — bijv. Enkhuizen vindt Enchuijzen">' +
+             '<input type="checkbox" id="opt-tolerant" checked> ≈ spelling</label>');
     uit.push('</div>');
     uit.push('<div class="wb-knoppen">');
     if (heeftInhoud) {
@@ -440,10 +445,13 @@
       uit.push('<button type="button" class="wb-uitklap wb-dagen-knop" aria-expanded="false" aria-controls="wb-dagen">' +
                'Dagen <span class="wb-caret">▾</span></button>');
     }
+    uit.push('<button type="button" class="wb-uitklap wb-citeer-knop" aria-expanded="false" aria-controls="wb-citeer">' +
+             'Citeer <span class="wb-caret">▾</span></button>');
     uit.push('<button type="button" class="wb-uitklap" aria-expanded="false" aria-controls="wb-instellingen">' +
              'Weergave <span class="wb-caret">▾</span></button>');
     uit.push('</div>');
     uit.push('</div>'); // wb-boven
+    uit.push('<div class="wb-citeer" id="wb-citeer" hidden></div>');
     if (heeftInhoud) {
       uit.push('<nav class="wb-inhoud" id="wb-inhoud" hidden aria-label="Inhoudsopgave">');
       uit.push('<ol class="inhoud-lijst">');
@@ -465,11 +473,18 @@
       });
       uit.push('</ol></nav>');
     }
+    var heeftOrigineel = !!(config.meta.origineel_afbeeldingen ||
+      (config.meta.origineel_type === 'pdf' && config.meta.origineel_pdf));
     uit.push('<div class="wb-instellingen" id="wb-instellingen" hidden>');
     if (meerdere) {
       uit.push('<div class="wb-groep"><span class="wb-kop">Weergave</span>');
       uit.push('<label class="wb-opt"><input type="radio" name="modus" value="doorlopend" checked> Doorlopend</label>');
       uit.push('<label class="wb-opt"><input type="radio" name="modus" value="bladeren"> Per pagina</label>');
+      uit.push('</div>');
+    }
+    if (heeftOrigineel) {
+      uit.push('<div class="wb-groep wb-groep-origineel"><span class="wb-kop">Origineel</span>');
+      uit.push(toggle('opt-origineel', 'Naast de tekst', false));
       uit.push('</div>');
     }
     uit.push('<div class="wb-groep"><span class="wb-kop">Tonen</span>');
@@ -525,7 +540,10 @@
       return d;
     }
     function herbereken() {
-      var actief = window.matchMedia('(min-width: 1100px)').matches;
+      // Met het origineel naast de tekst is er geen ruimte voor kantnoten;
+      // noten verschijnen dan als popover (zoals op een smal scherm).
+      var actief = window.matchMedia('(min-width: 1100px)').matches &&
+                   !root.classList.contains('met-origineel');
       root.classList.toggle('kantnoten-aan', actief);
 
       var links = root.querySelector(':scope > .kant-links') || maakKant('links');
@@ -595,14 +613,219 @@
           laatsteBodem = top + item.el.offsetHeight;
         });
       });
+
+      // De kantnoten zijn zojuist opnieuw opgebouwd: markeer een actieve
+      // zoekterm ook daar (de navigatie loopt via het apparaat eronder).
+      if (huidigPatroon) {
+        wrapMatches(links, huidigPatroon);
+        wrapMatches(rechts, huidigPatroon);
+      }
     }
     var herTimer;
     function herberekenLater() { clearTimeout(herTimer); herTimer = setTimeout(herbereken, 120); }
-    window.addEventListener('resize', herberekenLater);
+    window.addEventListener('resize', function opResize() {
+      // De editor rendert herhaaldelijk in hetzelfde document; koppel
+      // listeners van weggegooide renders los.
+      if (!root.isConnected) { window.removeEventListener('resize', opResize); return; }
+      herberekenLater();
+    });
 
     function markeerKant(id, aan) {
       var kn = root.querySelector('.kantnoot[data-noot="' + id + '"]');
       if (kn) kn.classList.toggle('actief', aan);
+    }
+
+    // ---- Klembord + melding ----------------------------------------------
+    function melding(tekst) {
+      var m = document.querySelector('.editie-melding');
+      if (!m) {
+        m = document.createElement('div');
+        m.className = 'editie-melding';
+        document.body.appendChild(m);
+      }
+      m.textContent = tekst;
+      m.classList.add('zichtbaar');
+      clearTimeout(m._timer);
+      m._timer = setTimeout(function () { m.classList.remove('zichtbaar'); }, 1800);
+    }
+    function kopieer(tekst, gelukt) {
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = tekst;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); gelukt(); } catch (e) { melding('Kopiëren mislukt'); }
+        ta.remove();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(tekst).then(gelukt, fallback);
+      } else fallback();
+    }
+
+    // De pagina die de lezer nu (grofweg) in beeld heeft.
+    function huidigePagina() {
+      var paginasEl = root.querySelectorAll('.pagina');
+      if (root.classList.contains('modus-bladeren')) {
+        return root.querySelector('.pagina.actief') || paginasEl[0] || null;
+      }
+      var anker = window.innerHeight * 0.35;
+      var beste = paginasEl[0] || null;
+      for (var i = 0; i < paginasEl.length; i++) {
+        if (paginasEl[i].getBoundingClientRect().top <= anker) beste = paginasEl[i];
+        else break;
+      }
+      return beste;
+    }
+
+    // ---- Origineel naast de tekst ----------------------------------------
+    var opDoel = null; // huidig getoonde scan/pdf-pagina
+    function origineelPaneel() {
+      var paneel = root.querySelector('.origineel-paneel');
+      if (paneel) return paneel;
+      paneel = document.createElement('aside');
+      paneel.className = 'origineel-paneel';
+      paneel.innerHTML = '<div class="op-binnen">' +
+        '<div class="op-kop"><span class="op-label"></span>' +
+        '<a class="op-open" target="_blank" rel="noopener" hidden>Open ↗</a></div>' +
+        '<div class="op-inhoud"></div></div>';
+      var houder = root.querySelector('.paginas') || root;
+      houder.appendChild(paneel);
+      return paneel;
+    }
+    function updateOrigineel(forceer) {
+      if (!root.classList.contains('met-origineel')) return;
+      var pag = huidigePagina();
+      if (!pag) return;
+      var doel = pag.getAttribute('data-doel') || '';
+      if (!forceer && doel === opDoel) return;
+      opDoel = doel;
+      var paneel = origineelPaneel();
+      var label = paneel.querySelector('.op-label');
+      var open = paneel.querySelector('.op-open');
+      var inhoud = paneel.querySelector('.op-inhoud');
+      label.textContent = 'Origineel · ' + (pag.getAttribute('data-label') || '');
+      if (!doel) {
+        inhoud.innerHTML = '<p class="op-leeg">Geen scan gekoppeld aan deze pagina.</p>';
+        open.hidden = true;
+        return;
+      }
+      if (config.meta.origineel_type === 'pdf' && config.meta.origineel_pdf) {
+        var pdfUrl = config.meta.origineel_pdf + '#page=' + encodeURIComponent(doel);
+        var frame = inhoud.querySelector('iframe');
+        if (!frame) {
+          inhoud.innerHTML = '';
+          frame = document.createElement('iframe');
+          frame.className = 'op-pdf';
+          frame.title = 'Origineel (pdf)';
+          inhoud.appendChild(frame);
+        }
+        frame.src = pdfUrl;
+        open.href = pdfUrl; open.hidden = false;
+      } else if (config.meta.origineel_afbeeldingen) {
+        var src = config.meta.origineel_afbeeldingen.replace('{n}', doel);
+        var img = inhoud.querySelector('img');
+        if (!img) {
+          inhoud.innerHTML = '';
+          img = document.createElement('img');
+          img.className = 'op-scan';
+          img.alt = 'Scan van het origineel';
+          img.addEventListener('click', function () {
+            toonLightbox(img.src, label.textContent);
+          });
+          inhoud.appendChild(img);
+        }
+        img.src = src;
+        open.href = src; open.hidden = false;
+      }
+    }
+    var opScrollBezig = false;
+    window.addEventListener('scroll', function opScroll() {
+      if (!root.isConnected) { window.removeEventListener('scroll', opScroll); return; }
+      if (!root.classList.contains('met-origineel') || opScrollBezig) return;
+      opScrollBezig = true;
+      requestAnimationFrame(function () { opScrollBezig = false; updateOrigineel(); });
+    }, { passive: true });
+
+    // ---- Citeerhulp -------------------------------------------------------
+    function citeerTekst() {
+      var meta = config.meta;
+      var mnd = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli',
+                 'augustus', 'september', 'oktober', 'november', 'december'];
+      var nu = new Date();
+      var url = location.origin + location.pathname;
+      var delen = [];
+      if (meta.auteur) delen.push(meta.auteur);
+      if (meta.titel) delen.push(meta.titel + (meta.jaar ? ' (' + meta.jaar + ')' : ''));
+      var s = delen.join(', ') + '. Digitale editie, ' + url +
+        ', geraadpleegd ' + nu.getDate() + ' ' + mnd[nu.getMonth()] + ' ' + nu.getFullYear() + '.';
+      if (meta.bron) s += ' Origineel: ' + meta.bron + '.';
+      return s;
+    }
+    function vulCiteer() {
+      var box = document.getElementById('wb-citeer');
+      if (!box) return;
+      var pag = huidigePagina();
+      var html = '<div class="citeer-blok"><span class="wb-kop">Verwijzing</span>' +
+        '<p class="citeer-tekst">' + escapeHtml(citeerTekst()) + '</p>' +
+        '<button type="button" class="wb-uitklap" data-kopieer="citaat">Kopieer verwijzing</button></div>';
+      if (pag && root.querySelectorAll('.pagina').length > 1) {
+        var link = location.origin + location.pathname + '#pagina-' + pag.getAttribute('data-i');
+        html += '<div class="citeer-blok"><span class="wb-kop">Permalink naar ' +
+          escapeHtml(pag.getAttribute('data-label') || 'deze pagina') + '</span>' +
+          '<p class="citeer-tekst">' + escapeHtml(link) + '</p>' +
+          '<button type="button" class="wb-uitklap" data-kopieer="pagina">Kopieer permalink</button></div>';
+      }
+      if (root._bron) {
+        html += '<div class="citeer-blok"><span class="wb-kop">Exporteren</span>' +
+          '<p class="citeer-tekst">TEI-XML voor uitwisseling met andere (DH-)gereedschappen, ' +
+          'of de kale leestekst zonder noten en markup.</p>' +
+          '<button type="button" class="wb-uitklap" data-export="tei">TEI-XML</button> ' +
+          '<button type="button" class="wb-uitklap" data-export="tekst">Platte tekst</button></div>';
+      }
+      box.innerHTML = html;
+    }
+
+    // ---- Instellingen bewaren --------------------------------------------
+    var OPSLAG = 'editie-opts:' + location.pathname;
+    var herstelBezig = false;
+    function bewaarInstellingen() {
+      if (herstelBezig) return;
+      var st = { opts: {}, apps: {} };
+      root.querySelectorAll('.werkbalk input[id^="opt-"]').forEach(function (i) {
+        st.opts[i.id] = i.checked;
+      });
+      root.querySelectorAll('.werkbalk input[data-app]').forEach(function (i) {
+        st.apps[i.getAttribute('data-app')] = i.checked;
+      });
+      var modus = root.querySelector('input[name="modus"]:checked');
+      if (modus) st.modus = modus.value;
+      try { localStorage.setItem(OPSLAG, JSON.stringify(st)); } catch (e) {}
+    }
+    function herstelInstellingen() {
+      var st = null;
+      try { st = JSON.parse(localStorage.getItem(OPSLAG)); } catch (e) {}
+      if (!st) return;
+      herstelBezig = true;
+      function zet(input, waarde) {
+        if (!input || typeof waarde !== 'boolean' || input.checked === waarde) return;
+        input.checked = waarde;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      Object.keys(st.opts || {}).forEach(function (id) {
+        zet(root.querySelector('.werkbalk #' + id), st.opts[id]);
+      });
+      Object.keys(st.apps || {}).forEach(function (code) {
+        zet(root.querySelector('.werkbalk input[data-app="' + code + '"]'), st.apps[code]);
+      });
+      if (st.modus) {
+        var radio = root.querySelector('input[name="modus"][value="' + st.modus + '"]');
+        if (radio && !radio.checked) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+      herstelBezig = false;
     }
 
     // Weergavemodus (doorlopend / per pagina) + pager
@@ -620,6 +843,7 @@
       if (vn) vn.disabled = i >= secties.length;
       huidig = i;
       history.replaceState(null, '', '#pagina-' + i);
+      updateOrigineel();
     }
     function zetModus(m) {
       if (m === 'bladeren') {
@@ -631,6 +855,10 @@
         root.classList.add('modus-doorlopend');
         root.classList.remove('modus-bladeren');
         if (pager) pager.hidden = true;
+        // Anders heropent een herlaad-actie de bladermodus via de hash.
+        if (/^#pagina-/.test(location.hash)) {
+          history.replaceState(null, '', location.pathname + location.search);
+        }
       }
     }
     // Beschikbaar voor register en inhoudsopgave: toon (in bladermodus) de
@@ -642,6 +870,7 @@
     var zoekMarks = [];
     var zoekIdx = -1;
     var zoekTimer;
+    var huidigPatroon = null; // actief zoekpatroon, ook voor kantnoten/popover
 
     function veldWaarde() { return veld ? veld.value.trim() : ''; }
 
@@ -661,28 +890,29 @@
       root.querySelectorAll('.zoektreffer').forEach(function (m) {
         m.parentNode.replaceChild(document.createTextNode(m.textContent), m);
       });
-      root.querySelectorAll('.pagina .tekst').forEach(function (c) { c.normalize(); });
-      zoekMarks = []; zoekIdx = -1;
+      root.querySelectorAll('.pagina .tekst, .apparaat .noot-inhoud').forEach(function (c) { c.normalize(); });
+      zoekMarks = []; zoekIdx = -1; huidigPatroon = null;
     }
 
-    function wrapMatches(container, q) {
-      var ql = q.toLowerCase();
+    function wrapMatches(container, patroon) {
       var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
       var nodes = [];
       while (walker.nextNode()) nodes.push(walker.currentNode);
       nodes.forEach(function (node) {
-        var text = node.nodeValue, lower = text.toLowerCase(), idx = lower.indexOf(ql);
-        if (idx === -1) return;
-        var frag = document.createDocumentFragment(), last = 0;
-        while (idx !== -1) {
-          if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+        var text = node.nodeValue;
+        patroon.lastIndex = 0;
+        var frag = null, last = 0, m;
+        while ((m = patroon.exec(text))) {
+          if (!m[0]) { patroon.lastIndex++; continue; }
+          if (!frag) frag = document.createDocumentFragment();
+          if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
           var mark = document.createElement('mark');
           mark.className = 'zoektreffer';
-          mark.textContent = text.slice(idx, idx + q.length);
+          mark.textContent = m[0];
           frag.appendChild(mark);
-          last = idx + q.length;
-          idx = lower.indexOf(ql, last);
+          last = m.index + m[0].length;
         }
+        if (!frag) return;
         if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
         node.parentNode.replaceChild(frag, node);
       });
@@ -697,7 +927,22 @@
       zoekIdx = i;
       var sec = mark.closest('.pagina');
       if (sec && root.classList.contains('modus-bladeren')) activeer(+sec.getAttribute('data-i'));
-      mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Treffer in een noot terwijl de apparaten verborgen zijn (kantnoot-
+      // modus): klap de bijbehorende kantnoot open en laat die oplichten.
+      var nootLi = mark.closest('.apparaat li[data-noot]');
+      if (nootLi && root.classList.contains('kantnoten-aan')) {
+        var nootId = nootLi.getAttribute('data-noot');
+        uitgeklapt[nootId] = true;
+        herbereken();
+        var kn = root.querySelector('.kantnoot[data-noot="' + nootId + '"]');
+        if (kn) {
+          kn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          kn.classList.add('markeer');
+          setTimeout(function () { kn.classList.remove('markeer'); }, 1800);
+        }
+      } else {
+        mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       updateZoekStatus();
     }
 
@@ -705,8 +950,19 @@
       wisZoek();
       q = q.trim();
       if (q.length < 2) { updateZoekStatus(); return; }
-      root.querySelectorAll('.pagina .tekst').forEach(function (c) { wrapMatches(c, q); });
-      zoekMarks = [].slice.call(root.querySelectorAll('.zoektreffer'));
+      var tolerantKnop = root.querySelector('#opt-tolerant');
+      var patroon = maakZoekPatroon(q, !tolerantKnop || tolerantKnop.checked);
+      if (!patroon) { updateZoekStatus(); return; }
+      huidigPatroon = patroon;
+      root.querySelectorAll('.pagina .tekst').forEach(function (c) { wrapMatches(c, patroon); });
+      // Ook de noten doorzoeken (alleen apparaten die aan staan).
+      root.querySelectorAll('.pagina .apparaat').forEach(function (sectie) {
+        if (root.classList.contains('verberg-app-' + sectie.getAttribute('data-code'))) return;
+        sectie.querySelectorAll('.noot-inhoud').forEach(function (c) { wrapMatches(c, patroon); });
+      });
+      zoekMarks = [].slice.call(root.querySelectorAll('.pagina .zoektreffer'));
+      // Kantnoten zijn kopieën van de noten: markeer de term daar ook.
+      if (root.classList.contains('kantnoten-aan')) herbereken();
       updateZoekStatus();
       if (zoekMarks.length) gaNaarTreffer(0);
     }
@@ -721,10 +977,15 @@
       });
     }
 
-    var pop = document.createElement('div');
-    pop.className = 'noot-popover';
+    // Hergebruik één popover-element, ook als render() meermaals draait
+    // (zoals in het live voorbeeld van de editor).
+    var pop = document.querySelector('.noot-popover');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.className = 'noot-popover';
+      document.body.appendChild(pop);
+    }
     pop.hidden = true;
-    document.body.appendChild(pop);
 
     function toonPopover(el) {
       var id = el.getAttribute('data-noot');
@@ -734,6 +995,7 @@
       var app = apparaatVan(config, n.code);
       pop.innerHTML = '<span class="pop-lemma">' + n.labelHtml + '</span>' +
         '<span class="pop-inhoud">' + n.inhoudHtml + '</span>';
+      if (huidigPatroon) wrapMatches(pop, huidigPatroon);
       pop.style.setProperty('--kleur', app.kleur);
       pop.hidden = false;
       var rect = el.getBoundingClientRect();
@@ -769,7 +1031,8 @@
     });
     root.addEventListener('focusout', verbergPopover);
     // Op touch/smal scherm: tik buiten een lemma of de popover sluit hem.
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function buitenKlik(e) {
+      if (!root.isConnected) { document.removeEventListener('click', buitenKlik); return; }
       if (root.classList.contains('kantnoten-aan')) return;
       if (e.target.closest('.tekst .lemma') || e.target.closest('.noot-popover')) return;
       verbergPopover();
@@ -788,10 +1051,29 @@
         }
         return;
       }
+      var ex = e.target.closest('[data-export]');
+      if (ex && root._bron) {
+        var exNaam = (config.meta.titel || 'editie').toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'editie';
+        if (ex.getAttribute('data-export') === 'tei') {
+          downloadBestand(exNaam + '.xml', naarTEI(root._bron), 'application/xml');
+        } else {
+          downloadBestand(exNaam + '.txt', naarTekst(root._bron), 'text/plain');
+        }
+        return;
+      }
+      var kop = e.target.closest('[data-kopieer]');
+      if (kop) {
+        var citeerBox = kop.closest('.citeer-blok');
+        var citeerP = citeerBox && citeerBox.querySelector('.citeer-tekst');
+        if (citeerP) kopieer(citeerP.textContent, function () { melding('Gekopieerd naar het klembord'); });
+        return;
+      }
       var up = e.target.closest('.wb-uitklap');
       if (up) {
         var panel = document.getElementById(up.getAttribute('aria-controls'));
         if (!panel) return;
+        if (panel.id === 'wb-citeer' && panel.hidden) vulCiteer();
         var open = panel.hidden;
         // Sluit eventuele andere open werkbalkpanelen.
         root.querySelectorAll('.wb-uitklap').forEach(function (b) {
@@ -827,6 +1109,17 @@
       if (zb) { gaNaarTreffer(zoekIdx + (zb.getAttribute('data-zoek') === 'volgende' ? 1 : -1)); return; }
       var pg = e.target.closest('[data-pager]');
       if (pg) { activeer(huidig + (pg.getAttribute('data-pager') === 'volgende' ? 1 : -1)); return; }
+      // Klik op een zichtbaar regelnummer: kopieer een permalink naar de regel.
+      var rnr = e.target.closest('.tekst .rnr');
+      if (rnr && rnr.textContent) {
+        var tregel = rnr.closest('.tregel');
+        if (tregel) {
+          kopieer(location.origin + location.pathname + '#' + tregel.id, function () {
+            melding('Link naar regel ' + tregel.getAttribute('data-n') + ' gekopieerd');
+          });
+        }
+        return;
+      }
       var lemma = e.target.closest('.tekst .lemma');
       if (lemma) {
         var id = lemma.getAttribute('data-noot');
@@ -858,11 +1151,13 @@
 
     root.addEventListener('change', function (e) {
       var t = e.target;
-      if (t.name === 'modus') { zetModus(t.value); herberekenLater(); return; }
+      if (t.name === 'modus') { zetModus(t.value); herberekenLater(); bewaarInstellingen(); return; }
       if (t.classList.contains('pager-select')) { activeer(+t.value); return; }
       if (t.matches('input[data-app]')) {
         root.classList.toggle('verberg-app-' + t.getAttribute('data-app'), !t.checked);
         herberekenLater();
+        // Trefferlijst bijwerken: noten van dit apparaat tellen wel/niet mee.
+        if (veldWaarde().length >= 2) zoek(veld.value);
       } else if (t.id === 'opt-regelnr') {
         root.classList.toggle('geen-regelnr', !t.checked);
       } else if (t.id === 'opt-editie') {
@@ -874,7 +1169,15 @@
         herberekenLater();
       } else if (t.id === 'opt-markering') {
         root.classList.toggle('geen-markering', !t.checked);
+      } else if (t.id === 'opt-tolerant') {
+        if (veld && veld.value.trim().length >= 2) zoek(veld.value);
+      } else if (t.id === 'opt-origineel') {
+        root.classList.toggle('met-origineel', t.checked);
+        opDoel = null;
+        if (t.checked) updateOrigineel(true);
+        herberekenLater();
       }
+      if (t.closest('.werkbalk')) bewaarInstellingen();
     });
 
     // Startmodus uit de kop: een grote editie kan met `weergave: bladeren`
@@ -887,8 +1190,15 @@
       activeer(huidig);
     }
 
+    // Bewaarde weergave-instellingen van een vorig bezoek toepassen; een
+    // bewaarde modus wint van de startmodus uit de kop.
+    // De hash eerst vastleggen: het herstellen kan hem overschrijven.
+    var beginHash = location.hash;
+    herstelInstellingen();
+
     // Dieplink: #pagina-N opent direct in bladermodus op die pagina
-    var mh = location.hash.match(/^#pagina-(\d+)/);
+    // (een expliciete link wint van de bewaarde instellingen).
+    var mh = beginHash.match(/^#pagina-(\d+)/);
     if (mh && secties.length > 1) {
       var radio = root.querySelector('input[name="modus"][value="bladeren"]');
       if (radio) radio.checked = true;
@@ -896,7 +1206,75 @@
       activeer(+mh[1]);
     }
 
+    // Dieplink: #rN springt naar (en markeert) die regel.
+    var mr = beginHash.match(/^#r(\d+)$/);
+    if (mr) {
+      var regelEl = document.getElementById('r' + mr[1]);
+      if (regelEl) {
+        var regelPag = regelEl.closest('.pagina');
+        if (regelPag && root.classList.contains('modus-bladeren')) {
+          activeer(+regelPag.getAttribute('data-i'));
+        }
+        setTimeout(function () {
+          regelEl.scrollIntoView({ block: 'center' });
+          regelEl.classList.add('spring-actief');
+          setTimeout(function () { regelEl.classList.remove('spring-actief'); }, 2500);
+        }, 60);
+      }
+    }
+
+    // Sneltoetsen: '/' focust het zoekveld; ←/→ bladeren (in bladermodus).
+    document.addEventListener('keydown', function toetsen(e) {
+      if (!root.isConnected) { document.removeEventListener('keydown', toetsen); return; }
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === '/') {
+        var zv = root.querySelector('.zoekveld');
+        if (zv) { e.preventDefault(); zv.focus(); zv.select(); }
+        return;
+      }
+      if (!root.classList.contains('modus-bladeren')) return;
+      if (document.querySelector('.lightbox')) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); activeer(huidig - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); activeer(huidig + 1); }
+    });
+
     herbereken(); // kantlijnnoten plaatsen (indien breed genoeg)
+    updateOrigineel(true);
+  }
+
+  // ---- Spellingtolerant zoeken --------------------------------------------
+  // Vroegmoderne spelling varieert sterk (jaer/jair/yaer, Enchuijzen/Enkhuizen,
+  // Coppenhagen/Kopenhagen). Het tolerante zoekpatroon behandelt daarom
+  // letterklassen als inwisselbaar en klinkerclusters als één geheel.
+  var Z_VOCAAL = 'aeoàáâäãæèéêëòóôöõø';             // a/e/o-klinkers (clusteren onderling)
+  var Z_IJY = 'ijyìíîïýÿĲĳ';                        // i/j/y (aparte klasse: jaer/iaer/yaer)
+  var Z_KLASSEN = { u: 'uvùúûü', v: 'uvùúûü', s: 'sz', z: 'sz',
+                    c: 'ckç', k: 'ckç', d: 'dt', t: 'dt' };
+  function zoekEscape(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function maakZoekPatroon(q, tolerant) {
+    if (q.normalize) q = q.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    q = q.toLowerCase();
+    if (!tolerant) {
+      try { return new RegExp(zoekEscape(q), 'gi'); } catch (e) { return null; }
+    }
+    var stukken = [], vorige = null;
+    for (var i = 0; i < q.length; i++) {
+      var c = q.charAt(i);
+      var stuk;
+      if (Z_IJY.indexOf(c) !== -1) stuk = '[' + Z_IJY + ']+';
+      else if (Z_VOCAAL.indexOf(c) !== -1) stuk = '[' + Z_VOCAAL + ']+';
+      else if (Z_KLASSEN[c]) stuk = '[' + Z_KLASSEN[c] + ']+';
+      else if (c === 'g') stuk = 'g+h?';           // dagh / dag
+      else if (c === ' ') stuk = '\\s+';
+      else if (/[a-z0-9]/.test(c)) stuk = zoekEscape(c) + '+';
+      else stuk = zoekEscape(c);
+      if (stuk === vorige) continue;               // klinker-/lettercluster samenvouwen
+      stukken.push(stuk);
+      vorige = stuk;
+    }
+    try { return new RegExp(stukken.join(''), 'gi'); } catch (e) { return null; }
   }
 
   // ---- Origineel (scan of pdf) --------------------------------------------
@@ -912,14 +1290,82 @@
     var box = document.createElement('div');
     box.className = 'lightbox';
     box.innerHTML = '<div class="lb-binnen"><button class="lb-sluit" aria-label="Sluiten">×</button>' +
-      '<img src="' + src + '" alt="' + escapeHtml(bijschrift) + '">' +
+      '<div class="lb-knoppen">' +
+      '<button class="lb-zoomknop" data-lb="uit" title="Uitzoomen (−)">−</button>' +
+      '<button class="lb-zoomknop" data-lb="in" title="Inzoomen (+)">+</button>' +
+      '<button class="lb-zoomknop" data-lb="reset" title="Herstel (0)">⟲</button>' +
+      '</div>' +
+      '<div class="lb-canvas"><img src="' + escapeHtml(src) + '" alt="' + escapeHtml(bijschrift) + '" draggable="false"></div>' +
       '<div class="lb-bijschrift">' + escapeHtml(bijschrift) + '</div></div>';
-    function sluit() { box.remove(); document.removeEventListener('keydown', esc); }
-    function esc(e) { if (e.key === 'Escape') sluit(); }
+
+    var canvas = box.querySelector('.lb-canvas');
+    var img = box.querySelector('.lb-canvas img');
+    var schaal = 1, tx = 0, ty = 0;
+    function pasToe() {
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + schaal + ')';
+      canvas.classList.toggle('gezoomd', schaal > 1);
+    }
+    // Zoom naar een punt (px,py in canvas-coördinaten t.o.v. het midden).
+    function zoomNaar(px, py, nieuw) {
+      nieuw = Math.max(1, Math.min(8, nieuw));
+      if (nieuw === 1) { tx = 0; ty = 0; }
+      else {
+        tx = px - (px - tx) * (nieuw / schaal);
+        ty = py - (py - ty) * (nieuw / schaal);
+      }
+      schaal = nieuw;
+      pasToe();
+    }
+    function midden(e) {
+      var r = canvas.getBoundingClientRect();
+      return [e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2];
+    }
+    canvas.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      var p = midden(e);
+      zoomNaar(p[0], p[1], schaal * (e.deltaY < 0 ? 1.18 : 1 / 1.18));
+    }, { passive: false });
+    canvas.addEventListener('dblclick', function (e) {
+      var p = midden(e);
+      zoomNaar(p[0], p[1], schaal > 1.5 ? 1 : 2.5);
+    });
+    // Slepen (pan) met pointer events; werkt ook op touch.
+    var sleep = null;
+    canvas.addEventListener('pointerdown', function (e) {
+      if (schaal <= 1) return;
+      sleep = { x: e.clientX - tx, y: e.clientY - ty };
+      canvas.setPointerCapture(e.pointerId);
+      canvas.classList.add('sleept');
+    });
+    canvas.addEventListener('pointermove', function (e) {
+      if (!sleep) return;
+      tx = e.clientX - sleep.x;
+      ty = e.clientY - sleep.y;
+      pasToe();
+    });
+    function sleepKlaar() { sleep = null; canvas.classList.remove('sleept'); }
+    canvas.addEventListener('pointerup', sleepKlaar);
+    canvas.addEventListener('pointercancel', sleepKlaar);
+
+    function sluit() { box.remove(); document.removeEventListener('keydown', toetsen); }
+    function toetsen(e) {
+      if (e.key === 'Escape') sluit();
+      else if (e.key === '+' || e.key === '=') zoomNaar(0, 0, schaal * 1.4);
+      else if (e.key === '-') zoomNaar(0, 0, schaal / 1.4);
+      else if (e.key === '0') zoomNaar(0, 0, 1);
+    }
     box.addEventListener('click', function (e) {
+      var knop = e.target.closest('[data-lb]');
+      if (knop) {
+        var wat = knop.getAttribute('data-lb');
+        if (wat === 'in') zoomNaar(0, 0, schaal * 1.4);
+        else if (wat === 'uit') zoomNaar(0, 0, schaal / 1.4);
+        else zoomNaar(0, 0, 1);
+        return;
+      }
       if (e.target === box || e.target.closest('.lb-sluit')) sluit();
     });
-    document.addEventListener('keydown', esc);
+    document.addEventListener('keydown', toetsen);
     document.body.appendChild(box);
   }
 
@@ -1066,8 +1512,227 @@
     });
   }
 
+  // ---- Export: TEI-XML en platte tekst ------------------------------------
+  function xmlEsc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+  }
+  // Typografie en editeursingrepen naar TEI-elementen (invoer is al ge-escaped).
+  function teiOpmaak(s) {
+    s = s.replace(/\{(\w+):([\s\S]*?)\}/g, function (m, code, body) {
+      switch (code) {
+        case 'sc':   return '<hi rend="smallcaps">' + body + '</hi>';
+        case 'sup':  return '<hi rend="superscript">' + body + '</hi>';
+        case 'sub':  return '<hi rend="subscript">' + body + '</hi>';
+        case 'del':  return '<del>' + body + '</del>';
+        case 'ul':   return '<hi rend="underline">' + body + '</hi>';
+        case 'sp':   return '<hi rend="letterspace">' + body + '</hi>';
+        case 'add':  return '<supplied resp="#editeur">' + body + '</supplied>';
+        case 'unc':  return '<unclear>' + body + '</unclear>';
+        case 'ex':   return '<expan>' + body + '</expan>';
+        case 'ab':   return '<ex>' + body + '</ex>';
+        case 'gap':  return '<gap reason="' + (body || 'onleesbaar') + '"/>';
+        case 'rood': return '<hi rend="rubricated">' + body + '</hi>';
+        case 'init': return '<hi rend="initial">' + body + '</hi>';
+        case 'itl':  return '<add place="above">' + body + '</add>';
+        case 'marg': return '<add place="margin">' + body + '</add>';
+        default:     return body;
+      }
+    });
+    s = s.replace(/\*\*([\s\S]+?)\*\*/g, '<hi rend="bold">$1</hi>');
+    s = s.replace(/\*([^*]+)\*/g, '<hi rend="italic">$1</hi>');
+    return s;
+  }
+  // Noten ([[lemma|code|inhoud]], genest) naar seg/note.
+  function teiSegment(s, config) {
+    var out = '', i = 0;
+    while (i < s.length) {
+      var open = s.indexOf('[[', i);
+      if (open === -1) { out += teiOpmaak(s.slice(i)); break; }
+      out += teiOpmaak(s.slice(i, open));
+      var close = matchClose(s, open + 2);
+      if (close === -1) { out += teiOpmaak(s.slice(open)); break; }
+      var velden = splitTop(s.slice(open + 2, close));
+      var lemma = (velden[0] || '').trim();
+      var code = (velden[1] || '').trim();
+      var inhoud = velden.slice(2).join('|').trim();
+      var app = apparaatVan(config, code);
+      if (!app) {
+        out += teiSegment(lemma, config);
+      } else {
+        out += '<seg>' + teiSegment(lemma, config) +
+          '<note type="' + xmlEsc(code) + '" resp="' +
+          (app.soort === 'origineel' ? '#auteur' : '#editeur') + '">' +
+          teiSegment(inhoud, config) + '</note></seg>';
+      }
+      i = close + 2;
+    }
+    return out;
+  }
+  function naarTEI(tekst) {
+    var parsed = parseKop(tekst);
+    var config = parsed.config, meta = config.meta;
+    var regels = parsed.body.replace(/\r\n/g, '\n').split('\n');
+    var stap = parseInt(meta.regelnummering, 10) || 0;
+    var uit = [], inP = false, regelnr = 0;
+    function sluitP() { if (inP) { uit.push('</p>'); inP = false; } }
+
+    for (var i = 0; i < regels.length; i++) {
+      var t = regels[i].trim();
+      if (t === '') { sluitP(); continue; }
+      var kop = t.match(/^(#{1,3})\s+(.*)$/);
+      if (kop) {
+        sluitP();
+        uit.push('<head type="niveau-' + kop[1].length + '">' +
+          teiSegment(xmlEsc(kop[2]), config) + '</head>');
+        continue;
+      }
+      var fig = t.match(/^!\[([\s\S]*?)\]\(([^)]+)\)\s*(\{breed\})?\s*$/);
+      if (fig) {
+        sluitP();
+        uit.push('<figure><graphic url="' + xmlEsc(fig[2].trim()) + '"/>' +
+          (fig[1].trim() ? '<figDesc>' + teiOpmaak(xmlEsc(fig[1].trim())) + '</figDesc>' : '') +
+          '</figure>');
+        continue;
+      }
+      if (/^@\s/.test(t)) {
+        var dm = parseDag(t.slice(1).trim());
+        if (dm) {
+          sluitP();
+          uit.push('<milestone unit="day" when="' + xmlEsc(dm.key) + '"' +
+            (dm.kal === 'sv' ? ' style="julian"' : '') +
+            ' n="' + xmlEsc(dm.label) + '"/>');
+          continue;
+        }
+      }
+      if (t.charAt(0) === '~') {
+        var pm = t.slice(1).split('|').map(function (x) { return x.trim(); });
+        sluitP();
+        uit.push('<pb n="' + xmlEsc(pm[0] || '') + '"' +
+          (pm[1] ? ' facs="' + xmlEsc(pm[1]) + '"' : '') + '/>');
+        continue;
+      }
+      if (t.charAt(0) === '|') {
+        sluitP();
+        var rijen = [];
+        while (i < regels.length && regels[i].trim().charAt(0) === '|') { rijen.push(regels[i].trim()); i++; }
+        i--;
+        uit.push('<table>');
+        rijen.forEach(function (rij) {
+          if (isScheidingsrij(rij)) return;
+          uit.push('<row>' + tabelCellen(rij).map(function (c) {
+            return '<cell>' + teiSegment(xmlEsc(c), config) + '</cell>';
+          }).join('') + '</row>');
+        });
+        uit.push('</table>');
+        continue;
+      }
+      var li = t.match(/^([-*]|\d+\.)\s+(.*)$/);
+      if (li) {
+        sluitP();
+        uit.push('<list rend="' + (/\d/.test(li[1]) ? 'numbered' : 'bulleted') + '">');
+        while (i < regels.length) {
+          var lm = regels[i].trim().match(/^([-*]|\d+\.)\s+(.*)$/);
+          if (!lm) break;
+          uit.push('<item>' + teiSegment(xmlEsc(lm[2]), config) + '</item>');
+          i++;
+        }
+        i--;
+        uit.push('</list>');
+        continue;
+      }
+      // gewone tekstregel
+      regelnr++;
+      if (!inP) { uit.push('<p>'); inP = true; }
+      uit.push((stap > 0 ? '<lb n="' + regelnr + '"/>' : '') +
+        teiSegment(xmlEsc(regels[i]), config));
+    }
+    sluitP();
+
+    var kopj = [];
+    kopj.push('<?xml version="1.0" encoding="UTF-8"?>');
+    kopj.push('<TEI xmlns="http://www.tei-c.org/ns/1.0">');
+    kopj.push('<teiHeader><fileDesc><titleStmt>');
+    kopj.push('<title>' + xmlEsc(meta.titel || 'Editie') + '</title>');
+    if (meta.auteur) kopj.push('<author>' + xmlEsc(meta.auteur) + '</author>');
+    kopj.push('<respStmt xml:id="editeur"><resp>editeursnoten</resp><name>de editeur</name></respStmt>');
+    kopj.push('<respStmt xml:id="auteur"><resp>oorspronkelijke noten</resp><name>' +
+      xmlEsc(meta.auteur || 'de auteur') + '</name></respStmt>');
+    kopj.push('</titleStmt>');
+    kopj.push('<publicationStmt><p>Automatische TEI-export uit het Edities-platform.</p></publicationStmt>');
+    kopj.push('<sourceDesc><p>' + xmlEsc([meta.bron, meta.jaar, meta.type]
+      .filter(function (x) { return x; }).join(' · ') || 'Onbekende bron') + '</p></sourceDesc>');
+    kopj.push('</fileDesc>');
+    if (config.apparaten.length) {
+      kopj.push('<encodingDesc><editorialDecl>');
+      kopj.push('<p>Notenapparaten (het type-attribuut van elke note): ' +
+        xmlEsc(config.apparaten.map(function (a) {
+          return a.code + ' = ' + a.label + ' (' + a.soort + ')';
+        }).join('; ')) + '.</p>');
+      kopj.push('</editorialDecl></encodingDesc>');
+    }
+    kopj.push('</teiHeader>');
+    var personen = config.register.filter(function (r) { return r.soort === 'persoon'; });
+    var plaatsen = config.register.filter(function (r) { return r.soort === 'plaats'; });
+    if (personen.length || plaatsen.length) {
+      kopj.push('<standOff>');
+      function naamlijst(items, lijstTag, itemTag, naamTag) {
+        var u = ['<' + lijstTag + '>'];
+        items.forEach(function (ing) {
+          u.push('<' + itemTag + '><' + naamTag + '>' + xmlEsc(ing.naam) + '</' + naamTag + '>' +
+            ing.varianten.filter(function (v) { return v !== ing.naam; }).map(function (v) {
+              return '<' + naamTag + ' type="variant">' + xmlEsc(v) + '</' + naamTag + '>';
+            }).join('') + '</' + itemTag + '>');
+        });
+        u.push('</' + lijstTag + '>');
+        return u.join('\n');
+      }
+      if (personen.length) kopj.push(naamlijst(personen, 'listPerson', 'person', 'persName'));
+      if (plaatsen.length) kopj.push(naamlijst(plaatsen, 'listPlace', 'place', 'placeName'));
+      kopj.push('</standOff>');
+    }
+    return kopj.join('\n') + '\n<text><body>\n' + uit.join('\n') + '\n</body></text>\n</TEI>\n';
+  }
+
+  // Kale leestekst: noten worden hun lemma, markup verdwijnt.
+  function naarTekst(tekst) {
+    var parsed = parseKop(tekst);
+    var regels = parsed.body.replace(/\r\n/g, '\n').split('\n');
+    var uit = [];
+    regels.forEach(function (r) {
+      var t = r.trim();
+      if (/^!\[/.test(t) || t.charAt(0) === '~' || /^@\s/.test(t)) return;
+      var kop = t.match(/^(#{1,3})\s+(.*)$/);
+      var inhoud = kop ? kop[2] : r;
+      var vorig;
+      do { // binnenste noten eerst, tot alles is teruggebracht tot het lemma
+        vorig = inhoud;
+        inhoud = inhoud.replace(/\[\[((?:(?!\[\[)[\s\S])*?)\]\]/g, function (m, p) {
+          return splitTop(p)[0];
+        });
+      } while (inhoud !== vorig);
+      do {
+        vorig = inhoud;
+        inhoud = inhoud.replace(/\{\w+:([^{}]*)\}/g, '$1');
+      } while (inhoud !== vorig);
+      inhoud = inhoud.replace(/\*+/g, '');
+      uit.push(inhoud.replace(/\s+$/, ''));
+    });
+    return uit.join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+  }
+
+  function downloadBestand(naam, inhoud, mime) {
+    var blob = new Blob([inhoud], { type: mime + ';charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = naam;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
   // ---- Publiek ------------------------------------------------------------
   function render(root, tekst) {
+    root._bron = tekst; // voor export (TEI / platte tekst)
     var parsed = parseKop(tekst);
     var config = parsed.config;
     // achterwaartse compatibiliteit: facsimile_* -> origineel_*
@@ -1095,8 +1760,8 @@
     var heeftNummers = parseInt(meta.regelnummering, 10) > 0;
     var meerdere = body.paginas.length > 1;
     var paginasHtml = body.paginas.map(function (p, idx) {
-      return '<section class="pagina" data-i="' + (idx + 1) + '" data-label="' +
-        escapeHtml(p.label || ('[' + (idx + 1) + ']')) + '">' +
+      return '<section class="pagina" data-i="' + (idx + 1) + '" data-doel="' + escapeHtml(p.doel || '') +
+        '" data-label="' + escapeHtml(p.label || ('[' + (idx + 1) + ']')) + '">' +
         '<div class="tekst">' + p.uit.join('\n') + '</div>' +
         renderApparaten(config, p.noten, heeftNummers) +
         '</section>';
@@ -1106,7 +1771,7 @@
       kop +
       renderWerkbalk(config, body.noten, meerdere, body.koppen, body.dagen) +
       (meerdere ? bouwPager(body.paginas) : '') +
-      paginasHtml;
+      '<div class="paginas">' + paginasHtml + '</div>';
     var startBladeren = body.paginas.length > 1 && meta.weergave === 'bladeren';
     root.classList.add(startBladeren ? 'modus-bladeren' : 'modus-doorlopend');
     if (!heeftNummers) root.classList.add('geen-regelnr'); // geen lege nummer-goot
@@ -1132,5 +1797,8 @@
       });
   }
 
-  global.Editie = { laad: laad, render: render, parseKop: parseKop };
+  global.Editie = {
+    laad: laad, render: render, parseKop: parseKop,
+    naarTEI: naarTEI, naarTekst: naarTekst
+  };
 })(window);
