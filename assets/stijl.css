@@ -281,7 +281,7 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .geen-editiemark .pagina-nr { display: none; }
 .kantnoot .kn-lemma { font-weight: 600; color: var(--inkt); }
 .kantnoot .kn-lemma::after { content: " |"; color: var(--inkt-zacht); font-weight: 400; }
-.kantnoot .lemma { text-decoration: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */
+.kantnoot .lemma { border-bottom: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */
 .kantnoot.actief { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 0 0 4px 4px; }
 
 /* Inklapbare kantnoten: grote noten tonen standaard ~3 regels zodat ze op
@@ -341,21 +341,20 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 
 /* ---- Lemma's (geen markeringstekens; subtiele onderstreping + hover) ----- */
 .lemma {
-  /* text-decoration hugt de letters zelf (i.p.v. border-bottom, die op de
-     onderkant van de regelhoogte tekent en bij ruime leesregels als een losse
-     streep onder de hele regel oogt — verschilt dan per schermbreedte). */
-  text-decoration: underline dotted color-mix(in srgb, var(--kleur) 85%, transparent);
-  text-decoration-thickness: 2px; text-underline-offset: .16em;
+  /* border-bottom i.p.v. text-decoration: rendert in álle browsers (ook
+     Safari) identiek en duidelijk zichtbaar; de streep hugt de onderkant van
+     het woord (content-box, niet de hele regelhoogte). */
+  border-bottom: 2px dotted color-mix(in srgb, var(--kleur) 80%, transparent);
   cursor: pointer; outline: none;
 }
 .lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 2px; }
 /* Omvattende noot (bevat een geneste noot): dubbele onderstreping i.p.v. tint,
    zodat het geneste woord zijn eigen enkele stippellijn behoudt */
 .lemma.heeft-nest {
-  text-decoration-style: double;
+  border-bottom: 3px double color-mix(in srgb, var(--kleur) 80%, transparent);
 }
 /* "Markeer geannoteerde woorden" uit: onderstreping weg, hover blijft werken */
-.geen-markering .lemma { text-decoration: none; }
+.geen-markering .lemma { border-bottom: none; }
 .geen-markering .lemma:hover, .geen-markering .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); }
 /* Per-apparaat verbergen wordt per code via een JS-stijlblok gezet */
 

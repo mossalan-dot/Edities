@@ -1800,7 +1800,7 @@
 
     var verbergCss = config.apparaten.map(function (a) {
       var c = a.code;
-      return '.verberg-app-' + c + ' .lemma.app-' + c + '{text-decoration:none;cursor:text;background:none}' +
+      return '.verberg-app-' + c + ' .lemma.app-' + c + '{border-bottom:none;cursor:text;background:none}' +
              '.verberg-app-' + c + ' .apparaat[data-code="' + c + '"]{display:none}';
     }).join('\n');
 
