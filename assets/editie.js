@@ -372,6 +372,15 @@
     }
     return y * 10000 + mo * 100 + d;
   }
+  var MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni',
+                 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  // Maandkop uit een chronologische sleutel (YYYYMMDD): "juni 1672", of enkel
+  // het jaar als er geen maand bekend is.
+  function maandLabel(sleutel) {
+    var y = Math.floor(sleutel / 10000);
+    var mo = Math.floor(sleutel / 100) % 100;
+    return (mo ? MAANDEN[mo] + ' ' : '') + y;
+  }
   // Ontleedt  SLEUTEL[/SLEUTEL2] [sv|sn] | LABEL .
   function parseDag(s) {
     var pipe = s.indexOf('|');
@@ -433,8 +442,9 @@
     uit.push('<span class="zoek-status" aria-live="polite"></span>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="vorige" title="Vorige treffer" disabled hidden>‹</button>');
     uit.push('<button type="button" class="zoek-knop" data-zoek="volgende" title="Volgende treffer" disabled hidden>›</button>');
-    uit.push('<label class="wb-opt wb-tolerant" title="Vind ook historische spellingvarianten: u/v, i/j/y, c/k, s/z, d/t, g(h), klinkerclusters en accenten — bijv. Enkhuizen vindt Enchuijzen">' +
-             '<input type="checkbox" id="opt-tolerant" checked> ≈ spelling</label>');
+    // Spellingtolerant zoeken is de standaard (u/v, i/j/y, c/k, s/z, d/t, g(h),
+    // klinkerclusters, accenten). Er is geen zichtbaar vinkje meer voor: het
+    // gebeurt altijd, zodat bv. Enkhuizen ook Enchuijzen vindt.
     uit.push('</div>');
     uit.push('<div class="wb-knoppen">');
     if (heeftInhoud) {
@@ -445,13 +455,11 @@
       uit.push('<button type="button" class="wb-uitklap wb-dagen-knop" aria-expanded="false" aria-controls="wb-dagen">' +
                'Dagen <span class="wb-caret">▾</span></button>');
     }
-    uit.push('<button type="button" class="wb-uitklap wb-citeer-knop" aria-expanded="false" aria-controls="wb-citeer">' +
-             'Citeer <span class="wb-caret">▾</span></button>');
     uit.push('<button type="button" class="wb-uitklap" aria-expanded="false" aria-controls="wb-instellingen">' +
              'Weergave <span class="wb-caret">▾</span></button>');
     uit.push('</div>');
     uit.push('</div>'); // wb-boven
-    uit.push('<div class="wb-citeer" id="wb-citeer" hidden></div>');
+    // De Citeer-hulp (#wb-citeer) leeft in de editiekop, naast het type-label.
     if (heeftInhoud) {
       uit.push('<nav class="wb-inhoud" id="wb-inhoud" hidden aria-label="Inhoudsopgave">');
       uit.push('<ol class="inhoud-lijst">');
@@ -464,12 +472,34 @@
     }
     if (heeftDagen) {
       var chron = dagen.slice().sort(function (a, b) { return a.sleutel - b.sleutel; });
-      uit.push('<nav class="wb-dagen" id="wb-dagen" hidden aria-label="Dagen">');
-      uit.push('<ol class="dagen-lijst">');
+      // Groepeer per maand (YYYYMM uit de chronologische sleutel), zodat een
+      // lange reis eerst per maand te kiezen is en pas dan per dag.
+      var groepen = [], laatste = null;
       chron.forEach(function (d) {
-        uit.push('<li><a href="#" data-spring="' + d.id + '" data-pagina="' + d.pagina + '">' +
-          escapeHtml(d.label) +
-          (d.stijl ? ' <span class="db-stijl">' + d.stijl + '</span>' : '') + '</a></li>');
+        var mk = Math.floor(d.sleutel / 100);   // YYYYMM
+        if (!laatste || laatste.key !== mk) {
+          laatste = { key: mk, label: maandLabel(d.sleutel), dagen: [] };
+          groepen.push(laatste);
+        }
+        laatste.dagen.push(d);
+      });
+      var openBijStart = groepen.length <= 1;   // één maand: meteen open
+      uit.push('<nav class="wb-dagen" id="wb-dagen" hidden aria-label="Dagen">');
+      uit.push('<ol class="dagen-maanden">');
+      groepen.forEach(function (g) {
+        uit.push('<li class="dagmaand">');
+        uit.push('<button type="button" class="dagmaand-knop' + (openBijStart ? ' open' : '') +
+          '" aria-expanded="' + (openBijStart ? 'true' : 'false') + '">' +
+          '<span class="dagmaand-naam">' + escapeHtml(g.label) + '</span>' +
+          '<span class="dagmaand-tel">' + g.dagen.length + '</span>' +
+          '<span class="wb-caret">▾</span></button>');
+        uit.push('<ol class="dagen-lijst"' + (openBijStart ? '' : ' hidden') + '>');
+        g.dagen.forEach(function (d) {
+          uit.push('<li><a href="#" data-spring="' + d.id + '" data-pagina="' + d.pagina + '">' +
+            escapeHtml(d.label) +
+            (d.stijl ? ' <span class="db-stijl">' + d.stijl + '</span>' : '') + '</a></li>');
+        });
+        uit.push('</ol></li>');
       });
       uit.push('</ol></nav>');
     }
@@ -1084,6 +1114,18 @@
         panel.hidden = !open;
         up.setAttribute('aria-expanded', String(open));
         up.classList.toggle('open', open);
+        return;
+      }
+      // Maand-accordeon in de Dagen-navigator: klap de dagen eronder open/dicht.
+      var mk = e.target.closest('.dagmaand-knop');
+      if (mk) {
+        var maandLijst = mk.nextElementSibling;
+        if (maandLijst) {
+          var opn = maandLijst.hidden;
+          maandLijst.hidden = !opn;
+          mk.setAttribute('aria-expanded', String(opn));
+          mk.classList.toggle('open', opn);
+        }
         return;
       }
       var sl = e.target.closest('[data-spring]');
@@ -1748,12 +1790,17 @@
       '<p class="editie-sub">' +
         (meta.auteur ? '<span>' + escapeHtml(meta.auteur) + '</span>' : '') +
         (meta.jaar ? '<span>' + escapeHtml(meta.jaar) + '</span>' : '') +
-        (meta.type ? '<span class="editie-bron">' + escapeHtml(meta.type.charAt(0).toUpperCase() + meta.type.slice(1)) + '</span>' : '') +
-      '</p></header>';
+        '<span class="editie-onderregel">' +
+          (meta.type ? '<span class="editie-bron">' + escapeHtml(meta.type.charAt(0).toUpperCase() + meta.type.slice(1)) + '</span>' : '') +
+          '<button type="button" class="editie-citeer wb-uitklap" aria-expanded="false" aria-controls="wb-citeer" title="Citeerhulp, permalink en export">❝ Citeer</button>' +
+        '</span>' +
+      '</p>' +
+      '<div class="wb-citeer" id="wb-citeer" hidden></div>' +
+      '</header>';
 
     var verbergCss = config.apparaten.map(function (a) {
       var c = a.code;
-      return '.verberg-app-' + c + ' .lemma.app-' + c + '{border-bottom:none;cursor:text;background:none}' +
+      return '.verberg-app-' + c + ' .lemma.app-' + c + '{text-decoration:none;cursor:text;background:none}' +
              '.verberg-app-' + c + ' .apparaat[data-code="' + c + '"]{display:none}';
     }).join('\n');
 

@@ -79,8 +79,12 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 /* ---- Editiehoofd -------------------------------------------------------- */
 .editie-kop h1 { font-size: 1.9rem; line-height: 1.15; margin: 0 0 .3rem; }
 .editie-sub { color: var(--inkt-zacht); font-family: var(--sans); font-size: .95rem; margin: 0 0 1.5rem; }
-.editie-sub span { margin-right: 1rem; }
-.editie-sub .editie-bron { display: block; margin-top: .3rem; font-style: italic; }
+.editie-sub > span { margin-right: 1rem; }
+.editie-onderregel { display: flex; align-items: center; gap: .7rem; margin-top: .4rem; }
+.editie-onderregel .editie-bron { font-style: italic; margin: 0; }
+/* Kleine Citeer-knop naast het type-label in de editiekop. */
+.editie-citeer { font-size: .78rem; padding: .18rem .7rem; }
+.editie-citeer::first-letter { color: var(--accent); }
 
 /* ---- Werkbalk ----------------------------------------------------------- */
 .werkbalk {
@@ -141,8 +145,25 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
   max-height: 22rem; overflow-y: auto;
 }
 .wb-dagen[hidden] { display: none; }
-.dagen-lijst { list-style: none; margin: 0; padding: 0;
+/* Maand-accordeon: eerst de maand kiezen, dan de dag. */
+.dagen-maanden { list-style: none; margin: 0; padding: 0; }
+.dagmaand + .dagmaand { border-top: 1px solid var(--lijn); }
+.dagmaand-knop {
+  display: flex; align-items: center; gap: .6rem; width: 100%;
+  background: none; border: 0; cursor: pointer; text-align: left;
+  padding: .45rem .3rem; font-family: var(--sans); font-size: .9rem; color: var(--inkt);
+}
+.dagmaand-knop:hover { color: var(--accent); }
+.dagmaand-naam { flex: 1 1 auto; text-transform: capitalize; }
+.dagmaand-tel {
+  font-size: .72rem; color: var(--inkt-zacht);
+  border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: 0 .5rem;
+}
+.dagmaand-knop .wb-caret { font-size: .7em; transition: transform .15s; }
+.dagmaand-knop.open .wb-caret { transform: rotate(180deg); }
+.dagen-lijst { list-style: none; margin: 0 0 .4rem; padding: 0 0 .2rem .3rem;
   columns: 2; column-gap: 1.5rem; }
+.dagen-lijst[hidden] { display: none; }
 .dagen-lijst li { break-inside: avoid; }
 .dagen-lijst a {
   display: block; text-decoration: none; color: var(--inkt);
@@ -260,7 +281,7 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .geen-editiemark .pagina-nr { display: none; }
 .kantnoot .kn-lemma { font-weight: 600; color: var(--inkt); }
 .kantnoot .kn-lemma::after { content: " |"; color: var(--inkt-zacht); font-weight: 400; }
-.kantnoot .lemma { border-bottom: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */
+.kantnoot .lemma { text-decoration: none; cursor: default; background: none; } /* geneste lemma's niet interactief in de marge */
 .kantnoot.actief { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 0 0 4px 4px; }
 
 /* Inklapbare kantnoten: grote noten tonen standaard ~3 regels zodat ze op
@@ -320,17 +341,21 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 
 /* ---- Lemma's (geen markeringstekens; subtiele onderstreping + hover) ----- */
 .lemma {
-  border-bottom: 1px dotted color-mix(in srgb, var(--kleur) 70%, transparent);
+  /* text-decoration hugt de letters zelf (i.p.v. border-bottom, die op de
+     onderkant van de regelhoogte tekent en bij ruime leesregels als een losse
+     streep onder de hele regel oogt — verschilt dan per schermbreedte). */
+  text-decoration: underline dotted color-mix(in srgb, var(--kleur) 70%, transparent);
+  text-decoration-thickness: 1px; text-underline-offset: .22em;
   cursor: pointer; outline: none;
 }
 .lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 2px; }
 /* Omvattende noot (bevat een geneste noot): dubbele onderstreping i.p.v. tint,
    zodat het geneste woord zijn eigen enkele stippellijn behoudt */
 .lemma.heeft-nest {
-  border-bottom: 3px double color-mix(in srgb, var(--kleur) 70%, transparent);
+  text-decoration-style: double;
 }
 /* "Markeer geannoteerde woorden" uit: onderstreping weg, hover blijft werken */
-.geen-markering .lemma { border-bottom: none; }
+.geen-markering .lemma { text-decoration: none; }
 .geen-markering .lemma:hover, .geen-markering .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); }
 /* Per-apparaat verbergen wordt per code via een JS-stijlblok gezet */
 
@@ -455,14 +480,34 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .hero p { color: var(--inkt-zacht); max-width: 40rem; margin: 0; }
 .kaarten { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
 .kaart {
-  border: 1px solid var(--lijn); border-radius: 12px; padding: 1.2rem 1.3rem;
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--lijn); border-radius: 12px;
   text-decoration: none; color: inherit; background: color-mix(in srgb, var(--papier) 94%, var(--accent));
-  transition: border-color .15s, transform .15s;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
 }
-.kaart:hover { border-color: var(--accent); transform: translateY(-2px); }
+.kaart:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+/* Beeldbanner bovenaan: handschriftscan waar beschikbaar, anders een
+   perkamenten vlak met een verlichte initiaal. */
+.k-beeld {
+  display: block; height: 8.5rem; overflow: hidden;
+  border-bottom: 1px solid var(--lijn);
+  background: color-mix(in srgb, var(--papier) 86%, var(--accent));
+}
+.k-beeld img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+.kaart:hover .k-beeld img { transform: scale(1.03); }
+.k-beeld img { transition: transform .3s ease; }
+.k-beeld-leeg {
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 3.4rem; line-height: 1;
+  color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    color-mix(in srgb, var(--papier) 82%, var(--accent));
+}
+.k-tekst { display: block; padding: 1.1rem 1.3rem 1.3rem; }
 .kaart h2 { font-size: 1.25rem; margin: 0 0 .3rem; }
 .kaart .k-meta { font-family: var(--sans); font-size: .82rem; color: var(--inkt-zacht); margin: 0 0 .6rem; }
-.kaart .k-tag { display: inline-block; font-family: var(--sans); font-size: .72rem; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .05rem .55rem; color: var(--inkt-zacht); }
+.kaart .k-tag { display: inline-block; font-family: var(--sans); font-size: .72rem; border: 1px solid var(--lijn-sterk); border-radius: 999px; padding: .05rem .55rem; color: var(--inkt-zacht); margin-bottom: .5rem; }
 .kaart p { margin: .5rem 0 0; font-size: .98rem; }
 
 /* Facsimile-galerij: rooster met handschriftscans */
@@ -768,9 +813,11 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
 .register-lijst dd .reg-link:hover { text-decoration: underline; }
 .register-lijst dd .reg-sep { color: var(--lijn); margin: 0 .35rem; }
 
-/* ---- Citeerhulp (uitklap in de werkbalk) -------------------------------- */
+/* ---- Citeerhulp (uitklap-kaart onder de editiekop) ---------------------- */
 .wb-citeer {
-  margin-top: .7rem; padding-top: .7rem; border-top: 1px solid var(--lijn);
+  margin: .2rem 0 1.4rem; padding: .9rem 1.1rem;
+  border: 1px solid var(--lijn); border-radius: 10px;
+  background: color-mix(in srgb, var(--papier) 94%, var(--accent));
   display: flex; gap: 2rem; flex-wrap: wrap;
 }
 .wb-citeer[hidden] { display: none; }
