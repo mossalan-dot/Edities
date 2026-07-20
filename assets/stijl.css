@@ -344,8 +344,8 @@ mark.zoektreffer.actief { background: #f2a13a; box-shadow: 0 0 0 2px #f2a13a; }
   /* text-decoration hugt de letters zelf (i.p.v. border-bottom, die op de
      onderkant van de regelhoogte tekent en bij ruime leesregels als een losse
      streep onder de hele regel oogt — verschilt dan per schermbreedte). */
-  text-decoration: underline dotted color-mix(in srgb, var(--kleur) 70%, transparent);
-  text-decoration-thickness: 1px; text-underline-offset: .22em;
+  text-decoration: underline dotted color-mix(in srgb, var(--kleur) 85%, transparent);
+  text-decoration-thickness: 2px; text-underline-offset: .16em;
   cursor: pointer; outline: none;
 }
 .lemma:hover, .lemma:focus { background: color-mix(in srgb, var(--kleur) 14%, transparent); border-radius: 2px; }
