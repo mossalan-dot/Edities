@@ -19,14 +19,19 @@ LAND = "scripts/data/kust-west-europa.geojson"
 
 # per editie: kmz, kleur, bbox, labels (term, weergavenaam, kant e/w/s)
 EDITIES = {
+    # De KMZ beslaat de héle reis 1674–1677: heenreis via Duitsland naar Italië
+    # én de terugreis door Zuid-Frankrijk. Vandaar de ruime uitsnede.
     "ruysch": dict(
-        kmz="edities/ruysch/reis.kmz", kleur="#7c3aed", bbox=(3.4, 42.4, 15.0, 54.6),
+        kmz="edities/ruysch/reis.kmz", kleur="#7c3aed", bbox=(-3.0, 40.2, 15.4, 54.8),
         labels=[("amsterdam", "Amsterdam", "e"), ("hambor", "Hamburg", "e"),
                 ("breemen", "Bremen", "w"), ("augsburg", "Augsburg", "e"),
                 ("ulm", "Ulm", "w"), ("bazel", "Bazel", "w"), ("bern", "Bern", "w"),
                 ("geneve", "Genève", "w"), ("turijn", "Turijn", "w"),
                 ("milaan", "Milaan", "e"), ("bologna", "Bologna", "e"),
-                ("florence", "Florence", "e"), ("livorno", "Livorno", "w")]),
+                ("florence", "Florence", "e"), ("livorno", "Livorno", "w"),
+                ("rome", "Rome", "e"), ("napels", "Napels", "e"),
+                ("tolouse", "Toulouse", "w"), ("narbonne", "Narbonne", "s"),
+                ("parijs", "Parijs", "w"), ("paris", "Parijs", "w")]),
     "hinlopen-1667": dict(
         kmz="edities/hinlopen-1667/reis.kmz", kleur="#b45309", bbox=(-3.2, 46.0, 6.6, 53.4),
         labels=[("hoorn", "Hoorn", "e"), ("amsterdam", "Amsterdam", "e"),
@@ -49,7 +54,33 @@ EDITIES = {
 
 
 def norm(s):
-    return re.sub(r"[^a-z]", "", s.lower())
+    """Kleine letters, alleen letters en spaties (accenten blijven staan)."""
+    return re.sub(r"[^a-z ]", "", s.lower())
+
+
+def past(term, plaats):
+    """Matcht als een woord in `plaats` met `term` begint.
+
+    Bewust niet 'term ergens in plaats': dan matchte 'hambor' (Hamburg) ook op
+    'Chambord' in de Loire, waardoor het label in Frankrijk belandde.
+    """
+    t = norm(term).strip()
+    return any(w.startswith(t) for w in norm(plaats).split() if t)
+
+
+def kies_stop(term, stops):
+    """De stop die het best bij een labelterm past.
+
+    Eerst een exacte plaatsnaam, pas daarna een woord dat ermee begint. Anders
+    won een tussenstop als 'Between Rome and Napels' het van het echte 'Rome'.
+    """
+    t = norm(term).strip()
+    for exact in (True, False):
+        for s in stops:
+            _, plaats = rk.plaats_van(s["naam"])
+            if (norm(plaats).strip() == t) if exact else past(term, plaats):
+                return s
+    return None
 
 
 def bouw(slug, cfg, ringen):
@@ -83,21 +114,20 @@ def bouw(slug, cfg, ringen):
     for term, disp, kant in cfg["labels"]:
         if disp in gedaan:
             continue
-        for s in stops:
-            _, plaats = rk.plaats_van(s["naam"])
-            if norm(term) in norm(plaats):
-                x, y = proj(s["lon"], s["lat"])
-                dx, dy, anker = (10, 4, "start")
-                if kant == "w":
-                    dx, dy, anker = -10, 4, "end"
-                elif kant == "s":
-                    dx, dy, anker = 0, 20, "middle"
-                o.append(f'<circle cx="{rk.fmt(x)}" cy="{rk.fmt(y)}" r="3" '
-                         f'fill="var(--inkt)" opacity="0.85"/>')
-                o.append(f'<text x="{rk.fmt(x + dx)}" y="{rk.fmt(y + dy)}" '
-                         f'text-anchor="{anker}">{rk.esc(disp)}</text>')
-                gedaan.add(disp)
-                break
+        s = kies_stop(term, stops)
+        if not s:
+            continue
+        x, y = proj(s["lon"], s["lat"])
+        dx, dy, anker = (10, 4, "start")
+        if kant == "w":
+            dx, dy, anker = -10, 4, "end"
+        elif kant == "s":
+            dx, dy, anker = 0, 20, "middle"
+        o.append(f'<circle cx="{rk.fmt(x)}" cy="{rk.fmt(y)}" r="3" '
+                 f'fill="var(--inkt)" opacity="0.85"/>')
+        o.append(f'<text x="{rk.fmt(x + dx)}" y="{rk.fmt(y + dy)}" '
+                 f'text-anchor="{anker}">{rk.esc(disp)}</text>')
+        gedaan.add(disp)
     o.append('</g>')
     o.append('</svg>')
     return "\n".join(o), len(stops), len(lijnen), len(gedaan)

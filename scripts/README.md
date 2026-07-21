@@ -72,11 +72,28 @@ python3 scripts/overzichtskaart.py --uit /tmp/reizen.kaart.svg
 ```
 
 Plak de inhoud van de SVG in `reizen.html` (tussen
-`<div class="reiskaart-omhulsel ov-kaart">` en `</div>`). De reizen (slug, KMZ,
-kleur, naam) staan bovenin het script in `REIZEN`; elke route wordt een
-klikbare `<g class="ov-reis" data-slug="…">`, zodat `reizen.html` er hover- en
-klikgedrag aan kan hangen. Elke editie heeft zijn eigen `reis.kmz` in de
-editiemap.
+`<div class="reiskaart-omhulsel ov-kaart">` en `</div>`). De reizen staan
+bovenin het script in `REIZEN` als `(slug, kmz, kleur, naam, ondertitel,
+editie)`. Elke route wordt een `<g class="ov-reis" data-slug="…">`, zodat
+`reizen.html` er hover- en klikgedrag aan kan hangen.
+
+Het laatste veld bepaalt het gedrag:
+
+| `editie` | Betekenis |
+|---|---|
+| pad naar de editie | Doorgetrokken lijn, grote stippen, **klikbaar** |
+| `None` | Gestippelde dunne lijn, kleinere stippen, **niet klikbaar** |
+
+Zo staan ook reizen op de kaart waarvan nog géén editie bestaat: hun KMZ komt
+uit het PhD-corpus en ligt in **`reizen/<slug>.kmz`** (edities houden hun eigen
+`reis.kmz` in de editiemap). De legenda van `reizen.html` wordt uit dezelfde
+`REIZEN`-lijst opgebouwd, met een `<a>` voor edities en een niet-klikbare
+`<span class="ov-item-leeg">` voor corpusroutes.
+
+Let op bij het toevoegen van een route: controleer of de nieuwe stops binnen
+de `--bbox` vallen (en of de kustlijn ver genoeg reikt), en of de
+oriëntatielabels nog op de juiste plaats landen — `kies_stop()` kiest eerst een
+exacte plaatsnaam en pas daarna een woord dat met de zoekterm begint.
 
 ## data/kust-west-europa.geojson
 
@@ -84,7 +101,7 @@ Zelfde bron als hieronder (Natural Earth 1:50m land), maar geknipt op een groter
 gebied zodat óók de zuidelijke reizen (Frankrijk, Italië) een kustlijn krijgen:
 
 ```bash
-python3 scripts/knip_kust.py /tmp/land50.geojson scripts/data/kust-west-europa.geojson -6,41,16,60
+python3 scripts/knip_kust.py /tmp/land50.geojson scripts/data/kust-west-europa.geojson -7,39,17,60
 ```
 
 ## data/kust-nw-europa.geojson
