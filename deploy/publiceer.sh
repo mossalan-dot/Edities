@@ -25,12 +25,18 @@ if [ "$SERVER" = "gebruiker@jouw-server" ]; then
 fi
 
 echo "Publiceren van $BRON -> $SERVER:$DOEL"
+# --delete ruimt op de server op wat hier niet (meer) staat. Mappen die van
+# een ánder project komen en dus niet in deze repo zitten, moeten daarvan
+# uitgezonderd worden:
+#   compendium/  — de statische site van mossalan-dot/Reisverslagen,
+#                  gepubliceerd met deploy/compendium.sh
 rsync -avz --delete \
 	--exclude '.git' \
 	--exclude 'deploy' \
 	--exclude '__pycache__' \
 	--exclude '*.pyc' \
 	--exclude '.DS_Store' \
+	--exclude 'compendium' \
 	"$BRON" "$SERVER:$DOEL/"
 
 echo "Klaar. De site staat op $SERVER:$DOEL"

@@ -93,13 +93,22 @@ def controleer_bron(pad, rel):
 
 
 # ---- html-verwijzingen ---------------------------------------------------
+# Mappen die wél op de webserver staan maar niet in deze repository, en dus
+# niet als ontbrekende verwijzing gemeld moeten worden. Zie deploy/.
+SERVERMAPPEN = ('compendium',)
+
 REF = re.compile(r'(?:src|href|data-bron)\s*=\s*"([^"]+)"')
 def controleer_html(pad, rel):
     tekst = open(pad, encoding='utf-8').read()
     basis = os.path.dirname(pad)
     for ref in REF.findall(tekst):
         if re.match(r'^(https?:|//|#|mailto:|data:|tel:)', ref): continue
-        doel = os.path.normpath(os.path.join(basis, ref.split('#')[0].split('?')[0]))
+        schoon = ref.split('#')[0].split('?')[0]
+        doel = os.path.normpath(os.path.join(basis, schoon))
+        # pad relatief aan de repo-wortel; begint dat met een servermap?
+        vanaf_wortel = os.path.relpath(doel, ROOT)
+        if vanaf_wortel.split(os.sep)[0] in SERVERMAPPEN:
+            continue
         if not os.path.exists(doel):
             fout(rel, 'verwijzing bestaat niet: %s' % ref)
 

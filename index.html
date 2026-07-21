@@ -3,24 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Edities — wetenschappelijke edities van vroegmoderne teksten</title>
-  <meta name="description" content="Platform voor wetenschappelijke edities van vroegmoderne gedrukte en handgeschreven teksten: regelnummering, togglebare notenapparaten, facsimiles, register en routekaarten.">
-  <meta property="og:title" content="Edities — wetenschappelijke edities van vroegmoderne teksten">
-  <meta property="og:description" content="Platform voor wetenschappelijke edities van vroegmoderne gedrukte en handgeschreven teksten: regelnummering, togglebare notenapparaten, facsimiles, register en routekaarten.">
+  <title>Reisverslagen en edities van vroegmoderne teksten</title>
+  <meta name="description" content="Twee ingangen: een compendium van handgeschreven reisverslagen uit de Nederlanden, en wetenschappelijke edities van vroegmoderne teksten.">
+  <meta property="og:title" content="Reisverslagen en edities van vroegmoderne teksten">
+  <meta property="og:description" content="Een compendium van handgeschreven reisverslagen uit de Nederlanden, en wetenschappelijke edities van vroegmoderne teksten.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="nl_NL">
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f766e'/%3E%3Ctext x='50' y='73' font-size='64' text-anchor='middle' fill='%23fff' font-family='Georgia,serif'%3EE%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/stijl.css">
+  <style>
+    .poorten { display: grid; gap: 1.4rem; margin: 2rem 0 0;
+      grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); }
+    .poort { display: flex; flex-direction: column; gap: .6rem;
+      border: 1px solid var(--lijn); border-radius: 14px; padding: 1.6rem 1.7rem 1.8rem;
+      text-decoration: none; color: inherit;
+      background: color-mix(in srgb, var(--papier) 94%, var(--accent));
+      transition: border-color .15s, transform .15s, box-shadow .15s; }
+    .poort:hover { border-color: var(--accent); transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+    .poort h2 { font-size: 1.5rem; margin: 0; }
+    .poort .p-cijfers { font-family: var(--sans); font-size: .82rem; color: var(--inkt-zacht); }
+    .poort p { margin: 0; font-size: 1rem; }
+    .poort .p-ga { font-family: var(--sans); font-size: .9rem; color: var(--accent); margin-top: auto; padding-top: .6rem; }
+  </style>
 </head>
 <body>
   <header class="sitehoofd">
     <div class="binnen">
-      <span class="merk"><a href="index.html">Edities</a></span>
+      <span class="merk"><a href="index.html">Reisverslagen</a></span>
       <nav>
-        <a href="index.html">Overzicht</a>
+        <a href="edities.html">Edities</a>
         <a href="reizen.html">Reizen</a>
-        <a href="editor.html">Editor</a>
+        <a href="compendium/">Compendium</a>
         <button class="thema-knop" type="button" data-thema-knop>Licht / donker</button>
       </nav>
     </div>
@@ -28,112 +43,37 @@
 
   <main class="wrap">
     <section class="hero">
-      <h1>Edities</h1>
+      <h1>Reisverslagen</h1>
+      <p>Handgeschreven reisverslagen van reizigers uit de Nederlanden — beschreven én
+      uitgegeven. Twee ingangen, onderling gekoppeld: het compendium beschrijft wáár de
+      handschriften zijn, de edities geven de teksten zelf.</p>
     </section>
 
-    <div class="kaarten">
-      <a class="kaart kaart-reizen" href="reizen.html">
-        <span class="k-beeld k-beeld-leeg" aria-hidden="true">❦</span>
-        <span class="k-tekst">
-          <span class="k-tag">kaart · alle reizen</span>
-          <h2>Reizen op één kaart</h2>
-          <p class="k-meta">Overzichtskaart van alle routes</p>
-          <p>Alle ontsloten reizen samen op één kaart van West-Europa. Beweeg over een route
-          om die op te lichten en klik door naar de editie; elke stip is een gedateerde
-          pleisterplaats.</p>
-        </span>
+    <div class="poorten">
+      <a class="poort" href="compendium/">
+        <h2>Compendium</h2>
+        <span class="p-cijfers">651 reizen · 310 reizigers · 196 handschriften · 28 instellingen</span>
+        <p>Het overzicht van handgeschreven reisverslagen uit de Noordelijke en Zuidelijke
+        Nederlanden: per manuscript de actuele vindplaats en signatuur, en per reiziger en
+        reis de genealogie, brieven, gedichten en reisgezellen.</p>
+        <span class="p-ga">Doorzoek het compendium →</span>
       </a>
-      <a class="kaart" href="edities/van-der-meersch/index.html">
-        <span class="k-beeld"><img loading="lazy" src="edities/van-der-meersch/origineel/titelpagina.jpg" alt="Titelpagina van het handschrift van Van der Meersch"></span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift</span>
-          <h2>Reisverhaal van Abraham van der Meersch</h2>
-          <p class="k-meta">Reis door Denemarken en Zweden · 1672–1674</p>
-          <p>Kritische editie van het reisverhaal van de Hollandse koopman Abraham van der Meersch,
-          met woordverklaringen, historische toelichting en de handschriftscan.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/ruysch/index.html">
-        <span class="k-beeld"><img loading="lazy" src="edities/ruysch/kaartbeeld.jpg" alt="Openingspagina van het journaal van Coenraad Ruysch"></span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift · grand tour</span>
-          <h2>Journaal van een reis naar Genève, Italië en Frankrijk</h2>
-          <p class="k-meta">Coenraad Ruysch, met zijn neef Dirck van Hoogeveen · 1674–1677</p>
-          <p>De omvangrijkste editie: het volledige grand-tour-journaal van Coenraad Ruysch,
-          met ruim 7.000 aantekeningen van de editeur, een routekaart van de hele reis en
-          navigatie per maand.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/wicher-pott/index.html">
-        <span class="k-beeld"><img loading="lazy" src="edities/wicher-pott/kaartbeeld.jpg" alt="Brief van Wicher Pott aan zijn vader, Agen 1685"></span>
-        <span class="k-tekst">
-          <span class="k-tag">brieven</span>
-          <h2>Reisbrieven van Wicher Pott</h2>
-          <p class="k-meta">Grand tour door Engeland, Frankrijk en Italië · 1684–1686</p>
-          <p>Zesentwintig brieven van de jonge Groninger Wicher Pott aan zijn vader, geschreven
-          onderweg van Londen via Orléans naar Rome, Venetië en terug. Te lezen en te doorzoeken,
-          of te bladeren per brief.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/hinlopen-1662/index.html">
-        <span class="k-beeld k-beeld-leeg" aria-hidden="true">R</span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift</span>
-          <h2>Reijse gedaen int jaar 1662</h2>
-          <p class="k-meta">Gerard Hinlopen · jachttocht door de Nederlanden · 1662</p>
-          <p>Een korte pleziertocht van Hoorn langs Antwerpen en Brussel, met opgeloste
-          abbreviaturen, doorhalingen en marginale datums uit het handschrift.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/geelvinck/index.html">
-        <span class="k-beeld"><img loading="lazy" src="edities/geelvinck/kaartbeeld.jpg" alt="Band van het handschrift van Joan Geelvinck"></span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift · Frans</span>
-          <h2>Reisbeschrijving in Frankrijk</h2>
-          <p class="k-meta">Joan Geelvinck · 1663–1664</p>
-          <p>Een dichte, deels Franstalige reisbeschrijving door
-          Frankrijk, met lacunes en de aantekeningen van de transcribent als noten.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/hinlopen-1667/index.html">
-        <span class="k-beeld k-beeld-leeg" aria-hidden="true">J</span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift</span>
-          <h2>Journael en aantekeninge</h2>
-          <p class="k-meta">Gerard Hinlopen · Frankrijk en Engeland · 1667–1668</p>
-          <p>Hinlopens uitvoeriger tweede reis, folio na folio door Frankrijk en Engeland.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/vegelin/index.html">
-        <span class="k-beeld"><img loading="lazy" src="edities/vegelin/kaartbeeld.jpg" alt="Titelblad van Vegelins Mores … Parisienses"></span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift · Latijn</span>
-          <h2>Mores … consuetudines Parisienses</h2>
-          <p class="k-meta">Ernst Frederik Vegelin van Claerbergen · Parijs · 1669</p>
-          <p>Waargenomen zeden en gewoonten van Parijs, in Latijn en Nederlands opgetekend.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/anon-amsterdamse-vader/index.html">
-        <span class="k-beeld k-beeld-leeg" aria-hidden="true">O</span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift · onderrichting</span>
-          <h2>Onderrigt voor een reiziger</h2>
-          <p class="k-meta">‘De Amsterdamse vader’ · 1677–1696</p>
-          <p>Geen reisverslag maar reisadvies: wat een jonge reiziger in den vreemde
-          behoort waar te nemen en te leren.</p>
-        </span>
-      </a>
-      <a class="kaart" href="edities/de-vassy/index.html">
-        <span class="k-beeld k-beeld-leeg" aria-hidden="true">J</span>
-        <span class="k-tekst">
-          <span class="k-tag">handschrift · verzen</span>
-          <h2>Journaal van het plesier rijsje</h2>
-          <p class="k-meta">Cornelia Carolina de Vassy · 1748</p>
-          <p>Een pleziertochtje vanuit Middelburg, luchtig op rijm gezet — de enige
-          berijmde tekst in de reeks.</p>
-        </span>
+      <a class="poort" href="edities.html">
+        <h2>Edities</h2>
+        <span class="p-cijfers">9 uitgegeven teksten · routekaarten · facsimiles</span>
+        <p>De teksten zelf, wetenschappelijk uitgegeven: met woordverklaringen en
+        commentaar in af te schakelen notenapparaten, editeursingrepen, dagnavigatie,
+        een routekaart en waar mogelijk de handschriftscan.</p>
+        <span class="p-ga">Naar de edities →</span>
       </a>
     </div>
+
+    <section class="prozasectie" style="margin-top:2.5rem">
+      <h2>Alle reizen op één kaart</h2>
+      <p>De <a href="reizen.html">reizenkaart</a> brengt 32 routes samen met ruim 6.000
+      gedateerde pleisterplaatsen. De doorgetrokken routes horen bij een editie en zijn
+      aanklikbaar; de gestippelde komen uit het corpus en wachten nog op een uitgave.</p>
+    </section>
   </main>
 
   <script src="assets/site.js"></script>
